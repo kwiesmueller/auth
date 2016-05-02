@@ -49,7 +49,7 @@ func createServer(port int) (*http.Server, error) {
 	router := mux.NewRouter()
 	router.Path("/healthz").Methods("GET").HandlerFunc(check.ServeHTTP)
 	router.Path("/readiness").Methods("GET").HandlerFunc(check.ServeHTTP)
-	router.Path("/login").Methods("GET").HandlerFunc(login.ServeHTTP)
+	router.Path("/login").Methods("POST").HandlerFunc(login.ServeHTTP)
 
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: router}, nil
 }

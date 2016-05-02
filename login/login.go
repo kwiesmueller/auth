@@ -24,7 +24,7 @@ func New() *handler {
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("create")
+	logger.Debugf("login")
 	if err := h.serveHTTP(resp, req); err != nil {
 		logger.Debugf("Marshal json failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
