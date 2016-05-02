@@ -62,6 +62,7 @@ func (a *authClient) Auth(authToken api.AuthToken) (*api.User, *[]api.Group, err
 	}
 	resp, err := a.executeRequest(req)
 	if err != nil {
+		logger.Debugf("execute request failed: %v", err)
 		return nil, nil, err
 	}
 	logger.Debugf("response status: %s", resp.Status)
