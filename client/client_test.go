@@ -18,12 +18,15 @@ func TestImplementsAuthClient(t *testing.T) {
 	}
 }
 
-func TestTarget(t *testing.T) {
+func TestRequest(t *testing.T) {
 	counter := 0
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	c := New(func(req *http.Request) (resp *http.Response, err error) {
 		counter++
 		if err := AssertThat(req.URL.String(), Is("http://auth-api.auth.svc.cluster.local:8080/login")); err != nil {
+			t.Fatal(err)
+		}
+		if err := AssertThat(req.Method, Is("POST")); err != nil {
 			t.Fatal(err)
 		}
 		return &http.Response{}, nil
