@@ -72,7 +72,7 @@ func findUser(authToken api.AuthToken) (*api.User, error) {
 		user := api.User("bborbe")
 		return &user, nil
 	}
-	if authToken == api.AuthToken("telegram:abc") {
+	if authToken == api.AuthToken("telegram:112230768") {
 		user := api.User("bborbe")
 		return &user, nil
 	}
