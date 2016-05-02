@@ -45,7 +45,7 @@ func (a *authClient) Auth(authToken api.AuthToken) (*api.User, *[]api.Group, err
 		ApplicationPassword: a.applicationPassword,
 		AuthToken:           authToken,
 	}
-	target := fmt.Sprintf("http://%s", a.address)
+	target := fmt.Sprintf("http://%s/login", a.address)
 	logger.Debugf("send request to %s", target)
 	requestbuilder := a.httpRequestBuilderProvider.NewHttpRequestBuilder(target)
 	requestbuilder.SetMethod("POST")

@@ -1,9 +1,12 @@
 package client
 
 import (
+	"net/http"
 	"testing"
 
 	. "github.com/bborbe/assert"
+	"github.com/bborbe/auth/api"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 )
 
 func TestImplementsAuthClient(t *testing.T) {
@@ -11,6 +14,25 @@ func TestImplementsAuthClient(t *testing.T) {
 	var expected *AuthClient
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTarget(t *testing.T) {
+	counter := 0
+	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	c := New(func(req *http.Request) (resp *http.Response, err error) {
+		counter++
+		if err := AssertThat(req.URL.String(), Is("http://auth-api.auth.svc.cluster.local:8080/login")); err != nil {
+			t.Fatal(err)
+		}
+		return &http.Response{}, nil
+	}, httpRequestBuilderProvider, "auth-api.auth.svc.cluster.local:8080", "", "")
+	if err := AssertThat(counter, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	c.Auth(api.AuthToken("abc"))
+	if err := AssertThat(counter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
