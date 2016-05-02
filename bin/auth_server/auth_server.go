@@ -1,14 +1,13 @@
 package main
 
 import (
-	"flag"
-
 	"fmt"
 	"net/http"
 	"os"
 
 	auth_check "github.com/bborbe/auth/check"
 	auth_login "github.com/bborbe/auth/login"
+	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/log"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gorilla/mux"
@@ -17,9 +16,9 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	DEFAULT_PORT       int = 8080
-	PARAMETER_LOGLEVEL     = "loglevel"
-	PARAMETER_PORT         = "port"
+	DEFAULT_PORT       = 8080
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_PORT     = "port"
 )
 
 var (
