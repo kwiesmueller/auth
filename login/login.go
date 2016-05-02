@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bborbe/auth/api"
 	"github.com/bborbe/log"
 	error_handler "github.com/bborbe/server/handler/error"
 )
@@ -33,14 +34,14 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	logger.Debugf("login")
-	var request Request
+	var request api.Request
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
 	response, err := login(&request)
 	if err != nil {
 		if err == NOT_FOUND {
-			logger.Infof("user not found: %s/%s", request.ConnectorName, request.ConnectorUserIdentifier)
+			logger.Infof("user not found: %s", request.AuthToken)
 			resp.WriteHeader(http.StatusNotFound)
 			return nil
 		}
@@ -49,9 +50,9 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	return json.NewEncoder(resp).Encode(response)
 }
 
-func login(request *Request) (*Reponse, error) {
+func login(request *api.Request) (*api.Response, error) {
 	logger.Debugf("login")
-	user, err := findUser(request.ConnectorName, request.ConnectorUserIdentifier)
+	user, err := findUser(request.AuthToken)
 	if err != nil {
 		return nil, err
 	}
@@ -59,44 +60,28 @@ func login(request *Request) (*Reponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Reponse{
+	return &api.Response{
 		User:   user,
 		Groups: groups,
 	}, nil
 }
 
-func findUser(connectorName string, userIdentifier string) (*User, error) {
-	logger.Debugf("find user with connector: %s and userId: %s", connectorName, userIdentifier)
-	if connectorName == "hipchat" && userIdentifier == "130647" {
-		user := User("bborbe")
+func findUser(authToken api.AuthToken) (*api.User, error) {
+	logger.Debugf("find user with auth token: %s", authToken)
+	if authToken == api.AuthToken("hipchat:130647") {
+		user := api.User("bborbe")
 		return &user, nil
 	}
-	if connectorName == "telegram" && userIdentifier == "asda" {
-		user := User("bborbe")
+	if authToken == api.AuthToken("telegram:abc") {
+		user := api.User("bborbe")
 		return &user, nil
 	}
 	return nil, NOT_FOUND
 }
 
-func findGroupForUser(user User) (*[]Group, error) {
-	if user == User("bborbe") {
-		return &[]Group{Group("storage/admin")}, nil
+func findGroupForUser(user api.User) (*[]api.Group, error) {
+	if user == api.User("bborbe") {
+		return &[]api.Group{api.Group("storage/admin")}, nil
 	}
 	return nil, nil
-}
-
-type User string
-
-type Group string
-
-type Request struct {
-	ApplicationName         string `json:"applicatonName"`
-	ApplicationPassword     string `json:"applicatonPassword"`
-	ConnectorName           string `json:"connectorName"`
-	ConnectorUserIdentifier string `json:"connectorUserIdentifier"`
-}
-
-type Reponse struct {
-	User   *User    `json:"user"`
-	Groups *[]Group `json:"groups"`
 }
