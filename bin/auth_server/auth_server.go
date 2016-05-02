@@ -20,13 +20,11 @@ const (
 	DEFAULT_PORT       int = 8080
 	PARAMETER_LOGLEVEL     = "loglevel"
 	PARAMETER_PORT         = "port"
-	PARAMETER_ROOT         = "root"
 )
 
 var (
 	logLevelPtr = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
 	portPtr     = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
-	rootPtr     = flag.String(PARAMETER_ROOT, "/data", "auth root directory")
 )
 
 func main() {
@@ -35,7 +33,7 @@ func main() {
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
-	server, err := createServer(*portPtr, *rootPtr)
+	server, err := createServer(*portPtr)
 	if err != nil {
 		logger.Error(err)
 		os.Exit(1)
@@ -43,8 +41,8 @@ func main() {
 	gracehttp.Serve(server)
 }
 
-func createServer(port int, root string) (*http.Server, error) {
-	logger.Debugf("create server with port: %d root: %s", port, root)
+func createServer(port int) (*http.Server, error) {
+	logger.Debugf("create server with port: %d", port)
 
 	check := auth_check.New()
 	login := auth_login.New()

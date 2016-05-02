@@ -13,7 +13,7 @@ var logger = log.DefaultLogger
 type handler struct {
 }
 
-func New(root string) *handler {
+func New() *handler {
 	h := new(handler)
 	return h
 }

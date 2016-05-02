@@ -9,11 +9,10 @@ import (
 	error_handler "github.com/bborbe/server/handler/error"
 )
 
-const (
+var (
 	NOT_FOUND = fmt.Errorf("user not found")
+	logger    = log.DefaultLogger
 )
-
-var logger = log.DefaultLogger
 
 type handler struct {
 }
@@ -56,30 +55,32 @@ func login(request *Request) (*Reponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	groups, err := findGroupForUser(user)
+	groups, err := findGroupForUser(*user)
 	if err != nil {
 		return nil, err
 	}
 	return &Reponse{
 		User:   user,
 		Groups: groups,
-	}
+	}, nil
 }
 
-func findUser(connectorName string, userIdentifier string) (User, error) {
+func findUser(connectorName string, userIdentifier string) (*User, error) {
 	logger.Debugf("find user with connector: %s and userId: %s", connectorName, userIdentifier)
 	if connectorName == "hipchat" && userIdentifier == "130647" {
-		return User("bborbe")
+		user := User("bborbe")
+		return &user, nil
 	}
 	if connectorName == "telegram" && userIdentifier == "asda" {
-		return User("bborbe")
+		user := User("bborbe")
+		return &user, nil
 	}
-	return NOT_FOUND
+	return nil, NOT_FOUND
 }
 
-func findGroupForUser(user User) ([]Group, error) {
+func findGroupForUser(user User) (*[]Group, error) {
 	if user == User("bborbe") {
-		return []Group{Group("storage/admin")}, nil
+		return &[]Group{Group("storage/admin")}, nil
 	}
 	return nil, nil
 }
@@ -96,6 +97,6 @@ type Request struct {
 }
 
 type Reponse struct {
-	User   User     `json:"user"`
-	Groups []string `json:"groups"`
+	User   *User    `json:"user"`
+	Groups *[]Group `json:"groups"`
 }
