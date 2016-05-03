@@ -7,11 +7,11 @@ import (
 
 	auth_check "github.com/bborbe/auth/check"
 	auth_login "github.com/bborbe/auth/login"
+	"github.com/bborbe/auth/user_finder"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/log"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gorilla/mux"
-	"github.com/bborbe/auth/user_finder"
 )
 
 var logger = log.DefaultLogger
