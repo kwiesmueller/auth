@@ -11,6 +11,7 @@ import (
 	"github.com/bborbe/log"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gorilla/mux"
+	"github.com/bborbe/auth/user_finder"
 )
 
 var logger = log.DefaultLogger
@@ -43,8 +44,10 @@ func main() {
 func createServer(port int) (*http.Server, error) {
 	logger.Debugf("create server with port: %d", port)
 
+	userFinder := user_finder.New()
+
 	check := auth_check.New()
-	login := auth_login.New()
+	login := auth_login.New(userFinder)
 
 	router := mux.NewRouter()
 	router.Path("/healthz").Methods("GET").HandlerFunc(check.ServeHTTP)

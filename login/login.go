@@ -2,24 +2,23 @@ package list
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/bborbe/auth/api"
+	"github.com/bborbe/auth/user_finder"
 	"github.com/bborbe/log"
 	error_handler "github.com/bborbe/server/handler/error"
 )
 
-var (
-	NOT_FOUND = fmt.Errorf("user not found")
-	logger    = log.DefaultLogger
-)
+var logger = log.DefaultLogger
 
 type handler struct {
+	userFinder user_finder.UserFinder
 }
 
-func New() *handler {
+func New(userFinder user_finder.UserFinder) *handler {
 	h := new(handler)
+	h.userFinder = userFinder
 	return h
 }
 
@@ -38,9 +37,9 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
-	response, err := login(&request)
+	response, err := h.login(&request)
 	if err != nil {
-		if err == NOT_FOUND {
+		if h.userFinder.IsUserNotFound(err) {
 			logger.Infof("user not found: %s", request.AuthToken)
 			resp.WriteHeader(http.StatusNotFound)
 			return nil
@@ -50,9 +49,9 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	return json.NewEncoder(resp).Encode(response)
 }
 
-func login(request *api.Request) (*api.Response, error) {
+func (h *handler) login(request *api.Request) (*api.Response, error) {
 	logger.Debugf("login")
-	user, err := findUser(request.AuthToken)
+	user, err := h.userFinder.FindUserByAuthToken(request.AuthToken)
 	if err != nil {
 		return nil, err
 	}
@@ -64,19 +63,6 @@ func login(request *api.Request) (*api.Response, error) {
 		User:   user,
 		Groups: groups,
 	}, nil
-}
-
-func findUser(authToken api.AuthToken) (*api.User, error) {
-	logger.Debugf("find user with auth token: %s", authToken)
-	if authToken == api.AuthToken("hipchat:130647") {
-		user := api.User("bborbe")
-		return &user, nil
-	}
-	if authToken == api.AuthToken("telegram:112230768") {
-		user := api.User("bborbe")
-		return &user, nil
-	}
-	return nil, NOT_FOUND
 }
 
 func findGroupForUser(user api.User) (*[]api.Group, error) {
