@@ -15,6 +15,7 @@ type counter struct {
 	check             int
 	login             int
 	applicationCreate int
+	applicationDelete int
 }
 
 func Create(counter *int) func(http.ResponseWriter, *http.Request) {
@@ -25,7 +26,7 @@ func Create(counter *int) func(http.ResponseWriter, *http.Request) {
 
 func TestHealthz(t *testing.T) {
 	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete))
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/healthz")
@@ -45,7 +46,7 @@ func TestHealthz(t *testing.T) {
 
 func TestReadiness(t *testing.T) {
 	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete))
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/readiness")
@@ -65,7 +66,7 @@ func TestReadiness(t *testing.T) {
 
 func TestLogin(t *testing.T) {
 	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete))
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/login")
@@ -85,7 +86,7 @@ func TestLogin(t *testing.T) {
 
 func TestApplicationCreate(t *testing.T) {
 	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete))
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application")
@@ -99,6 +100,26 @@ func TestApplicationCreate(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err = AssertThat(c.applicationCreate, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestApplicationDelete(t *testing.T) {
+	c := counter{}
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete))
+	resp := mock.NewHttpResponseWriterMock()
+
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application")
+	rb.SetMethod("DELETE")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.applicationDelete, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.applicationDelete, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

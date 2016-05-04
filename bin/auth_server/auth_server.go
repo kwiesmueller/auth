@@ -9,6 +9,7 @@ import (
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/application_check"
 	"github.com/bborbe/auth/application_creator"
+	"github.com/bborbe/auth/application_deletor"
 	"github.com/bborbe/auth/application_directory"
 	"github.com/bborbe/auth/check"
 	"github.com/bborbe/auth/filter"
@@ -18,26 +19,27 @@ import (
 	"github.com/bborbe/auth/user_directory"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/log"
+	"github.com/bborbe/password/generator"
 	"github.com/facebookgo/grace/gracehttp"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	DEFAULT_PORT = 8080
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_PORT = "port"
+	DEFAULT_PORT                        = 8080
+	PARAMETER_LOGLEVEL                  = "loglevel"
+	PARAMETER_PORT                      = "port"
 	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDR = "ledisdb-address"
-	PARAMETER_LEDISDB_PASSWORD = "ledisdb-password"
+	PARAMETER_LEDISDB_ADDR              = "ledisdb-address"
+	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
 )
 
 var (
-	logLevelPtr = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
-	portPtr = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	logLevelPtr                = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
+	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
 	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	ledisdbAddressPtr = flag.String(PARAMETER_LEDISDB_ADDR, "", "ledisdb address")
-	ledisdbPasswordPtr = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
+	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDR, "", "ledisdb address")
+	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 )
 
 func main() {
@@ -78,8 +80,10 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 
 	checkHandler := check.New(ledisClient.Ping)
 	accessDeniedHandler := access_denied.New()
+	passwordGenerator := generator.New()
 	loginHandler := filter.New(applicationCheck.Check, login.New(userDirectory, applicationDirectory.Check).ServeHTTP, accessDeniedHandler.ServeHTTP)
-	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create, passwordGenerator.GeneratePassword).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationDirectory.Delete).ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {
 		err := applicationDirectory.Create(api.Application{
@@ -91,6 +95,6 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		}
 	}()
 
-	handler := router.New(checkHandler.ServeHTTP, loginHandler.ServeHTTP, applicationCreatorHandler.ServeHTTP)
+	handler := router.New(checkHandler.ServeHTTP, loginHandler.ServeHTTP, applicationCreatorHandler.ServeHTTP, applicationDeletorHandler.ServeHTTP)
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }

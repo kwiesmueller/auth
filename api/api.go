@@ -32,3 +32,9 @@ type CreateApplicationResponse struct {
 	ApplicationName     ApplicationName     `json:"applicatonName"`
 	ApplicationPassword ApplicationPassword `json:"applicatonPassword"`
 }
+
+type DeleteApplicationRequest struct {
+}
+
+type DeleteApplicationResponse struct {
+}
