@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/bborbe/auth/application_creator"
 	"github.com/bborbe/auth/application_directory"
 	auth_check "github.com/bborbe/auth/check"
 	auth_login "github.com/bborbe/auth/login"
@@ -51,7 +52,10 @@ func createServer(port int) (*http.Server, error) {
 
 	userDirectory := user_directory.New()
 	applicationDirectory := application_directory.New()
-	check := auth_check.New()
-	login := auth_login.New(userDirectory, applicationDirectory)
-	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: router.New(check.ServeHTTP, login.ServeHTTP)}, nil
+	checkHandler := auth_check.New()
+	loginHandler := auth_login.New(userDirectory, applicationDirectory)
+	applicationCreatorHandler := application_creator.New()
+
+	handler := router.New(checkHandler.ServeHTTP, loginHandler.ServeHTTP, applicationCreatorHandler.ServeHTTP)
+	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }

@@ -1,4 +1,4 @@
-package add_application
+package application_creator
 
 import (
 	"net/http"

@@ -11,10 +11,21 @@ import (
 	"github.com/bborbe/server/mock"
 )
 
+type counter struct {
+	check             int
+	login             int
+	applicationCreate int
+}
+
+func Create(counter *int) func(http.ResponseWriter, *http.Request) {
+	return func(http.ResponseWriter, *http.Request) {
+		*counter++
+	}
+}
+
 func TestHealthz(t *testing.T) {
-	counterCheck := 0
-	counterLogin := 0
-	r := New(Create(&counterCheck), Create(&counterLogin))
+	c := counter{}
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/healthz")
@@ -23,19 +34,18 @@ func TestHealthz(t *testing.T) {
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(counterCheck, Is(0)); err != nil {
+	if err = AssertThat(c.check, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(counterCheck, Is(1)); err != nil {
+	if err = AssertThat(c.check, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestReadiness(t *testing.T) {
-	counterCheck := 0
-	counterLogin := 0
-	r := New(Create(&counterCheck), Create(&counterLogin))
+	c := counter{}
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/readiness")
@@ -44,19 +54,18 @@ func TestReadiness(t *testing.T) {
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(counterCheck, Is(0)); err != nil {
+	if err = AssertThat(c.check, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(counterCheck, Is(1)); err != nil {
+	if err = AssertThat(c.check, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestLogin(t *testing.T) {
-	counterCheck := 0
-	counterLogin := 0
-	r := New(Create(&counterCheck), Create(&counterLogin))
+	c := counter{}
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/login")
@@ -65,17 +74,31 @@ func TestLogin(t *testing.T) {
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(counterLogin, Is(0)); err != nil {
+	if err = AssertThat(c.login, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(counterLogin, Is(1)); err != nil {
+	if err = AssertThat(c.login, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func Create(counter *int) func(http.ResponseWriter, *http.Request) {
-	return func(http.ResponseWriter, *http.Request) {
-		*counter++
+func TestApplicationCreate(t *testing.T) {
+	c := counter{}
+	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate))
+	resp := mock.NewHttpResponseWriterMock()
+
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application")
+	rb.SetMethod("POST")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.applicationCreate, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.applicationCreate, Is(1)); err != nil {
+		t.Fatal(err)
 	}
 }

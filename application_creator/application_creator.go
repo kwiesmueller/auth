@@ -1,4 +1,4 @@
-package add_application
+package application_creator
 
 import (
 	"net/http"
@@ -19,7 +19,7 @@ func New() *handler {
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("add application")
+	logger.Debugf("create application")
 	resp.WriteHeader(http.StatusOK)
 	fmt.Fprintf(resp, "ok")
 }
