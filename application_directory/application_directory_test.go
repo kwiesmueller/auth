@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	. "github.com/bborbe/assert"
+	"github.com/bborbe/auth/api"
 )
 
 func TestImplementsApplicationDirectory(t *testing.T) {
-	object := New()
+	object := New(api.ApplicationPassword(""))
 	var expected *ApplicationDirectory
 	err := AssertThat(object, Implements(expected))
 	if err != nil {

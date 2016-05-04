@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/bborbe/auth/access_denied"
+	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/application_check"
 	"github.com/bborbe/auth/application_creator"
 	"github.com/bborbe/auth/application_directory"
@@ -22,14 +23,16 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	DEFAULT_PORT       = 8080
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_PORT     = "port"
+	DEFAULT_PORT                        = 8080
+	PARAMETER_LOGLEVEL                  = "loglevel"
+	PARAMETER_PORT                      = "port"
+	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
 )
 
 var (
-	logLevelPtr = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
-	portPtr     = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	logLevelPtr                = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
+	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
 )
 
 func main() {
@@ -38,7 +41,7 @@ func main() {
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
-	server, err := createServer(*portPtr)
+	server, err := createServer(*portPtr, *authApplicationPasswordPtr)
 
 	if err != nil {
 		logger.Error(err)
@@ -47,14 +50,17 @@ func main() {
 	gracehttp.Serve(server)
 }
 
-func createServer(port int) (*http.Server, error) {
+func createServer(port int, authApplicationPassword string) (*http.Server, error) {
 	logger.Debugf("create server with port: %d", port)
 	if port <= 0 {
 		return nil, fmt.Errorf("parameter %s invalid", PARAMETER_PORT)
 	}
+	if len(authApplicationPassword) == 0 {
+		return nil, fmt.Errorf("parameter %s missing", PARAMETER_AUTH_APPLICATION_PASSWORD)
+	}
 
 	userDirectory := user_directory.New()
-	applicationDirectory := application_directory.New()
+	applicationDirectory := application_directory.New(api.ApplicationPassword(authApplicationPassword))
 	applicationCheck := application_check.New(applicationDirectory.Check)
 
 	checkHandler := check.New()
