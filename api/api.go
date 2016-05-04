@@ -25,7 +25,10 @@ type LoginResponse struct {
 }
 
 type CreateApplicationRequest struct {
+	ApplicationName ApplicationName `json:"applicatonName"`
+}
+
+type CreateApplicationResponse struct {
 	ApplicationName     ApplicationName     `json:"applicatonName"`
 	ApplicationPassword ApplicationPassword `json:"applicatonPassword"`
-	AuthToken           AuthToken           `json:"authToken"`
 }
