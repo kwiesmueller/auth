@@ -22,10 +22,3 @@ func TestServerSuccess(t *testing.T) {
 		t.Fatal(err)
 	}
 }
-
-func TestCreateHandler(t *testing.T) {
-	handler := createHandler()
-	if err := AssertThat(handler, NotNilValue()); err != nil {
-		t.Fatal(err)
-	}
-}
