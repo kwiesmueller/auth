@@ -5,8 +5,10 @@ import (
 
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/ledis"
-	"github.com/timelinelabs/romulus/Godeps/_workspace/src/github.com/albertrdixon/gearbox/logger"
+	"github.com/bborbe/log"
 )
+
+var logger = log.DefaultLogger
 
 const (
 	AUTH_APPLICATION_NAME = api.ApplicationName("auth")
