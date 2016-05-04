@@ -5,10 +5,13 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/bborbe/auth/access_denied"
+	"github.com/bborbe/auth/application_check"
 	"github.com/bborbe/auth/application_creator"
 	"github.com/bborbe/auth/application_directory"
-	auth_check "github.com/bborbe/auth/check"
-	auth_login "github.com/bborbe/auth/login"
+	"github.com/bborbe/auth/check"
+	"github.com/bborbe/auth/filter"
+	"github.com/bborbe/auth/login"
 	"github.com/bborbe/auth/router"
 	"github.com/bborbe/auth/user_directory"
 	flag "github.com/bborbe/flagenv"
@@ -45,16 +48,19 @@ func main() {
 }
 
 func createServer(port int) (*http.Server, error) {
+	logger.Debugf("create server with port: %d", port)
 	if port <= 0 {
 		return nil, fmt.Errorf("parameter %s invalid", PARAMETER_PORT)
 	}
-	logger.Debugf("create server with port: %d", port)
 
 	userDirectory := user_directory.New()
 	applicationDirectory := application_directory.New()
-	checkHandler := auth_check.New()
-	loginHandler := auth_login.New(userDirectory, applicationDirectory)
-	applicationCreatorHandler := application_creator.New()
+	applicationCheck := application_check.New(applicationDirectory.Check)
+
+	checkHandler := check.New()
+	accessDeniedHandler := access_denied.New()
+	loginHandler := filter.New(applicationCheck.Check, login.New(userDirectory, applicationDirectory).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New().ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	handler := router.New(checkHandler.ServeHTTP, loginHandler.ServeHTTP, applicationCreatorHandler.ServeHTTP)
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil

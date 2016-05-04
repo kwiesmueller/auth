@@ -1,4 +1,4 @@
-package login
+package access_denied
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestImplementsHandler(t *testing.T) {
-	object := New(nil, nil)
+	object := New()
 	var expected *http.Handler
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
