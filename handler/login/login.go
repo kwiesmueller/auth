@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
+
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/user_finder"
 	"github.com/bborbe/log"
@@ -51,7 +53,11 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 
 func (h *handler) login(request *api.Request) (*api.Response, error) {
 	logger.Debugf("login")
-	user, err := h.userFinder.FindUserByAuthToken(request.AuthToken)
+	applicationId, err := findApplication(request.ApplicationName, request.ApplicationPassword)
+	if err != nil {
+		return nil, err
+	}
+	user, err := h.userFinder.FindUserByAuthToken(*applicationId, request.AuthToken)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +69,14 @@ func (h *handler) login(request *api.Request) (*api.Response, error) {
 		User:   user,
 		Groups: groups,
 	}, nil
+}
+
+func findApplication(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.ApplicationId, error) {
+	if applicationName == "name" && applicationPassword == "pw" {
+		id := api.ApplicationId("adsf")
+		return &id, nil
+	}
+	return nil, fmt.Errorf("application not found")
 }
 
 func findGroupForUser(user api.User) (*[]api.Group, error) {

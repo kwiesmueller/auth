@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	auth_check "github.com/bborbe/auth/check"
-	auth_login "github.com/bborbe/auth/login"
+	auth_check "github.com/bborbe/auth/handler/check"
+	auth_login "github.com/bborbe/auth/handler/login"
 	"github.com/bborbe/auth/user_finder"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/log"
@@ -34,6 +34,7 @@ func main() {
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
 	server, err := createServer(*portPtr)
+
 	if err != nil {
 		logger.Error(err)
 		os.Exit(1)
@@ -42,10 +43,15 @@ func main() {
 }
 
 func createServer(port int) (*http.Server, error) {
+	if port <= 0 {
+		return nil, fmt.Errorf("parameter %s invalid", PARAMETER_PORT)
+	}
 	logger.Debugf("create server with port: %d", port)
+	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: createHandler()}, nil
+}
 
+func createHandler() http.Handler {
 	userFinder := user_finder.New()
-
 	check := auth_check.New()
 	login := auth_login.New(userFinder)
 
@@ -54,5 +60,5 @@ func createServer(port int) (*http.Server, error) {
 	router.Path("/readiness").Methods("GET").HandlerFunc(check.ServeHTTP)
 	router.Path("/login").Methods("POST").HandlerFunc(login.ServeHTTP)
 
-	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: router}, nil
+	return router
 }

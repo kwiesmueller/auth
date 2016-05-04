@@ -6,10 +6,16 @@ type Group string
 
 type AuthToken string
 
+type ApplicationName string
+
+type ApplicationPassword string
+
+type ApplicationId string
+
 type Request struct {
-	ApplicationName     string    `json:"applicatonName"`
-	ApplicationPassword string    `json:"applicatonPassword"`
-	AuthToken           AuthToken `json:"authToken"`
+	ApplicationName     ApplicationName     `json:"applicatonName"`
+	ApplicationPassword ApplicationPassword `json:"applicatonPassword"`
+	AuthToken           AuthToken           `json:"authToken"`
 }
 
 type Response struct {

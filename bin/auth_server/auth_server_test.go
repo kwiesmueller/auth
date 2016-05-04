@@ -6,8 +6,26 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestResumeFail(t *testing.T) {
-	if err := AssertThat(DEFAULT_PORT, Is(DEFAULT_PORT)); err != nil {
+func TestServerFails(t *testing.T) {
+	_, err := createServer(0)
+	if err := AssertThat(err, NotNilValue()); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestServerSuccess(t *testing.T) {
+	srv, err := createServer(1337)
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(srv, NotNilValue()); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateHandler(t *testing.T) {
+	handler := createHandler()
+	if err := AssertThat(handler, NotNilValue()); err != nil {
 		t.Fatal(err)
 	}
 }

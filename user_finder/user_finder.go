@@ -11,7 +11,7 @@ type userFinder struct {
 }
 
 type UserFinder interface {
-	FindUserByAuthToken(authToken api.AuthToken) (*api.User, error)
+	FindUserByAuthToken(applicationId api.ApplicationId, authToken api.AuthToken) (*api.User, error)
 	IsUserNotFound(err error) bool
 }
 
@@ -24,7 +24,7 @@ func New() *userFinder {
 	return new(userFinder)
 }
 
-func (u *userFinder) FindUserByAuthToken(authToken api.AuthToken) (*api.User, error) {
+func (u *userFinder) FindUserByAuthToken(applicationId api.ApplicationId, authToken api.AuthToken) (*api.User, error) {
 	return findUser(authToken)
 }
 

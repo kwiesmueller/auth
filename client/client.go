@@ -21,15 +21,15 @@ type authClient struct {
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 	executeRequest             ExecuteRequest
 	address                    string
-	applicationName            string
-	applicationPassword        string
+	applicationName            api.ApplicationName
+	applicationPassword        api.ApplicationPassword
 }
 
 type AuthClient interface {
 	Auth(authToken api.AuthToken) (*api.User, *[]api.Group, error)
 }
 
-func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, address string, applicationName string, applicationPassword string) *authClient {
+func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, address string, applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) *authClient {
 	a := new(authClient)
 	a.executeRequest = executeRequest
 	a.httpRequestBuilderProvider = httpRequestBuilderProvider
