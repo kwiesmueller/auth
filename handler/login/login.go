@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"fmt"
-
 	"github.com/bborbe/auth/api"
-	"github.com/bborbe/auth/user_finder"
+	"github.com/bborbe/auth/application_directory"
+	"github.com/bborbe/auth/user_directory"
+	"github.com/bborbe/http/bearer"
 	"github.com/bborbe/log"
 	error_handler "github.com/bborbe/server/handler/error"
 )
@@ -15,12 +15,14 @@ import (
 var logger = log.DefaultLogger
 
 type handler struct {
-	userFinder user_finder.UserFinder
+	userDirectory        user_directory.UserDirectory
+	applicationDirectory application_directory.ApplicationDirectory
 }
 
-func New(userFinder user_finder.UserFinder) *handler {
+func New(userDirectory user_directory.UserDirectory, applicationDirectory application_directory.ApplicationDirectory) *handler {
 	h := new(handler)
-	h.userFinder = userFinder
+	h.userDirectory = userDirectory
+	h.applicationDirectory = applicationDirectory
 	return h
 }
 
@@ -35,13 +37,20 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	logger.Debugf("login")
-	var request api.Request
+	applicationName, applicationPassword, err := parseApplication(req)
+	if err != nil {
+		return err
+	}
+	if err = h.applicationDirectory.Check(applicationName, applicationPassword); err != nil {
+		return err
+	}
+	var request api.LoginRequest
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
-	response, err := h.login(&request)
+	response, err := h.login(applicationName, &request)
 	if err != nil {
-		if h.userFinder.IsUserNotFound(err) {
+		if h.userDirectory.IsUserNotFound(err) {
 			logger.Infof("user not found: %s", request.AuthToken)
 			resp.WriteHeader(http.StatusNotFound)
 			return nil
@@ -51,13 +60,17 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	return json.NewEncoder(resp).Encode(response)
 }
 
-func (h *handler) login(request *api.Request) (*api.Response, error) {
-	logger.Debugf("login")
-	applicationId, err := findApplication(request.ApplicationName, request.ApplicationPassword)
+func parseApplication(req *http.Request) (api.ApplicationName, api.ApplicationPassword, error) {
+	name, password, err := bearer.ParseBearerHttpRequest(req)
 	if err != nil {
-		return nil, err
+		return "", "", err
 	}
-	user, err := h.userFinder.FindUserByAuthToken(*applicationId, request.AuthToken)
+	return api.ApplicationName(name), api.ApplicationPassword(password), nil
+}
+
+func (h *handler) login(applicationName api.ApplicationName, request *api.LoginRequest) (*api.LoginResponse, error) {
+	logger.Debugf("login")
+	user, err := h.userDirectory.FindUserByAuthToken(applicationName, request.AuthToken)
 	if err != nil {
 		return nil, err
 	}
@@ -65,18 +78,10 @@ func (h *handler) login(request *api.Request) (*api.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &api.Response{
+	return &api.LoginResponse{
 		User:   user,
 		Groups: groups,
 	}, nil
-}
-
-func findApplication(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.ApplicationId, error) {
-	if applicationName == "name" && applicationPassword == "pw" {
-		id := api.ApplicationId("adsf")
-		return &id, nil
-	}
-	return nil, fmt.Errorf("application not found")
 }
 
 func findGroupForUser(user api.User) (*[]api.Group, error) {

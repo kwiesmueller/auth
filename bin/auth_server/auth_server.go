@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/bborbe/auth/application_directory"
 	auth_check "github.com/bborbe/auth/handler/check"
 	auth_login "github.com/bborbe/auth/handler/login"
-	"github.com/bborbe/auth/user_finder"
+	"github.com/bborbe/auth/user_directory"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/log"
 	"github.com/facebookgo/grace/gracehttp"
@@ -51,9 +52,10 @@ func createServer(port int) (*http.Server, error) {
 }
 
 func createHandler() http.Handler {
-	userFinder := user_finder.New()
+	userDirectory := user_directory.New()
+	applicationDirectory := application_directory.New()
 	check := auth_check.New()
-	login := auth_login.New(userFinder)
+	login := auth_login.New(userDirectory, applicationDirectory)
 
 	router := mux.NewRouter()
 	router.Path("/healthz").Methods("GET").HandlerFunc(check.ServeHTTP)

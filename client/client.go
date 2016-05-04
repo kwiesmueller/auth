@@ -9,6 +9,7 @@ import (
 
 	"github.com/bborbe/auth/api"
 
+	"github.com/bborbe/http/bearer"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
@@ -39,17 +40,20 @@ func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestb
 	return a
 }
 
+func (a *authClient) createBearer() string {
+	return fmt.Sprintf("%s:%s", a.applicationName, a.applicationPassword)
+}
+
 func (a *authClient) Auth(authToken api.AuthToken) (*api.User, *[]api.Group, error) {
-	request := api.Request{
-		ApplicationName:     a.applicationName,
-		ApplicationPassword: a.applicationPassword,
-		AuthToken:           authToken,
+	request := api.LoginRequest{
+		AuthToken: authToken,
 	}
 	target := fmt.Sprintf("http://%s/login", a.address)
 	logger.Debugf("send request to %s", target)
 	requestbuilder := a.httpRequestBuilderProvider.NewHttpRequestBuilder(target)
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
+	requestbuilder.AddHeader("Authorization", bearer.CreateBearerHeader(string(a.applicationName), string(a.applicationPassword)))
 	content, err := json.Marshal(request)
 	if err != nil {
 		return nil, nil, err
@@ -74,7 +78,7 @@ func (a *authClient) Auth(authToken api.AuthToken) (*api.User, *[]api.Group, err
 		return nil, nil, err
 	}
 	logger.Debugf("response %s", string(responseContent))
-	var response api.Response
+	var response api.LoginResponse
 	err = json.Unmarshal(responseContent, &response)
 	if err != nil {
 		return nil, nil, err
