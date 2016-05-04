@@ -24,20 +24,20 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	DEFAULT_PORT                        = 8080
-	PARAMETER_LOGLEVEL                  = "loglevel"
-	PARAMETER_PORT                      = "port"
+	DEFAULT_PORT = 8080
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_PORT = "port"
 	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDR              = "ledisdb-address"
-	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
+	PARAMETER_LEDISDB_ADDR = "ledisdb-address"
+	PARAMETER_LEDISDB_PASSWORD = "ledisdb-password"
 )
 
 var (
-	logLevelPtr                = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
-	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	logLevelPtr = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
+	portPtr = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
 	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDR, "", "ledisdb address")
-	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
+	ledisdbAddressPtr = flag.String(PARAMETER_LEDISDB_ADDR, "", "ledisdb address")
+	ledisdbPasswordPtr = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 )
 
 func main() {
@@ -78,8 +78,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 
 	checkHandler := check.New(ledisClient.Ping)
 	accessDeniedHandler := access_denied.New()
-	loginHandler := filter.New(applicationCheck.Check, login.New(userDirectory, applicationDirectory).ServeHTTP, accessDeniedHandler.ServeHTTP)
-	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New().ServeHTTP, accessDeniedHandler.ServeHTTP)
+	loginHandler := filter.New(applicationCheck.Check, login.New(userDirectory, applicationDirectory.Check).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create).ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {
 		err := applicationDirectory.Create(api.Application{

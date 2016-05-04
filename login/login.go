@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/bborbe/auth/api"
-	"github.com/bborbe/auth/application_directory"
 	"github.com/bborbe/auth/user_directory"
 	"github.com/bborbe/http/bearer"
 	"github.com/bborbe/log"
@@ -14,15 +13,17 @@ import (
 
 var logger = log.DefaultLogger
 
+type CheckApplication func(api.ApplicationName, api.ApplicationPassword) error
+
 type handler struct {
-	userDirectory        user_directory.UserDirectory
-	applicationDirectory application_directory.ApplicationDirectory
+	userDirectory    user_directory.UserDirectory
+	checkApplication CheckApplication
 }
 
-func New(userDirectory user_directory.UserDirectory, applicationDirectory application_directory.ApplicationDirectory) *handler {
+func New(userDirectory user_directory.UserDirectory, checkApplication CheckApplication) *handler {
 	h := new(handler)
 	h.userDirectory = userDirectory
-	h.applicationDirectory = applicationDirectory
+	h.checkApplication = checkApplication
 	return h
 }
 
@@ -41,7 +42,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	if err = h.applicationDirectory.Check(applicationName, applicationPassword); err != nil {
+	if err = h.checkApplication(applicationName, applicationPassword); err != nil {
 		return err
 	}
 	var request api.LoginRequest
