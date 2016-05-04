@@ -30,7 +30,7 @@ const (
 	PARAMETER_LOGLEVEL                  = "loglevel"
 	PARAMETER_PORT                      = "port"
 	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDR              = "ledisdb-address"
+	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
 	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
 )
 
@@ -38,22 +38,24 @@ var (
 	logLevelPtr                = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
 	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
 	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDR, "", "ledisdb address")
+	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
 	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 )
 
 func main() {
+	defer logger.Close()
 	flag.Parse()
 
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
 	server, err := createServer(*portPtr, *authApplicationPasswordPtr, *ledisdbAddressPtr, *ledisdbPasswordPtr)
-
 	if err != nil {
-		logger.Error(err)
+		logger.Fatal(err)
+		logger.Close()
 		os.Exit(1)
 	}
+	logger.Debugf("start server")
 	gracehttp.Serve(server)
 }
 
@@ -66,7 +68,7 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		return nil, fmt.Errorf("parameter %s missing", PARAMETER_AUTH_APPLICATION_PASSWORD)
 	}
 	if len(ledisdbAddress) == 0 {
-		return nil, fmt.Errorf("parameter %s missing", PARAMETER_LEDISDB_ADDR)
+		return nil, fmt.Errorf("parameter %s missing", PARAMETER_LEDISDB_ADDRESS)
 	}
 
 	ledisClient := ledis.New(ledisdbAddress, ledisdbPassword)
