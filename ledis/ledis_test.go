@@ -6,10 +6,11 @@ import (
 	"os"
 	"testing"
 
+	"path"
+
 	. "github.com/bborbe/assert"
 	lediscfg "github.com/siddontang/ledisdb/config"
 	"github.com/siddontang/ledisdb/server"
-	"path"
 )
 
 func TestImplementsClient(t *testing.T) {
@@ -91,11 +92,11 @@ func TestHashGetSet(t *testing.T) {
 	go server.Run()
 
 	client := New(fmt.Sprintf("localhost:%d", port), "secret")
-	err = client.HashSet("hello", "new","world")
+	err = client.HashSet("hello", "new", "world")
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	value, err := client.HashGet("hello","new")
+	value, err := client.HashGet("hello", "new")
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
@@ -117,19 +118,56 @@ func TestHashDel(t *testing.T) {
 	go server.Run()
 
 	client := New(fmt.Sprintf("localhost:%d", port), "secret")
-	err = client.HashSet("hello", "new","world")
+	err = client.HashSet("hello", "new", "world")
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	value, err := client.HashGet("hello","new")
+	value, err := client.HashGet("hello", "new")
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
 	if err := AssertThat(value, Is("world")); err != nil {
 		t.Fatal(err)
 	}
-	client.HashDel("hello","new")
-	_, err = client.HashGet("hello","new")
+	err = client.HashDel("hello", "new")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	_, err = client.HashGet("hello", "new")
+	if err := AssertThat(err, NotNilValue()); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestHashClear(t *testing.T) {
+	port, err := getFreePort()
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	server, err := createServer(port)
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	defer server.Close()
+	go server.Run()
+
+	client := New(fmt.Sprintf("localhost:%d", port), "secret")
+	err = client.HashSet("hello", "new", "world")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	value, err := client.HashGet("hello", "new")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(value, Is("world")); err != nil {
+		t.Fatal(err)
+	}
+	err = client.HashClear("hello")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	_, err = client.HashGet("hello", "new")
 	if err := AssertThat(err, NotNilValue()); err != nil {
 		t.Fatal(err)
 	}

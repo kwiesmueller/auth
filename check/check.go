@@ -10,25 +10,25 @@ import (
 
 var logger = log.DefaultLogger
 
+type Check func() error
+
 type handler struct {
+	check Check
 }
 
-func New() *handler {
+func New(c Check) *handler {
 	h := new(handler)
+	h.check = c
 	return h
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	if check() {
+	if err := h.check(); err != nil {
+		logger.Debugf("check => failed: %v", err)
+		http.Error(resp, fmt.Sprintf("check failed"), http.StatusInternalServerError)
+	} else {
 		logger.Debugf("check => ok")
 		resp.WriteHeader(http.StatusOK)
 		fmt.Fprintf(resp, "ok")
-	} else {
-		logger.Debugf("check => failed")
-		http.Error(resp, fmt.Sprintf("check failed"), http.StatusInternalServerError)
 	}
-}
-
-func check() bool {
-	return true
 }

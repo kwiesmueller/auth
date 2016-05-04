@@ -14,6 +14,7 @@ type Client interface {
 	HashGet(key string, field string) (string, error)
 	HashSet(key string, field string, value string) error
 	HashDel(key string, field string) error
+	HashClear(key string) error
 	Close()
 	Ping() error
 }
@@ -61,3 +62,7 @@ func (c *client) HashDel(key string, field string) error {
 	return err
 }
 
+func (c *client) HashClear(key string) error {
+	_, err := c.client.Do("HCLEAR", key)
+	return err
+}
