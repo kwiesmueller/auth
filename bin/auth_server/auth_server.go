@@ -68,9 +68,6 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	if len(ledisdbAddress) == 0 {
 		return nil, fmt.Errorf("parameter %s missing", PARAMETER_LEDISDB_ADDR)
 	}
-	if len(ledisdbPassword) == 0 {
-		return nil, fmt.Errorf("parameter %s missing", PARAMETER_LEDISDB_PASSWORD)
-	}
 
 	ledisClient := ledis.New(ledisdbAddress, ledisdbPassword)
 
