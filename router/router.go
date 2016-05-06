@@ -12,13 +12,14 @@ type handler struct {
 	router http.Handler
 }
 
-func New(check HandlerFunc, login HandlerFunc, applicationCreate HandlerFunc, applicationDelete HandlerFunc) *handler {
+func New(check HandlerFunc, login HandlerFunc, applicationCreate HandlerFunc, applicationDelete HandlerFunc, applicationGet HandlerFunc) *handler {
 	router := mux.NewRouter()
 	router.Path("/healthz").Methods("GET").HandlerFunc(check)
 	router.Path("/readiness").Methods("GET").HandlerFunc(check)
 	router.Path("/login").Methods("POST").HandlerFunc(login)
 	router.Path("/application").Methods("POST").HandlerFunc(applicationCreate)
-	router.PathPrefix("/application").Methods("DELETE").HandlerFunc(applicationDelete)
+	router.PathPrefix("/application/").Methods("DELETE").HandlerFunc(applicationDelete)
+	router.PathPrefix("/application/").Methods("GET").HandlerFunc(applicationGet)
 
 	h := new(handler)
 	h.router = router

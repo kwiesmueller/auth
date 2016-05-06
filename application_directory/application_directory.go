@@ -12,8 +12,8 @@ var logger = log.DefaultLogger
 
 const (
 	AUTH_APPLICATION_NAME = api.ApplicationName("auth")
-	PREFIX                = "application"
-	FIELD_PASSWORD        = "password"
+	PREFIX = "application"
+	FIELD_PASSWORD = "password"
 )
 
 type applicationDirectory struct {
@@ -24,6 +24,7 @@ type ApplicationDirectory interface {
 	Check(api.ApplicationName, api.ApplicationPassword) error
 	Create(application api.Application) error
 	Delete(applicationName api.ApplicationName) error
+	Get(applicationName api.ApplicationName) (*api.Application, error)
 }
 
 func New(ledisClient ledis.Client) *applicationDirectory {
@@ -57,4 +58,17 @@ func (a *applicationDirectory) Delete(applicationName api.ApplicationName) error
 
 func createKey(applicationName api.ApplicationName) string {
 	return fmt.Sprintf("%s:%s", PREFIX, applicationName)
+}
+
+func (a *applicationDirectory) Get(applicationName api.ApplicationName) (*api.Application, error) {
+	logger.Debugf("get application: %s", applicationName)
+	key := createKey(applicationName)
+	value, err := a.ledis.HashGet(key, FIELD_PASSWORD)
+	if err != nil {
+		return nil, err
+	}
+	return &api.Application{
+		ApplicationName:applicationName,
+		ApplicationPassword:api.ApplicationPassword(value),
+	}, nil
 }
