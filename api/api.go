@@ -16,12 +16,12 @@ type Application struct {
 }
 
 type LoginRequest struct {
-	AuthToken AuthToken `json:"authToken"`
+	AuthToken      AuthToken   `json:"authToken"`
+	RequiredGroups []GroupName `json:"groups"`
 }
 
 type LoginResponse struct {
-	User   *UserName    `json:"user"`
-	Groups *[]GroupName `json:"groups"`
+	User *UserName `json:"user"`
 }
 
 type CreateApplicationRequest struct {

@@ -27,7 +27,7 @@ type authClient struct {
 }
 
 type AuthClient interface {
-	Auth(authToken api.AuthToken) (*api.UserName, *[]api.GroupName, error)
+	Auth(authToken api.AuthToken, requiredGroups []api.GroupName) (*api.UserName, error)
 }
 
 func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, address string, applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) *authClient {
@@ -44,9 +44,10 @@ func (a *authClient) createBearer() string {
 	return fmt.Sprintf("%s:%s", a.applicationName, a.applicationPassword)
 }
 
-func (a *authClient) Auth(authToken api.AuthToken) (*api.UserName, *[]api.GroupName, error) {
+func (a *authClient) Auth(authToken api.AuthToken, requiredGroups []api.GroupName) (*api.UserName, error) {
 	request := api.LoginRequest{
-		AuthToken: authToken,
+		AuthToken:      authToken,
+		RequiredGroups: requiredGroups,
 	}
 	target := fmt.Sprintf("http://%s/login", a.address)
 	logger.Debugf("send request to %s", target)
@@ -56,32 +57,32 @@ func (a *authClient) Auth(authToken api.AuthToken) (*api.UserName, *[]api.GroupN
 	requestbuilder.AddHeader("Authorization", bearer.CreateBearerHeader(string(a.applicationName), string(a.applicationPassword)))
 	content, err := json.Marshal(request)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	logger.Debugf("auth request message: %s", string(content))
 	requestbuilder.SetBody(bytes.NewBuffer(content))
 	req, err := requestbuilder.Build()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	resp, err := a.executeRequest(req)
 	if err != nil {
 		logger.Debugf("auth request failed: %v", err)
-		return nil, nil, err
+		return nil, err
 	}
 	logger.Debugf("auth response status: %s", resp.Status)
 	if resp.StatusCode/100 != 2 {
-		return nil, nil, fmt.Errorf("request not success. status: %d", resp.Status)
+		return nil, fmt.Errorf("request not success. status: %d", resp.Status)
 	}
 	responseContent, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	logger.Debugf("response %s", string(responseContent))
 	var response api.LoginResponse
 	err = json.Unmarshal(responseContent, &response)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return response.User, response.Groups, nil
+	return response.User, nil
 }

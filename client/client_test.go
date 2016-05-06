@@ -34,7 +34,7 @@ func TestRequest(t *testing.T) {
 	if err := AssertThat(counter, Is(0)); err != nil {
 		t.Fatal(err)
 	}
-	c.Auth(api.AuthToken("abc"))
+	c.Auth(api.AuthToken("abc"), []api.GroupName{})
 	if err := AssertThat(counter, Is(1)); err != nil {
 		t.Fatal(err)
 	}

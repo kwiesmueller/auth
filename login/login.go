@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
+
 	"github.com/bborbe/auth/api"
-	"github.com/bborbe/auth/user_directory"
 	"github.com/bborbe/http/bearer"
 	"github.com/bborbe/log"
 	error_handler "github.com/bborbe/server/handler/error"
@@ -14,16 +15,26 @@ import (
 var logger = log.DefaultLogger
 
 type CheckApplication func(api.ApplicationName, api.ApplicationPassword) error
+type FindUserByAuthToken func(authToken api.AuthToken) (*api.UserName, error)
+type IsUserNotFound func(err error) bool
+type ApplicationContainsUser func(applicationName api.ApplicationName, userName api.UserName) (bool, error)
+type ApplicationContainsGroupWithUser func(applicationName api.ApplicationName, groupName api.GroupName, userName api.UserName) (bool, error)
 
 type handler struct {
-	userDirectory    user_directory.UserDirectory
-	checkApplication CheckApplication
+	checkApplication                 CheckApplication
+	findUserByAuthToken              FindUserByAuthToken
+	isUserNotFound                   IsUserNotFound
+	applicationContainsUser          ApplicationContainsUser
+	applicationContainsGroupWithUser ApplicationContainsGroupWithUser
 }
 
-func New(userDirectory user_directory.UserDirectory, checkApplication CheckApplication) *handler {
+func New(checkApplication CheckApplication, findUserByAuthToken FindUserByAuthToken, isUserNotFound IsUserNotFound, applicationContainsUser ApplicationContainsUser, applicationContainsGroupWithUser ApplicationContainsGroupWithUser) *handler {
 	h := new(handler)
-	h.userDirectory = userDirectory
 	h.checkApplication = checkApplication
+	h.findUserByAuthToken = findUserByAuthToken
+	h.isUserNotFound = isUserNotFound
+	h.applicationContainsUser = applicationContainsUser
+	h.applicationContainsGroupWithUser = applicationContainsGroupWithUser
 	return h
 }
 
@@ -49,9 +60,9 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
-	response, err := h.login(applicationName, &request)
+	response, err := h.login(applicationName, request.AuthToken, request.RequiredGroups)
 	if err != nil {
-		if h.userDirectory.IsUserNotFound(err) {
+		if h.isUserNotFound(err) {
 			logger.Infof("user not found: %s", request.AuthToken)
 			resp.WriteHeader(http.StatusNotFound)
 			return nil
@@ -69,25 +80,29 @@ func parseApplication(req *http.Request) (api.ApplicationName, api.ApplicationPa
 	return api.ApplicationName(name), api.ApplicationPassword(password), nil
 }
 
-func (h *handler) login(applicationName api.ApplicationName, request *api.LoginRequest) (*api.LoginResponse, error) {
+func (h *handler) login(applicationName api.ApplicationName, authToken api.AuthToken, requiredGroupNames []api.GroupName) (*api.LoginResponse, error) {
 	logger.Debugf("login")
-	user, err := h.userDirectory.FindUserByAuthToken(applicationName, request.AuthToken)
+	userName, err := h.findUserByAuthToken(authToken)
 	if err != nil {
 		return nil, err
 	}
-	groups, err := findGroupForUser(*user)
+	userFound, err := h.applicationContainsUser(applicationName, *userName)
 	if err != nil {
 		return nil, err
+	}
+	if !userFound {
+		return nil, fmt.Errorf("user %s not found in application %s", userName, applicationName)
+	}
+	for _, groupName := range requiredGroupNames {
+		containsGroup, err := h.applicationContainsGroupWithUser(applicationName, groupName, *userName)
+		if err != nil {
+			return nil, err
+		}
+		if !containsGroup {
+			return nil, fmt.Errorf("user %s not in group %s in application %s", userName, groupName, applicationName)
+		}
 	}
 	return &api.LoginResponse{
-		User:   user,
-		Groups: groups,
+		User: userName,
 	}, nil
-}
-
-func findGroupForUser(user api.UserName) (*[]api.GroupName, error) {
-	if user == api.UserName("bborbe") {
-		return &[]api.GroupName{api.GroupName("storage/admin")}, nil
-	}
-	return nil, nil
 }

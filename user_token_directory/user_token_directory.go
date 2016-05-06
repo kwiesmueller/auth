@@ -1,4 +1,4 @@
-package user_directory
+package user_token_directory
 
 import (
 	"fmt"
@@ -8,11 +8,11 @@ import (
 	"github.com/bborbe/log"
 )
 
-type userDirectory struct {
+type userTokenDirectory struct {
 }
 
-type UserDirectory interface {
-	FindUserByAuthToken(applicationName api.ApplicationName, authToken api.AuthToken) (*api.UserName, error)
+type UserTokenDirectory interface {
+	FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error)
 	IsUserNotFound(err error) bool
 }
 
@@ -21,11 +21,11 @@ var (
 	logger    = log.DefaultLogger
 )
 
-func New() *userDirectory {
-	return new(userDirectory)
+func New() *userTokenDirectory {
+	return new(userTokenDirectory)
 }
 
-func (u *userDirectory) FindUserByAuthToken(applicationId api.ApplicationName, authToken api.AuthToken) (*api.UserName, error) {
+func (u *userTokenDirectory) FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error) {
 	return findUser(authToken)
 }
 
@@ -46,6 +46,6 @@ func findUser(authToken api.AuthToken) (*api.UserName, error) {
 	return nil, NOT_FOUND
 }
 
-func (u *userDirectory) IsUserNotFound(err error) bool {
+func (u *userTokenDirectory) IsUserNotFound(err error) bool {
 	return err == NOT_FOUND
 }
