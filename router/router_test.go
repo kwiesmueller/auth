@@ -109,7 +109,7 @@ func TestApplicationDelete(t *testing.T) {
 	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete))
 	resp := mock.NewHttpResponseWriterMock()
 
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application")
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application/test123")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
 	if err = AssertThat(err, NilValue()); err != nil {
