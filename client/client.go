@@ -58,7 +58,7 @@ func (a *authClient) Auth(authToken api.AuthToken) (*api.User, *[]api.Group, err
 	if err != nil {
 		return nil, nil, err
 	}
-	logger.Debugf("request message: %s", string(content))
+	logger.Debugf("auth request message: %s", string(content))
 	requestbuilder.SetBody(bytes.NewBuffer(content))
 	req, err := requestbuilder.Build()
 	if err != nil {
@@ -66,10 +66,10 @@ func (a *authClient) Auth(authToken api.AuthToken) (*api.User, *[]api.Group, err
 	}
 	resp, err := a.executeRequest(req)
 	if err != nil {
-		logger.Debugf("execute request failed: %v", err)
+		logger.Debugf("auth request failed: %v", err)
 		return nil, nil, err
 	}
-	logger.Debugf("response status: %s", resp.Status)
+	logger.Debugf("auth response status: %s", resp.Status)
 	if resp.StatusCode/100 != 2 {
 		return nil, nil, fmt.Errorf("request not success. status: %d", resp.Status)
 	}
