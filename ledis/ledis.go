@@ -9,11 +9,13 @@ type client struct {
 // https://github.com/siddontang/ledisdb/wiki/Commands
 type Client interface {
 	Get(key string) (string, error)
+	Exists(key string) (bool, error)
 	Set(key string, value string) error
 	Del(key string) error
 	HashGet(key string, field string) (string, error)
 	HashSet(key string, field string, value string) error
 	HashDel(key string, field string) error
+	HashExists(key string, field string) (bool,error)
 	HashClear(key string) error
 	Close()
 	Ping() error
@@ -36,6 +38,10 @@ func (c *client) Close() {
 
 func (c *client) Get(key string) (string, error) {
 	return goredis.String(c.client.Do("GET", key))
+}
+
+func (c *client) Exists(key string) (bool, error) {
+	return goredis.Bool(c.client.Do("EXISTS", key))
 }
 
 func (c *client) Set(key string, value string) error {
@@ -66,3 +72,8 @@ func (c *client) HashClear(key string) error {
 	_, err := c.client.Do("HCLEAR", key)
 	return err
 }
+
+func (c *client) HashExists(key string, field string) (bool, error) {
+	return goredis.Bool(c.client.Do("HEXISTS", key, field))
+}
+

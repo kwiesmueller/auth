@@ -222,3 +222,70 @@ func getFreePort() (int, error) {
 	defer l.Close()
 	return l.Addr().(*net.TCPAddr).Port, nil
 }
+
+func TestExists(t *testing.T) {
+	port, err := getFreePort()
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	server, err := createServer(port)
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	defer server.Close()
+	go server.Run()
+
+	client := New(fmt.Sprintf("localhost:%d", port), "secret")
+	result, err := client.Exists("hello")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(result, Is(false)); err != nil {
+		t.Fatal(err)
+	}
+	err = client.Set("hello", "world")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	result, err = client.Exists("hello")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(result, Is(true)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+
+func TestHashExists(t *testing.T) {
+	port, err := getFreePort()
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	server, err := createServer(port)
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	defer server.Close()
+	go server.Run()
+
+	client := New(fmt.Sprintf("localhost:%d", port), "secret")
+	exists, err := client.HashExists("hello", "new")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(exists, Is(false)); err != nil {
+		t.Fatal(err)
+	}
+	err = client.HashSet("hello", "new", "world")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	exists, err = client.HashExists("hello", "new")
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(exists, Is(true)); err != nil {
+		t.Fatal(err)
+	}
+}
