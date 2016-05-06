@@ -76,7 +76,7 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 
 	ledisClient := ledis.New(ledisdbAddress, ledisdbPassword)
 
-	userDirectory := user_token_directory.New()
+	userDirectory := user_token_directory.New(ledisClient)
 	applicationDirectory := application_directory.New(ledisClient)
 	applicationCheck := application_check.New(applicationDirectory.Check)
 	applicationUserDirectory := application_user_directory.New()
