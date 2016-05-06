@@ -27,7 +27,7 @@ type authClient struct {
 }
 
 type AuthClient interface {
-	Auth(authToken api.AuthToken) (*api.UserName, *[]api.Group, error)
+	Auth(authToken api.AuthToken) (*api.UserName, *[]api.GroupName, error)
 }
 
 func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, address string, applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) *authClient {
@@ -44,7 +44,7 @@ func (a *authClient) createBearer() string {
 	return fmt.Sprintf("%s:%s", a.applicationName, a.applicationPassword)
 }
 
-func (a *authClient) Auth(authToken api.AuthToken) (*api.UserName, *[]api.Group, error) {
+func (a *authClient) Auth(authToken api.AuthToken) (*api.UserName, *[]api.GroupName, error) {
 	request := api.LoginRequest{
 		AuthToken: authToken,
 	}
