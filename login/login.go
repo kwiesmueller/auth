@@ -85,8 +85,8 @@ func (h *handler) login(applicationName api.ApplicationName, request *api.LoginR
 	}, nil
 }
 
-func findGroupForUser(user api.User) (*[]api.Group, error) {
-	if user == api.User("bborbe") {
+func findGroupForUser(user api.UserName) (*[]api.Group, error) {
+	if user == api.UserName("bborbe") {
 		return &[]api.Group{api.Group("storage/admin")}, nil
 	}
 	return nil, nil

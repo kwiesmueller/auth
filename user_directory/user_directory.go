@@ -12,7 +12,7 @@ type userDirectory struct {
 }
 
 type UserDirectory interface {
-	FindUserByAuthToken(applicationName api.ApplicationName, authToken api.AuthToken) (*api.User, error)
+	FindUserByAuthToken(applicationName api.ApplicationName, authToken api.AuthToken) (*api.UserName, error)
 	IsUserNotFound(err error) bool
 }
 
@@ -25,22 +25,22 @@ func New() *userDirectory {
 	return new(userDirectory)
 }
 
-func (u *userDirectory) FindUserByAuthToken(applicationId api.ApplicationName, authToken api.AuthToken) (*api.User, error) {
+func (u *userDirectory) FindUserByAuthToken(applicationId api.ApplicationName, authToken api.AuthToken) (*api.UserName, error) {
 	return findUser(authToken)
 }
 
-func findUser(authToken api.AuthToken) (*api.User, error) {
+func findUser(authToken api.AuthToken) (*api.UserName, error) {
 	logger.Debugf("find user with auth token: %s", authToken)
 	source, id, err := bearer.ParseBearerToken(string(authToken))
 	if err != nil {
 		return nil, err
 	}
 	if source == "hipchat" && id == "130647" {
-		user := api.User("bborbe")
+		user := api.UserName("bborbe")
 		return &user, nil
 	}
 	if source == "telegram" && id == "112230768" {
-		user := api.User("bborbe")
+		user := api.UserName("bborbe")
 		return &user, nil
 	}
 	return nil, NOT_FOUND

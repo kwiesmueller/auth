@@ -1,6 +1,6 @@
 package api
 
-type User string
+type UserName string
 
 type Group string
 
@@ -20,8 +20,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	User   *User    `json:"user"`
-	Groups *[]Group `json:"groups"`
+	User   *UserName `json:"user"`
+	Groups *[]Group  `json:"groups"`
 }
 
 type CreateApplicationRequest struct {
