@@ -29,7 +29,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	logger.Debugf("get application")
 	if err := h.serveHTTP(resp, req); err != nil {
 		logger.Debugf("Marshal json failed: %v", err)
-		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
+		e := error_handler.NewErrorMessage(http.StatusNotFound, err.Error())
 		e.ServeHTTP(resp, req)
 	}
 }
