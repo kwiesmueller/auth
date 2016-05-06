@@ -84,7 +84,7 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	loginHandler := filter.New(applicationCheck.Check, login.New(userDirectory, applicationDirectory.Check).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create, passwordGenerator.GeneratePassword).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationDirectory.Delete).ServeHTTP, accessDeniedHandler.ServeHTTP)
-	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationDirectory.Get).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationDirectory.Get, applicationDirectory.IsApplicationNotFound).ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {
 		err := applicationDirectory.Create(api.Application{

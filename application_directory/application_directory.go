@@ -8,7 +8,10 @@ import (
 	"github.com/bborbe/log"
 )
 
-var logger = log.DefaultLogger
+var (
+	logger    = log.DefaultLogger
+	NOT_FOUND = fmt.Errorf("application not found")
+)
 
 const (
 	AUTH_APPLICATION_NAME = api.ApplicationName("auth")
@@ -25,12 +28,17 @@ type ApplicationDirectory interface {
 	Create(application api.Application) error
 	Delete(applicationName api.ApplicationName) error
 	Get(applicationName api.ApplicationName) (*api.Application, error)
+	IsApplicationNotFound(err error) bool
 }
 
 func New(ledisClient ledis.Client) *applicationDirectory {
 	a := new(applicationDirectory)
 	a.ledis = ledisClient
 	return a
+}
+
+func (a *applicationDirectory) IsApplicationNotFound(err error) bool {
+	return err == NOT_FOUND
 }
 
 func (a *applicationDirectory) Check(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) error {
@@ -63,6 +71,13 @@ func createKey(applicationName api.ApplicationName) string {
 func (a *applicationDirectory) Get(applicationName api.ApplicationName) (*api.Application, error) {
 	logger.Debugf("get application: %s", applicationName)
 	key := createKey(applicationName)
+	exists, err := a.ledis.HashExists(key, FIELD_PASSWORD)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, NOT_FOUND
+	}
 	value, err := a.ledis.HashGet(key, FIELD_PASSWORD)
 	if err != nil {
 		return nil, err
