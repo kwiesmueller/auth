@@ -38,3 +38,11 @@ type DeleteApplicationRequest struct {
 
 type DeleteApplicationResponse struct {
 }
+
+type GetApplicationRequest struct {
+}
+
+type GetApplicationResponse struct {
+	ApplicationName     ApplicationName     `json:"applicatonName"`
+	ApplicationPassword ApplicationPassword `json:"applicatonPassword"`
+}
