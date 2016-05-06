@@ -15,7 +15,7 @@ type Client interface {
 	HashGet(key string, field string) (string, error)
 	HashSet(key string, field string, value string) error
 	HashDel(key string, field string) error
-	HashExists(key string, field string) (bool,error)
+	HashExists(key string, field string) (bool, error)
 	HashClear(key string) error
 	Close()
 	Ping() error
@@ -76,4 +76,3 @@ func (c *client) HashClear(key string) error {
 func (c *client) HashExists(key string, field string) (bool, error) {
 	return goredis.Bool(c.client.Do("HEXISTS", key, field))
 }
-

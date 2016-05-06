@@ -256,7 +256,6 @@ func TestExists(t *testing.T) {
 	}
 }
 
-
 func TestHashExists(t *testing.T) {
 	port, err := getFreePort()
 	if err := AssertThat(err, NilValue()); err != nil {

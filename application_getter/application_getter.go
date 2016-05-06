@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
+	"strings"
+
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/log"
 	error_handler "github.com/bborbe/server/handler/error"
-	"fmt"
-	"strings"
 )
 
 var logger = log.DefaultLogger
@@ -39,7 +40,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if len(parts) == 0 {
 		return fmt.Errorf("invalid request uri: %s", req.RequestURI)
 	}
-	last := parts[len(parts) - 1]
+	last := parts[len(parts)-1]
 	application, err := h.getApplication(api.ApplicationName(last))
 	if err != nil {
 		return err

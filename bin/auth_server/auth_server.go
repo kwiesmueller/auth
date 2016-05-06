@@ -11,6 +11,7 @@ import (
 	"github.com/bborbe/auth/application_creator"
 	"github.com/bborbe/auth/application_deletor"
 	"github.com/bborbe/auth/application_directory"
+	"github.com/bborbe/auth/application_getter"
 	"github.com/bborbe/auth/check"
 	"github.com/bborbe/auth/filter"
 	"github.com/bborbe/auth/ledis"
@@ -21,7 +22,6 @@ import (
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
 	"github.com/facebookgo/grace/gracehttp"
-	"github.com/bborbe/auth/application_getter"
 )
 
 var logger = log.DefaultLogger
@@ -96,6 +96,6 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		}
 	}()
 
-	handler := router.New(checkHandler.ServeHTTP, loginHandler.ServeHTTP, applicationCreatorHandler.ServeHTTP, applicationDeletorHandler.ServeHTTP,applicationGetterHandler.ServeHTTP)
+	handler := router.New(checkHandler.ServeHTTP, loginHandler.ServeHTTP, applicationCreatorHandler.ServeHTTP, applicationDeletorHandler.ServeHTTP, applicationGetterHandler.ServeHTTP)
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }

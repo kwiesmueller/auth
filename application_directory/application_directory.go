@@ -12,8 +12,8 @@ var logger = log.DefaultLogger
 
 const (
 	AUTH_APPLICATION_NAME = api.ApplicationName("auth")
-	PREFIX = "application"
-	FIELD_PASSWORD = "password"
+	PREFIX                = "application"
+	FIELD_PASSWORD        = "password"
 )
 
 type applicationDirectory struct {
@@ -68,7 +68,7 @@ func (a *applicationDirectory) Get(applicationName api.ApplicationName) (*api.Ap
 		return nil, err
 	}
 	return &api.Application{
-		ApplicationName:applicationName,
-		ApplicationPassword:api.ApplicationPassword(value),
+		ApplicationName:     applicationName,
+		ApplicationPassword: api.ApplicationPassword(value),
 	}, nil
 }
