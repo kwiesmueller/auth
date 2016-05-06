@@ -18,7 +18,7 @@ func New(check HandlerFunc, login HandlerFunc, applicationCreate HandlerFunc, ap
 	router.Path("/readiness").Methods("GET").HandlerFunc(check)
 	router.Path("/login").Methods("POST").HandlerFunc(login)
 	router.Path("/application").Methods("POST").HandlerFunc(applicationCreate)
-	router.Path("/application").Methods("DELETE").HandlerFunc(applicationDelete)
+	router.PathPrefix("/application").Methods("DELETE").HandlerFunc(applicationDelete)
 
 	h := new(handler)
 	h.router = router
