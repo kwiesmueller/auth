@@ -1,4 +1,4 @@
-package user_directory
+package user_token_directory
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsUserDirectory(t *testing.T) {
+func TestImplementsUserTokenDirectory(t *testing.T) {
 	object := New(nil)
-	var expected *UserDirectory
+	var expected *UserTokenDirectory
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)
