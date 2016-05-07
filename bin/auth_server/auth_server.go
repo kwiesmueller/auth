@@ -16,11 +16,12 @@ import (
 	"github.com/bborbe/auth/application_user_directory"
 	"github.com/bborbe/auth/check"
 	"github.com/bborbe/auth/filter"
-	"github.com/bborbe/auth/ledis"
 	"github.com/bborbe/auth/login"
 	"github.com/bborbe/auth/router"
-	"github.com/bborbe/auth/user_token_directory"
+	"github.com/bborbe/auth/token_user_directory"
+	"github.com/bborbe/auth/user_creator"
 	flag "github.com/bborbe/flagenv"
+	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
 	"github.com/facebookgo/grace/gracehttp"
@@ -76,18 +77,21 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 
 	ledisClient := ledis.New(ledisdbAddress, ledisdbPassword)
 
-	userDirectory := user_token_directory.New(ledisClient)
+	tokenDirectory := token_user_directory.New(ledisClient)
 	applicationDirectory := application_directory.New(ledisClient)
 	applicationCheck := application_check.New(applicationDirectory.Check)
 	applicationUserDirectory := application_user_directory.New()
 	applicationGroupUserDirectory := application_group_user_directory.New()
+	passwordGenerator := generator.New()
+	userCreator := user_creator.New()
+
 	checkHandler := check.New(ledisClient.Ping)
 	accessDeniedHandler := access_denied.New()
-	passwordGenerator := generator.New()
-	loginHandler := filter.New(applicationCheck.Check, login.New(applicationDirectory.Check, userDirectory.FindUserByAuthToken, userDirectory.IsUserNotFound, applicationUserDirectory.Contains, applicationGroupUserDirectory.Contains).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	loginHandler := filter.New(applicationCheck.Check, login.New(applicationDirectory.Check, tokenDirectory.FindUserByAuthToken, tokenDirectory.IsUserNotFound, applicationUserDirectory.Contains, applicationGroupUserDirectory.Contains).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create, passwordGenerator.GeneratePassword).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationDirectory.Delete).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationDirectory.Get, applicationDirectory.IsApplicationNotFound).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	userCreateHandler := filter.New(applicationCheck.Check, userCreator.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {
 		err := applicationDirectory.Create(api.Application{
@@ -99,6 +103,13 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		}
 	}()
 
-	handler := router.New(checkHandler.ServeHTTP, loginHandler.ServeHTTP, applicationCreatorHandler.ServeHTTP, applicationDeletorHandler.ServeHTTP, applicationGetterHandler.ServeHTTP)
+	handler := router.New(
+		checkHandler.ServeHTTP,
+		loginHandler.ServeHTTP,
+		applicationCreatorHandler.ServeHTTP,
+		applicationDeletorHandler.ServeHTTP,
+		applicationGetterHandler.ServeHTTP,
+		userCreateHandler.ServeHTTP,
+	)
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bborbe/auth/api"
-	"github.com/bborbe/auth/ledis"
+	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 )
 
@@ -20,7 +20,7 @@ const (
 )
 
 type applicationDirectory struct {
-	ledis ledis.Client
+	ledis ledis.Hash
 }
 
 type ApplicationDirectory interface {
@@ -31,7 +31,7 @@ type ApplicationDirectory interface {
 	IsApplicationNotFound(err error) bool
 }
 
-func New(ledisClient ledis.Client) *applicationDirectory {
+func New(ledisClient ledis.Hash) *applicationDirectory {
 	a := new(applicationDirectory)
 	a.ledis = ledisClient
 	return a

@@ -17,6 +17,7 @@ type counter struct {
 	applicationCreate int
 	applicationDelete int
 	applicationGet    int
+	userCreate        int
 }
 
 func Create(counter *int) func(http.ResponseWriter, *http.Request) {
@@ -25,9 +26,13 @@ func Create(counter *int) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
+func newWithCounter(c *counter) *handler {
+	return New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet), Create(&c.userCreate))
+}
+
 func TestHealthz(t *testing.T) {
-	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet))
+	c := new(counter)
+	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/healthz")
@@ -46,8 +51,8 @@ func TestHealthz(t *testing.T) {
 }
 
 func TestReadiness(t *testing.T) {
-	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet))
+	c := new(counter)
+	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/readiness")
@@ -66,8 +71,8 @@ func TestReadiness(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet))
+	c := new(counter)
+	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/login")
@@ -86,8 +91,8 @@ func TestLogin(t *testing.T) {
 }
 
 func TestApplicationCreate(t *testing.T) {
-	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet))
+	c := new(counter)
+	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application")
 	rb.SetMethod("POST")
@@ -105,8 +110,8 @@ func TestApplicationCreate(t *testing.T) {
 }
 
 func TestApplicationDelete(t *testing.T) {
-	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet))
+	c := new(counter)
+	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application/test123")
 	rb.SetMethod("DELETE")
@@ -124,8 +129,8 @@ func TestApplicationDelete(t *testing.T) {
 }
 
 func TestApplicationGet(t *testing.T) {
-	c := counter{}
-	r := New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet))
+	c := new(counter)
+	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/application/test123")
 	rb.SetMethod("GET")
@@ -138,6 +143,25 @@ func TestApplicationGet(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err = AssertThat(c.applicationGet, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserCreate(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user")
+	rb.SetMethod("POST")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userCreate, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userCreate, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -103,6 +103,6 @@ func (h *handler) login(applicationName api.ApplicationName, authToken api.AuthT
 		}
 	}
 	return &api.LoginResponse{
-		User: userName,
+		UserName: userName,
 	}, nil
 }

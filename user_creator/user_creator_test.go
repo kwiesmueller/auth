@@ -1,14 +1,15 @@
-package user_token_directory
+package user_creator
 
 import (
+	"net/http"
 	"testing"
 
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsUserTokenDirectory(t *testing.T) {
-	object := New(nil)
-	var expected *UserTokenDirectory
+func TestImplementsHandler(t *testing.T) {
+	object := New()
+	var expected *http.Handler
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)

@@ -21,7 +21,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	User *UserName `json:"user"`
+	UserName *UserName `json:"user"`
 }
 
 type CreateApplicationRequest struct {
@@ -45,4 +45,12 @@ type GetApplicationRequest struct {
 type GetApplicationResponse struct {
 	ApplicationName     ApplicationName     `json:"applicatonName"`
 	ApplicationPassword ApplicationPassword `json:"applicatonPassword"`
+}
+
+type RegisterRequest struct {
+	AuthToken AuthToken `json:"authToken"`
+	UserName  UserName  `json:"user"`
+}
+
+type RegisterResponse struct {
 }

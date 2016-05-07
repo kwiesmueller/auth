@@ -84,5 +84,5 @@ func (a *authClient) Auth(authToken api.AuthToken, requiredGroups []api.GroupNam
 	if err != nil {
 		return nil, err
 	}
-	return response.User, nil
+	return response.UserName, nil
 }
