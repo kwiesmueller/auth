@@ -18,6 +18,8 @@ import (
 	"github.com/bborbe/auth/filter"
 	"github.com/bborbe/auth/login"
 	"github.com/bborbe/auth/router"
+	"github.com/bborbe/auth/token_adder"
+	"github.com/bborbe/auth/token_remover"
 	"github.com/bborbe/auth/token_user_directory"
 	"github.com/bborbe/auth/user_creator"
 	"github.com/bborbe/auth/user_token_directory"
@@ -86,6 +88,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	applicationGroupUserDirectory := application_group_user_directory.New()
 	passwordGenerator := generator.New()
 	userCreator := user_creator.New(userTokenDirectory.Add, tokenUserDirectory.Add, userTokenDirectory.Exists, tokenUserDirectory.Exists)
+	tokenAdder := token_adder.New()
+	tokenRemover := token_remover.New()
 
 	checkHandler := check.New(ledisClient.Ping)
 	accessDeniedHandler := access_denied.New()
@@ -94,6 +98,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationDirectory.Delete).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationDirectory.Get, applicationDirectory.IsApplicationNotFound).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	userCreateHandler := filter.New(applicationCheck.Check, userCreator.ServeHTTP, accessDeniedHandler.ServeHTTP)
+	tokenAddHandler := filter.New(applicationCheck.Check, tokenAdder.ServeHTTP, accessDeniedHandler.ServeHTTP)
+	tokenRemoveHandler := filter.New(applicationCheck.Check, tokenRemover.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {
 		err := applicationDirectory.Create(api.Application{
@@ -112,6 +118,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		applicationDeletorHandler.ServeHTTP,
 		applicationGetterHandler.ServeHTTP,
 		userCreateHandler.ServeHTTP,
+		tokenAddHandler.ServeHTTP,
+		tokenRemoveHandler.ServeHTTP,
 	)
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }

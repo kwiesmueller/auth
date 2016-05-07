@@ -18,6 +18,8 @@ type counter struct {
 	applicationDelete int
 	applicationGet    int
 	userCreate        int
+	tokenAdd          int
+	tokenRemove       int
 }
 
 func Create(counter *int) func(http.ResponseWriter, *http.Request) {
@@ -27,7 +29,7 @@ func Create(counter *int) func(http.ResponseWriter, *http.Request) {
 }
 
 func newWithCounter(c *counter) *handler {
-	return New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet), Create(&c.userCreate))
+	return New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet), Create(&c.userCreate), Create(&c.tokenAdd), Create(&c.tokenRemove))
 }
 
 func TestHealthz(t *testing.T) {
@@ -162,6 +164,44 @@ func TestUserCreate(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err = AssertThat(c.userCreate, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTokenAdd(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/token")
+	rb.SetMethod("POST")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.tokenAdd, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.tokenAdd, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTokenRemove(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/token")
+	rb.SetMethod("DELETE")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.tokenRemove, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.tokenRemove, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

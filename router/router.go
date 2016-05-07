@@ -19,6 +19,8 @@ func New(
 	applicationDelete HandlerFunc,
 	applicationGet HandlerFunc,
 	userCreate HandlerFunc,
+	tokenAdd HandlerFunc,
+	tokenRemove HandlerFunc,
 ) *handler {
 	router := mux.NewRouter()
 	router.Path("/healthz").Methods("GET").HandlerFunc(check)
@@ -28,6 +30,8 @@ func New(
 	router.PathPrefix("/application/").Methods("DELETE").HandlerFunc(applicationDelete)
 	router.PathPrefix("/application/").Methods("GET").HandlerFunc(applicationGet)
 	router.Path("/user").Methods("POST").HandlerFunc(userCreate)
+	router.Path("/token").Methods("POST").HandlerFunc(tokenAdd)
+	router.Path("/token").Methods("DELETE").HandlerFunc(tokenRemove)
 
 	h := new(handler)
 	h.router = router
