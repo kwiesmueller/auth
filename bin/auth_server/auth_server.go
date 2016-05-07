@@ -88,8 +88,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	applicationGroupUserDirectory := application_group_user_directory.New()
 	passwordGenerator := generator.New()
 	userCreator := user_creator.New(userTokenDirectory.Add, tokenUserDirectory.Add, userTokenDirectory.Exists, tokenUserDirectory.Exists)
-	tokenAdder := token_adder.New()
-	tokenRemover := token_remover.New()
+	tokenAdder := token_adder.New(userTokenDirectory.Add, tokenUserDirectory.Add, tokenUserDirectory.Exists, tokenUserDirectory.FindUserByAuthToken)
+	tokenRemover := token_remover.New(userTokenDirectory.Remove, tokenUserDirectory.Remove, tokenUserDirectory.FindUserByAuthToken)
 
 	checkHandler := check.New(ledisClient.Ping)
 	accessDeniedHandler := access_denied.New()
