@@ -54,3 +54,19 @@ type RegisterRequest struct {
 
 type RegisterResponse struct {
 }
+
+type AddTokenRequest struct {
+	AuthToken AuthToken `json:"authToken"`
+	Token     AuthToken `json:"token"`
+}
+
+type AddTokenResponse struct {
+}
+
+type RemoveTokenRequest struct {
+	AuthToken AuthToken `json:"authToken"`
+	Token     AuthToken `json:"token"`
+}
+
+type RemoveTokenResponse struct {
+}
