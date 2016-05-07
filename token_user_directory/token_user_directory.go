@@ -40,32 +40,32 @@ func createKey(authToken api.AuthToken) string {
 }
 
 func (u *tokenUserDirectory) Add(authToken api.AuthToken, userName api.UserName) error {
-	logger.Debugf("add token %s to user %s", authToken, userName)
+	logger.Debugf("add token %v to user %v", authToken, userName)
 	key := createKey(authToken)
 	return u.ledis.Set(key, string(userName))
 }
 
 func (u *tokenUserDirectory) Exists(authToken api.AuthToken) (bool, error) {
-	logger.Debugf("exists token %s to user %s", authToken)
+	logger.Debugf("exists token %v for user %v", authToken)
 	key := createKey(authToken)
 	return u.ledis.Exists(key)
 }
 
 func (u *tokenUserDirectory) Remove(authToken api.AuthToken, userName api.UserName) error {
-	logger.Debugf("remove token %s from user %s", authToken, userName)
+	logger.Debugf("remove token %v from user %v", authToken, userName)
 	key := createKey(authToken)
 	return u.ledis.Del(key)
 }
 
 func (u *tokenUserDirectory) FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error) {
-	logger.Debugf("find user for token %s", authToken)
+	logger.Debugf("find user for token %v", authToken)
 	key := createKey(authToken)
 	value, err := u.ledis.Get(key)
 	if err != nil {
 		return nil, NOT_FOUND
 	}
 	userName := api.UserName(value)
-	logger.Debugf("found user %s for token %s", userName, authToken)
+	logger.Debugf("found user %v for token %v", userName, authToken)
 	return &userName, nil
 }
 
