@@ -40,9 +40,9 @@ func New(
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("create application")
+	logger.Debugf("user create")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("Marshal json failed: %v", err)
+		logger.Debugf("create user failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	}
@@ -50,9 +50,11 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	var request api.RegisterRequest
+	logger.Debugf("decode json")
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
+	logger.Debugf("register user %s with token %s", request.UserName, request.AuthToken)
 	if err := h.assertTokenNotUsed(request.AuthToken); err != nil {
 		return err
 	}
@@ -69,6 +71,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 }
 
 func (h *handler) assertTokenNotUsed(authToken api.AuthToken) error {
+	logger.Debugf("assert token %s not used", authToken)
 	exists, err := h.existsToken(authToken)
 	if err != nil {
 		return err
@@ -81,6 +84,7 @@ func (h *handler) assertTokenNotUsed(authToken api.AuthToken) error {
 }
 
 func (h *handler) assertUserNameNotUser(userName api.UserName) error {
+	logger.Debugf("assert user %s not existing", userName)
 	exists, err := h.existsUser(userName)
 	if err != nil {
 		return err
