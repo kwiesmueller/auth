@@ -2,6 +2,8 @@ package application_group_directory
 
 import "github.com/bborbe/auth/api"
 
+const ADMIN_GROUP = api.GroupName("admin")
+
 type applicationGroupDirectory struct {
 }
 

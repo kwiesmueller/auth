@@ -5,26 +5,27 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bborbe/auth/access_denied"
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/application_check"
-	"github.com/bborbe/auth/application_creator"
-	"github.com/bborbe/auth/application_deletor"
-	"github.com/bborbe/auth/application_directory"
-	"github.com/bborbe/auth/application_getter"
-	"github.com/bborbe/auth/application_group_user_directory"
-	"github.com/bborbe/auth/application_user_directory"
-	"github.com/bborbe/auth/check"
+	"github.com/bborbe/auth/directory/application_directory"
+	"github.com/bborbe/auth/directory/application_group_user_directory"
+	"github.com/bborbe/auth/directory/application_user_directory"
+	"github.com/bborbe/auth/directory/user_token_directory"
+	"github.com/bborbe/auth/directory/application_group_directory"
+	"github.com/bborbe/auth/directory/token_user_directory"
+	"github.com/bborbe/auth/handler/application_creator"
+	"github.com/bborbe/auth/handler/application_deletor"
+	"github.com/bborbe/auth/handler/access_denied"
+	"github.com/bborbe/auth/handler/application_getter"
+	"github.com/bborbe/auth/handler/check"
+	"github.com/bborbe/auth/handler/login"
+	"github.com/bborbe/auth/handler/token_adder"
+	"github.com/bborbe/auth/handler/token_remover"
+	"github.com/bborbe/auth/handler/user_register"
+	"github.com/bborbe/auth/handler/user_unregister"
 	"github.com/bborbe/auth/filter"
-	"github.com/bborbe/auth/login"
-	"github.com/bborbe/auth/router"
-	"github.com/bborbe/auth/token_adder"
-	"github.com/bborbe/auth/token_remover"
-	"github.com/bborbe/auth/token_user_directory"
-	"github.com/bborbe/auth/user_register"
-	"github.com/bborbe/auth/user_token_directory"
-	"github.com/bborbe/auth/user_unregister"
 	flag "github.com/bborbe/flagenv"
+	"github.com/bborbe/auth/router"
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
@@ -34,20 +35,22 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	DEFAULT_PORT                        = 8080
-	PARAMETER_LOGLEVEL                  = "loglevel"
-	PARAMETER_PORT                      = "port"
+	DEFAULT_PORT = 8080
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_PORT = "port"
+	PARAMETER_ADMIN = "admin"
 	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
-	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
+	PARAMETER_LEDISDB_ADDRESS = "ledisdb-address"
+	PARAMETER_LEDISDB_PASSWORD = "ledisdb-password"
 )
 
 var (
-	logLevelPtr                = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
-	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	logLevelPtr = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
+	portPtr = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
 	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
-	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
+	adminUserNamePtr = flag.String(PARAMETER_ADMIN, "", "admin username")
+	ledisdbAddressPtr = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
+	ledisdbPasswordPtr = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 )
 
 func main() {
@@ -57,7 +60,7 @@ func main() {
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
 
-	server, err := createServer(*portPtr, *authApplicationPasswordPtr, *ledisdbAddressPtr, *ledisdbPasswordPtr)
+	server, err := createServer(*portPtr, *authApplicationPasswordPtr, *adminUserNamePtr, *ledisdbAddressPtr, *ledisdbPasswordPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -67,7 +70,7 @@ func main() {
 	gracehttp.Serve(server)
 }
 
-func createServer(port int, authApplicationPassword string, ledisdbAddress string, ledisdbPassword string) (*http.Server, error) {
+func createServer(port int, authApplicationPassword string, adminUserName string, ledisdbAddress string, ledisdbPassword string) (*http.Server, error) {
 	logger.Debugf("create server with port: %d", port)
 	if port <= 0 {
 		return nil, fmt.Errorf("parameter %s invalid", PARAMETER_PORT)
@@ -86,6 +89,7 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	applicationDirectory := application_directory.New(ledisClient)
 	applicationCheck := application_check.New(applicationDirectory.Check)
 	applicationUserDirectory := application_user_directory.New()
+	applicationGroupDirectory := application_group_directory.New()
 	applicationGroupUserDirectory := application_group_user_directory.New()
 	passwordGenerator := generator.New()
 	userRegister := user_register.New(userTokenDirectory.Add, tokenUserDirectory.Add, userTokenDirectory.Exists, tokenUserDirectory.Exists)
@@ -105,12 +109,24 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	tokenRemoveHandler := filter.New(applicationCheck.Check, tokenRemover.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {
-		err := applicationDirectory.Create(api.Application{
+		var err error
+		err = applicationDirectory.Create(api.Application{
 			ApplicationName:     application_directory.AUTH_APPLICATION_NAME,
 			ApplicationPassword: api.ApplicationPassword(authApplicationPassword),
 		})
 		if err != nil {
 			logger.Warnf("create auth application failed: %v", err)
+			return
+		}
+		err = applicationGroupDirectory.Add(application_directory.AUTH_APPLICATION_NAME, application_group_directory.ADMIN_GROUP)
+		if err != nil {
+			logger.Warnf("create admin group failed: %v", err)
+			return
+		}
+		err = applicationGroupUserDirectory.Add(application_directory.AUTH_APPLICATION_NAME, application_group_directory.ADMIN_GROUP, api.UserName(adminUserName))
+		if err != nil {
+			logger.Warnf("create admin user failed: %v", err)
+			return
 		}
 	}()
 
