@@ -1,8 +1,10 @@
 package user_unregister
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"fmt"
+	"strings"
 
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/log"
@@ -38,24 +40,27 @@ func New(
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("user create")
+	logger.Debugf("unregister user")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("create user failed: %v", err)
+		logger.Debugf("unregister user failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
+	} else {
+		logger.Debugf("unregister user success")
 	}
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	var request api.UnRegisterRequest
-	logger.Debugf("decode json")
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
-		return err
+	parts := strings.Split(req.RequestURI, "/")
+	if len(parts) == 0 {
+		logger.Debugf("auth token missing")
+		return fmt.Errorf("invalid request uri: %s", req.RequestURI)
 	}
-	logger.Debugf("unregister user with token %v", request.AuthToken)
-	userName, err := h.findUserByAuthToken(request.AuthToken)
+	authToken := api.AuthToken(parts[len(parts)-1])
+	logger.Debugf("unregister user with token %v", authToken)
+	userName, err := h.findUserByAuthToken(authToken)
 	if err != nil {
-		logger.Debugf("find user with token %v failed", request.AuthToken)
+		logger.Debugf("find user with token %v failed", authToken)
 		return err
 	}
 	tokens, err := h.getTokensForUser(*userName)

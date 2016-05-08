@@ -45,15 +45,25 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		logger.Debugf("add token failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
+	} else {
+		logger.Debugf("add token success")
 	}
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	var request api.AddTokenRequest
-	logger.Debugf("decode json")
+	var response api.AddTokenResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
+	err := h.action(&request, &response)
+	if err != nil {
+		return err
+	}
+	return json.NewEncoder(resp).Encode(&response)
+}
+
+func (h *handler) action(request *api.AddTokenRequest, response *api.AddTokenResponse) error {
 	if err := h.assertTokenNotUsed(request.Token); err != nil {
 		return err
 	}

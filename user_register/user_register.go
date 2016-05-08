@@ -45,15 +45,25 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		logger.Debugf("register user failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
+	} else {
+		logger.Debugf("register user success")
 	}
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	var request api.RegisterRequest
-	logger.Debugf("decode json")
+	var response api.RegisterResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
+	err := h.action(&request, &response)
+	if err != nil {
+		return err
+	}
+	return json.NewEncoder(resp).Encode(&response)
+}
+
+func (h *handler) action(request *api.RegisterRequest, response *api.RegisterResponse) error {
 	logger.Debugf("register user %v with token %v", request.UserName, request.AuthToken)
 	if err := h.assertTokenNotUsed(request.AuthToken); err != nil {
 		logger.Debugf("token %v already used", request.AuthToken)

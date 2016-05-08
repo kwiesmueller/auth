@@ -30,27 +30,37 @@ func New(createApplication CreateApplication, generatePassword GeneratePassword)
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	logger.Debugf("create application")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("Marshal json failed: %v", err)
+		logger.Debugf("create application failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
+	} else {
+		logger.Debugf("create application success")
 	}
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	var createApplicationRequest api.CreateApplicationRequest
-	if err := json.NewDecoder(req.Body).Decode(&createApplicationRequest); err != nil {
+	var request api.CreateApplicationRequest
+	var response api.CreateApplicationResponse
+	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
+	err := h.action(&request, &response)
+	if err != nil {
+		return err
+	}
+	return json.NewEncoder(resp).Encode(&response)
+}
+
+func (h *handler) action(request *api.CreateApplicationRequest, response *api.CreateApplicationResponse) error {
 	application := api.Application{
-		ApplicationName:     createApplicationRequest.ApplicationName,
+		ApplicationName:     request.ApplicationName,
 		ApplicationPassword: api.ApplicationPassword(h.generatePassword(PASSWORD_LENGTH)),
 	}
 	err := h.createApplication(application)
 	if err != nil {
 		return err
 	}
-	return json.NewEncoder(resp).Encode(&api.CreateApplicationResponse{
-		ApplicationName:     application.ApplicationName,
-		ApplicationPassword: application.ApplicationPassword,
-	})
+	response.ApplicationName = application.ApplicationName
+	response.ApplicationPassword = application.ApplicationPassword
+	return nil
 }

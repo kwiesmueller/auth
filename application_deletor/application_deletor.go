@@ -26,11 +26,13 @@ func New(deleteApplication DeleteApplication) *handler {
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("delete application")
+	logger.Debugf("create application")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("Marshal json failed: %v", err)
+		logger.Debugf("create application failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
+	} else {
+		logger.Debugf("create application success")
 	}
 }
 
@@ -40,11 +42,11 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 		return fmt.Errorf("invalid request uri: %s", req.RequestURI)
 	}
 	last := parts[len(parts)-1]
+
 	err := h.deleteApplication(api.ApplicationName(last))
 	if err != nil {
 		return err
 	}
 	logger.Debugf("application deleted")
-	resp.WriteHeader(http.StatusOK)
 	return nil
 }
