@@ -21,8 +21,9 @@ import (
 	"github.com/bborbe/auth/token_adder"
 	"github.com/bborbe/auth/token_remover"
 	"github.com/bborbe/auth/token_user_directory"
-	"github.com/bborbe/auth/user_creator"
+	"github.com/bborbe/auth/user_register"
 	"github.com/bborbe/auth/user_token_directory"
+	"github.com/bborbe/auth/user_unregister"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
@@ -87,7 +88,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	applicationUserDirectory := application_user_directory.New()
 	applicationGroupUserDirectory := application_group_user_directory.New()
 	passwordGenerator := generator.New()
-	userCreator := user_creator.New(userTokenDirectory.Add, tokenUserDirectory.Add, userTokenDirectory.Exists, tokenUserDirectory.Exists)
+	userRegister := user_register.New(userTokenDirectory.Add, tokenUserDirectory.Add, userTokenDirectory.Exists, tokenUserDirectory.Exists)
+	userUnregister := user_unregister.New(tokenUserDirectory.FindUserByAuthToken, userTokenDirectory.Get, tokenUserDirectory.Remove, userTokenDirectory.Delete)
 	tokenAdder := token_adder.New(userTokenDirectory.Add, tokenUserDirectory.Add, tokenUserDirectory.Exists, tokenUserDirectory.FindUserByAuthToken)
 	tokenRemover := token_remover.New(userTokenDirectory.Remove, tokenUserDirectory.Remove, tokenUserDirectory.FindUserByAuthToken)
 
@@ -97,7 +99,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create, passwordGenerator.GeneratePassword).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationDirectory.Delete).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationDirectory.Get, applicationDirectory.IsApplicationNotFound).ServeHTTP, accessDeniedHandler.ServeHTTP)
-	userCreateHandler := filter.New(applicationCheck.Check, userCreator.ServeHTTP, accessDeniedHandler.ServeHTTP)
+	userRegisterHandler := filter.New(applicationCheck.Check, userRegister.ServeHTTP, accessDeniedHandler.ServeHTTP)
+	userUnregisterHandler := filter.New(applicationCheck.Check, userUnregister.ServeHTTP, accessDeniedHandler.ServeHTTP)
 	tokenAddHandler := filter.New(applicationCheck.Check, tokenAdder.ServeHTTP, accessDeniedHandler.ServeHTTP)
 	tokenRemoveHandler := filter.New(applicationCheck.Check, tokenRemover.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
@@ -117,7 +120,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		applicationCreatorHandler.ServeHTTP,
 		applicationDeletorHandler.ServeHTTP,
 		applicationGetterHandler.ServeHTTP,
-		userCreateHandler.ServeHTTP,
+		userRegisterHandler.ServeHTTP,
+		userUnregisterHandler.ServeHTTP,
 		tokenAddHandler.ServeHTTP,
 		tokenRemoveHandler.ServeHTTP,
 	)

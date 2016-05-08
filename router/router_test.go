@@ -17,7 +17,8 @@ type counter struct {
 	applicationCreate int
 	applicationDelete int
 	applicationGet    int
-	userCreate        int
+	userRegister      int
+	userUnregister    int
 	tokenAdd          int
 	tokenRemove       int
 }
@@ -29,7 +30,7 @@ func Create(counter *int) func(http.ResponseWriter, *http.Request) {
 }
 
 func newWithCounter(c *counter) *handler {
-	return New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet), Create(&c.userCreate), Create(&c.tokenAdd), Create(&c.tokenRemove))
+	return New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet), Create(&c.userRegister), Create(&c.userUnregister), Create(&c.tokenAdd), Create(&c.tokenRemove))
 }
 
 func TestHealthz(t *testing.T) {
@@ -149,7 +150,7 @@ func TestApplicationGet(t *testing.T) {
 	}
 }
 
-func TestUserCreate(t *testing.T) {
+func TestUserRegister(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
@@ -159,11 +160,30 @@ func TestUserCreate(t *testing.T) {
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userCreate, Is(0)); err != nil {
+	if err = AssertThat(c.userRegister, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userCreate, Is(1)); err != nil {
+	if err = AssertThat(c.userRegister, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUnregister(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user")
+	rb.SetMethod("DELETE")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userUnregister, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userUnregister, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

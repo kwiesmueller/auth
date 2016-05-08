@@ -1,4 +1,4 @@
-package user_creator
+package user_register
 
 import (
 	"encoding/json"
@@ -40,9 +40,9 @@ func New(
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("user create")
+	logger.Debugf("register user")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("create user failed: %v", err)
+		logger.Debugf("register user failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	}

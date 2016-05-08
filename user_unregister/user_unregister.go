@@ -1,4 +1,4 @@
-package token_remover
+package user_unregister
 
 import (
 	"encoding/json"
@@ -12,51 +12,57 @@ import (
 var logger = log.DefaultLogger
 
 type FindUserByAuthToken func(authToken api.AuthToken) (*api.UserName, error)
-type UserRemoveToken func(userName api.UserName, authToken api.AuthToken) error
-type TokenRemove func(authToken api.AuthToken) error
+type GetTokensForUser func(userName api.UserName) (*[]api.AuthToken, error)
+type RemoveToken func(authToken api.AuthToken) error
+type RemoveUser func(userName api.UserName) error
 
 type handler struct {
-	userRemoveToken     UserRemoveToken
-	tokenRemove         TokenRemove
 	findUserByAuthToken FindUserByAuthToken
+	getTokensForUser    GetTokensForUser
+	removeToken         RemoveToken
+	removeUser          RemoveUser
 }
 
 func New(
-	userRemoveToken UserRemoveToken,
-	tokenRemove TokenRemove,
 	findUserByAuthToken FindUserByAuthToken,
+	getTokensForUser GetTokensForUser,
+	removeToken RemoveToken,
+	removeUser RemoveUser,
 ) *handler {
 	h := new(handler)
-	h.userRemoveToken = userRemoveToken
-	h.tokenRemove = tokenRemove
 	h.findUserByAuthToken = findUserByAuthToken
+	h.getTokensForUser = getTokensForUser
+	h.removeToken = removeToken
+	h.removeUser = removeUser
 	return h
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("remove token")
+	logger.Debugf("user create")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("remove token failed: %v", err)
+		logger.Debugf("create user failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	}
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	var request api.RemoveTokenRequest
+	var request api.UnRegisterRequest
 	logger.Debugf("decode json")
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
+	logger.Debugf("unregister user with token %s", request.AuthToken)
 	userName, err := h.findUserByAuthToken(request.AuthToken)
 	if err != nil {
 		return err
 	}
-	if err := h.tokenRemove(request.Token); err != nil {
+	tokens, err := h.getTokensForUser(*userName)
+	if err != nil {
 		return err
 	}
-	if err := h.userRemoveToken(*userName, request.Token); err != nil {
-		return err
+	for _, token := range *tokens {
+		h.removeToken(token)
 	}
-	return nil
+	return h.removeUser(*userName)
 }

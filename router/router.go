@@ -18,7 +18,8 @@ func New(
 	applicationCreate HandlerFunc,
 	applicationDelete HandlerFunc,
 	applicationGet HandlerFunc,
-	userCreate HandlerFunc,
+	userRegister HandlerFunc,
+	userUnregister HandlerFunc,
 	tokenAdd HandlerFunc,
 	tokenRemove HandlerFunc,
 ) *handler {
@@ -29,10 +30,10 @@ func New(
 	router.Path("/application").Methods("POST").HandlerFunc(applicationCreate)
 	router.PathPrefix("/application/").Methods("DELETE").HandlerFunc(applicationDelete)
 	router.PathPrefix("/application/").Methods("GET").HandlerFunc(applicationGet)
-	router.Path("/user").Methods("POST").HandlerFunc(userCreate)
+	router.Path("/user").Methods("POST").HandlerFunc(userRegister)
+	router.Path("/user").Methods("DELETE").HandlerFunc(userUnregister)
 	router.Path("/token").Methods("POST").HandlerFunc(tokenAdd)
 	router.Path("/token").Methods("DELETE").HandlerFunc(tokenRemove)
-
 	h := new(handler)
 	h.router = router
 	return h

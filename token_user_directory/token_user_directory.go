@@ -15,7 +15,7 @@ type tokenUserDirectory struct {
 type TokenUserDirectory interface {
 	Add(authToken api.AuthToken, userName api.UserName) error
 	Exists(authToken api.AuthToken) (bool, error)
-	Remove(authToken api.AuthToken, userName api.UserName) error
+	Remove(authToken api.AuthToken) error
 	FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error)
 	IsUserNotFound(err error) bool
 }
@@ -51,8 +51,8 @@ func (u *tokenUserDirectory) Exists(authToken api.AuthToken) (bool, error) {
 	return u.ledis.Exists(key)
 }
 
-func (u *tokenUserDirectory) Remove(authToken api.AuthToken, userName api.UserName) error {
-	logger.Debugf("remove token %v from user %v", authToken, userName)
+func (u *tokenUserDirectory) Remove(authToken api.AuthToken) error {
+	logger.Debugf("remove token %v from user %v", authToken)
 	key := createKey(authToken)
 	return u.ledis.Del(key)
 }

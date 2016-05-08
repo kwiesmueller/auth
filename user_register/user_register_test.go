@@ -1,4 +1,4 @@
-package user_creator
+package user_register
 
 import (
 	"net/http"
