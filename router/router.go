@@ -27,13 +27,17 @@ func New(
 	router.Path("/healthz").Methods("GET").HandlerFunc(check)
 	router.Path("/readiness").Methods("GET").HandlerFunc(check)
 	router.Path("/login").Methods("POST").HandlerFunc(login)
+
 	router.Path("/application").Methods("POST").HandlerFunc(applicationCreate)
 	router.PathPrefix("/application/").Methods("DELETE").HandlerFunc(applicationDelete)
 	router.PathPrefix("/application/").Methods("GET").HandlerFunc(applicationGet)
+
 	router.Path("/user").Methods("POST").HandlerFunc(userRegister)
-	router.Path("/user").Methods("DELETE").HandlerFunc(userUnregister)
+	router.PathPrefix("/user/").Methods("DELETE").HandlerFunc(userUnregister)
+
 	router.Path("/token").Methods("POST").HandlerFunc(tokenAdd)
 	router.Path("/token").Methods("DELETE").HandlerFunc(tokenRemove)
+
 	h := new(handler)
 	h.router = router
 	return h

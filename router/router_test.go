@@ -173,7 +173,7 @@ func TestUnregister(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user")
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/123")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
 	if err = AssertThat(err, NilValue()); err != nil {
