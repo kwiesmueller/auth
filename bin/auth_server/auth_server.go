@@ -8,14 +8,15 @@ import (
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/application_check"
 	"github.com/bborbe/auth/directory/application_directory"
+	"github.com/bborbe/auth/directory/application_group_directory"
 	"github.com/bborbe/auth/directory/application_group_user_directory"
 	"github.com/bborbe/auth/directory/application_user_directory"
-	"github.com/bborbe/auth/directory/user_token_directory"
-	"github.com/bborbe/auth/directory/application_group_directory"
 	"github.com/bborbe/auth/directory/token_user_directory"
+	"github.com/bborbe/auth/directory/user_token_directory"
+	"github.com/bborbe/auth/filter"
+	"github.com/bborbe/auth/handler/access_denied"
 	"github.com/bborbe/auth/handler/application_creator"
 	"github.com/bborbe/auth/handler/application_deletor"
-	"github.com/bborbe/auth/handler/access_denied"
 	"github.com/bborbe/auth/handler/application_getter"
 	"github.com/bborbe/auth/handler/check"
 	"github.com/bborbe/auth/handler/login"
@@ -23,9 +24,8 @@ import (
 	"github.com/bborbe/auth/handler/token_remover"
 	"github.com/bborbe/auth/handler/user_register"
 	"github.com/bborbe/auth/handler/user_unregister"
-	"github.com/bborbe/auth/filter"
-	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/auth/router"
+	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
@@ -35,22 +35,22 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	DEFAULT_PORT = 8080
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_PORT = "port"
-	PARAMETER_ADMIN = "admin"
+	DEFAULT_PORT                        = 8080
+	PARAMETER_LOGLEVEL                  = "loglevel"
+	PARAMETER_PORT                      = "port"
+	PARAMETER_ADMIN                     = "admin"
 	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDRESS = "ledisdb-address"
-	PARAMETER_LEDISDB_PASSWORD = "ledisdb-password"
+	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
+	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
 )
 
 var (
-	logLevelPtr = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
-	portPtr = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	logLevelPtr                = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
+	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
 	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	adminUserNamePtr = flag.String(PARAMETER_ADMIN, "", "admin username")
-	ledisdbAddressPtr = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
-	ledisdbPasswordPtr = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
+	adminUserNamePtr           = flag.String(PARAMETER_ADMIN, "", "admin username")
+	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
+	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 )
 
 func main() {
@@ -87,10 +87,11 @@ func createServer(port int, authApplicationPassword string, adminUserName string
 	tokenUserDirectory := token_user_directory.New(ledisClient)
 	userTokenDirectory := user_token_directory.New(ledisClient)
 	applicationDirectory := application_directory.New(ledisClient)
-	applicationCheck := application_check.New(applicationDirectory.Check)
 	applicationUserDirectory := application_user_directory.New()
 	applicationGroupDirectory := application_group_directory.New()
 	applicationGroupUserDirectory := application_group_user_directory.New()
+
+	applicationCheck := application_check.New(applicationDirectory.Check)
 	passwordGenerator := generator.New()
 	userRegister := user_register.New(userTokenDirectory.Add, tokenUserDirectory.Add, userTokenDirectory.Exists, tokenUserDirectory.Exists)
 	userUnregister := user_unregister.New(tokenUserDirectory.FindUserByAuthToken, userTokenDirectory.Get, tokenUserDirectory.Remove, userTokenDirectory.Delete)
