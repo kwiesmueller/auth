@@ -52,17 +52,26 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
-	logger.Debugf("unregister user with token %s", request.AuthToken)
+	logger.Debugf("unregister user with token %v", request.AuthToken)
 	userName, err := h.findUserByAuthToken(request.AuthToken)
 	if err != nil {
+		logger.Debugf("find user with token %v failed", request.AuthToken)
 		return err
 	}
 	tokens, err := h.getTokensForUser(*userName)
 	if err != nil {
+		logger.Debugf("find tokens for user %v failed", *userName)
 		return err
 	}
 	for _, token := range *tokens {
-		h.removeToken(token)
+		if err = h.removeToken(token); err != nil {
+			logger.Debugf("remove token %v failed", token)
+		}
 	}
-	return h.removeUser(*userName)
+	if err = h.removeUser(*userName); err != nil {
+		logger.Debugf("remove user %v failed", *userName)
+		return err
+	}
+	logger.Debugf("unregister user %v successful", *userName)
+	return nil
 }

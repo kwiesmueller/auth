@@ -54,19 +54,24 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
-	logger.Debugf("register user %s with token %s", request.UserName, request.AuthToken)
+	logger.Debugf("register user %v with token %v", request.UserName, request.AuthToken)
 	if err := h.assertTokenNotUsed(request.AuthToken); err != nil {
+		logger.Debugf("token %v already used", request.AuthToken)
 		return err
 	}
 	if err := h.assertUserNameNotUser(request.UserName); err != nil {
+		logger.Debugf("userName %v already used", request.UserName)
 		return err
 	}
 	if err := h.tokenAddUser(request.AuthToken, request.UserName); err != nil {
+		logger.Debugf("add user %v to token %v failed", request.UserName, request.AuthToken)
 		return err
 	}
 	if err := h.userAddToken(request.UserName, request.AuthToken); err != nil {
+		logger.Debugf("add token %v to user %v failed", request.AuthToken, request.UserName)
 		return err
 	}
+	logger.Debugf("register user %v successful", request.UserName)
 	return nil
 }
 
