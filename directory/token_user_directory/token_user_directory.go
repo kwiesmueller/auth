@@ -8,6 +8,8 @@ import (
 	"github.com/bborbe/log"
 )
 
+const PREFIX = "token_user"
+
 type directory struct {
 	ledis ledis.Kv
 }
@@ -18,8 +20,6 @@ type TokenUserDirectory interface {
 	Remove(authToken api.AuthToken) error
 	FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error)
 }
-
-const PREFIX = "token_user"
 
 var logger = log.DefaultLogger
 

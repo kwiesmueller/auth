@@ -8,13 +8,9 @@ import (
 	"github.com/bborbe/log"
 )
 
-const (
-	PREFIX = "user"
-)
+const PREFIX = "user_token"
 
-var (
-	logger = log.DefaultLogger
-)
+var logger = log.DefaultLogger
 
 type directory struct {
 	ledis ledis.Set
@@ -39,22 +35,22 @@ func createKey(userName api.UserName) string {
 	return fmt.Sprintf("%s:%s", PREFIX, userName)
 }
 
-func (u *directory) Add(userName api.UserName, authToken api.AuthToken) error {
-	logger.Debugf("add user %s", userName)
+func (d *directory) Add(userName api.UserName, authToken api.AuthToken) error {
+	logger.Debugf("add token %v user %v", authToken, userName)
 	key := createKey(userName)
-	return u.ledis.SetAdd(key, string(authToken))
+	return d.ledis.SetAdd(key, string(authToken))
 }
 
-func (u *directory) Exists(userName api.UserName) (bool, error) {
-	logger.Debugf("exists user %s", userName)
+func (d *directory) Exists(userName api.UserName) (bool, error) {
+	logger.Debugf("exists user %v", userName)
 	key := createKey(userName)
-	return u.ledis.SetExists(key)
+	return d.ledis.SetExists(key)
 }
 
-func (u *directory) Get(userName api.UserName) (*[]api.AuthToken, error) {
-	logger.Debugf("get user %s", userName)
+func (d *directory) Get(userName api.UserName) (*[]api.AuthToken, error) {
+	logger.Debugf("get tokens for user %v", userName)
 	key := createKey(userName)
-	tokens, err := u.ledis.SetGet(key)
+	tokens, err := d.ledis.SetGet(key)
 	if err != nil {
 		return nil, err
 	}
@@ -65,20 +61,20 @@ func (u *directory) Get(userName api.UserName) (*[]api.AuthToken, error) {
 	return &result, nil
 }
 
-func (u *directory) Contains(userName api.UserName, authToken api.AuthToken) (bool, error) {
-	logger.Debugf("contains user %s token %s", userName, authToken)
+func (d *directory) Contains(userName api.UserName, authToken api.AuthToken) (bool, error) {
+	logger.Debugf("contains user %v token %v", userName, authToken)
 	key := createKey(userName)
-	return u.ledis.SetContains(key, string(authToken))
+	return d.ledis.SetContains(key, string(authToken))
 }
 
-func (u *directory) Remove(userName api.UserName, authToken api.AuthToken) error {
-	logger.Debugf("remove token %s from user %s", authToken, userName)
+func (d *directory) Remove(userName api.UserName, authToken api.AuthToken) error {
+	logger.Debugf("remove token %v from user %v", authToken, userName)
 	key := createKey(userName)
-	return u.ledis.SetRemove(key, string(authToken))
+	return d.ledis.SetRemove(key, string(authToken))
 }
 
-func (u *directory) Delete(userName api.UserName) error {
-	logger.Debugf("delete user %s", userName)
+func (d *directory) Delete(userName api.UserName) error {
+	logger.Debugf("delete user %v", userName)
 	key := createKey(userName)
-	return u.ledis.SetClear(key)
+	return d.ledis.SetClear(key)
 }
