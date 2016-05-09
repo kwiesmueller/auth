@@ -17,17 +17,11 @@ type TokenUserDirectory interface {
 	Exists(authToken api.AuthToken) (bool, error)
 	Remove(authToken api.AuthToken) error
 	FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error)
-	IsUserNotFound(err error) bool
 }
 
-const (
-	PREFIX = "token_user"
-)
+const PREFIX = "token_user"
 
-var (
-	NOT_FOUND = fmt.Errorf("user not found")
-	logger    = log.DefaultLogger
-)
+var logger = log.DefaultLogger
 
 func New(ledisClient ledis.Kv) *directory {
 	u := new(directory)
@@ -62,13 +56,9 @@ func (d *directory) FindUserByAuthToken(authToken api.AuthToken) (*api.UserName,
 	key := createKey(authToken)
 	value, err := d.ledis.Get(key)
 	if err != nil {
-		return nil, NOT_FOUND
+		return nil, err
 	}
 	userName := api.UserName(value)
 	logger.Debugf("found user %v for token %v", userName, authToken)
 	return &userName, nil
-}
-
-func (u *directory) IsUserNotFound(err error) bool {
-	return err == NOT_FOUND
 }
