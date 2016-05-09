@@ -11,19 +11,14 @@ import (
 
 var logger = log.DefaultLogger
 
-const PASSWORD_LENGTH = 16
-
-type CreateApplication func(application api.Application) error
-type GeneratePassword func(length int) string
+type CreateApplication func(applicationName api.ApplicationName) (*api.Application, error)
 type handler struct {
 	createApplication CreateApplication
-	generatePassword  GeneratePassword
 }
 
-func New(createApplication CreateApplication, generatePassword GeneratePassword) *handler {
+func New(createApplication CreateApplication) *handler {
 	h := new(handler)
 	h.createApplication = createApplication
-	h.generatePassword = generatePassword
 	return h
 }
 
@@ -52,11 +47,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 }
 
 func (h *handler) action(request *api.CreateApplicationRequest, response *api.CreateApplicationResponse) error {
-	application := api.Application{
-		ApplicationName:     request.ApplicationName,
-		ApplicationPassword: api.ApplicationPassword(h.generatePassword(PASSWORD_LENGTH)),
-	}
-	err := h.createApplication(application)
+	application, err := h.createApplication(request.ApplicationName)
 	if err != nil {
 		return err
 	}

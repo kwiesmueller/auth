@@ -24,6 +24,7 @@ import (
 	"github.com/bborbe/auth/handler/user_register"
 	"github.com/bborbe/auth/handler/user_unregister"
 	"github.com/bborbe/auth/router"
+	"github.com/bborbe/auth/service/application"
 	"github.com/bborbe/auth/service/user"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/ledis"
@@ -90,10 +91,12 @@ func createServer(port int, authApplicationPassword string, adminUserName string
 	groupUserDirectory := group_user_directory.New(ledisClient)
 	userGroupDirectory := user_group_directory.New(ledisClient)
 
+	passwordGenerator := generator.New()
+
 	userService := user.New(userTokenDirectory, userGroupDirectory, tokenUserDirectory)
+	applicationService := application.New(passwordGenerator.GeneratePassword, applicationDirectory)
 
 	applicationCheck := application_check.New(applicationDirectory.Check)
-	passwordGenerator := generator.New()
 	userRegister := user_register.New(userService.CreateUserWithToken)
 	userUnregister := user_unregister.New(userService.DeleteUserWithToken)
 	tokenAdder := token_adder.New(userService.AddTokenToUserWithToken)
@@ -102,7 +105,7 @@ func createServer(port int, authApplicationPassword string, adminUserName string
 	checkHandler := check.New(ledisClient.Ping)
 	accessDeniedHandler := access_denied.New()
 	loginHandler := filter.New(applicationCheck.Check, login.New(userService.VerifyTokenHasGroups).ServeHTTP, accessDeniedHandler.ServeHTTP)
-	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create, passwordGenerator.GeneratePassword).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationService.CreateApplication).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationDirectory.Delete).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationDirectory.Get, applicationDirectory.IsApplicationNotFound).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	userRegisterHandler := filter.New(applicationCheck.Check, userRegister.ServeHTTP, accessDeniedHandler.ServeHTTP)

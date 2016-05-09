@@ -89,6 +89,7 @@ func (h *service) assertTokenNotUsed(authToken api.AuthToken) error {
 	logger.Debugf("assert token %s not used", authToken)
 	exists, err := h.tokenUserDirectory.Exists(authToken)
 	if err != nil {
+		logger.Debugf("exists token failed: %v", err)
 		return err
 	}
 	if exists {
@@ -102,6 +103,7 @@ func (h *service) assertUserNameNotUser(userName api.UserName) error {
 	logger.Debugf("assert user %s not existing", userName)
 	exists, err := h.userTokenDirectory.Exists(userName)
 	if err != nil {
+		logger.Debugf("exists user failed: %v", err)
 		return err
 	}
 	if exists {
@@ -122,9 +124,11 @@ func (h *service) AddTokenToUserWithToken(newToken api.AuthToken, userToken api.
 	}
 	logger.Debugf("add token %v to user %v", newToken, *userName)
 	if err := h.tokenUserDirectory.Add(newToken, *userName); err != nil {
+		logger.Debugf("add token %v to user %v failed: %v", newToken, *userName, err)
 		return err
 	}
 	if err := h.userTokenDirectory.Add(*userName, newToken); err != nil {
+		logger.Debugf("add user %v to token %v failed: %v", *userName, newToken, err)
 		return err
 	}
 	logger.Debugf("token added successful")
@@ -132,16 +136,18 @@ func (h *service) AddTokenToUserWithToken(newToken api.AuthToken, userToken api.
 }
 
 func (h *service) RemoveTokenFromUserWithToken(newToken api.AuthToken, userToken api.AuthToken) error {
-	logger.Debugf("remove token %v to user with token %v", newToken, userToken)
+	logger.Debugf("remove token %v from user with token %v", newToken, userToken)
 	userName, err := h.tokenUserDirectory.FindUserByAuthToken(userToken)
 	if err != nil {
 		return err
 	}
-	logger.Debugf("remove token %v to user %v", newToken, *userName)
+	logger.Debugf("remove token %v from user %v", newToken, *userName)
 	if err := h.tokenUserDirectory.Remove(newToken); err != nil {
+		logger.Debugf("remove token %v failed: %v", newToken, err)
 		return err
 	}
 	if err := h.userTokenDirectory.Remove(*userName, newToken); err != nil {
+		logger.Debugf("remove token %v from user %v failed: %v", newToken, *userName, err)
 		return err
 	}
 	logger.Debugf("token removed successful")
@@ -158,6 +164,7 @@ func (s *service) VerifyTokenHasGroups(authToken api.AuthToken, requiredGroupNam
 	for _, groupName := range requiredGroupNames {
 		containsGroup, err := s.userGroupDirectory.Contains(*userName, groupName)
 		if err != nil {
+			logger.Debugf("contains failed: %v", err)
 			return userName, err
 		}
 		if !containsGroup {
