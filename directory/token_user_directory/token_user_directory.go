@@ -8,7 +8,7 @@ import (
 	"github.com/bborbe/log"
 )
 
-type tokenUserDirectory struct {
+type directory struct {
 	ledis ledis.Kv
 }
 
@@ -29,8 +29,8 @@ var (
 	logger    = log.DefaultLogger
 )
 
-func New(ledisClient ledis.Kv) *tokenUserDirectory {
-	u := new(tokenUserDirectory)
+func New(ledisClient ledis.Kv) *directory {
+	u := new(directory)
 	u.ledis = ledisClient
 	return u
 }
@@ -39,28 +39,28 @@ func createKey(authToken api.AuthToken) string {
 	return fmt.Sprintf("%s:%s", PREFIX, authToken)
 }
 
-func (u *tokenUserDirectory) Add(authToken api.AuthToken, userName api.UserName) error {
+func (d *directory) Add(authToken api.AuthToken, userName api.UserName) error {
 	logger.Debugf("add token %v to user %v", authToken, userName)
 	key := createKey(authToken)
-	return u.ledis.Set(key, string(userName))
+	return d.ledis.Set(key, string(userName))
 }
 
-func (u *tokenUserDirectory) Exists(authToken api.AuthToken) (bool, error) {
+func (d *directory) Exists(authToken api.AuthToken) (bool, error) {
 	logger.Debugf("exists token %v for user %v", authToken)
 	key := createKey(authToken)
-	return u.ledis.Exists(key)
+	return d.ledis.Exists(key)
 }
 
-func (u *tokenUserDirectory) Remove(authToken api.AuthToken) error {
+func (d *directory) Remove(authToken api.AuthToken) error {
 	logger.Debugf("remove token %v from user %v", authToken)
 	key := createKey(authToken)
-	return u.ledis.Del(key)
+	return d.ledis.Del(key)
 }
 
-func (u *tokenUserDirectory) FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error) {
+func (d *directory) FindUserByAuthToken(authToken api.AuthToken) (*api.UserName, error) {
 	logger.Debugf("find user for token %v", authToken)
 	key := createKey(authToken)
-	value, err := u.ledis.Get(key)
+	value, err := d.ledis.Get(key)
 	if err != nil {
 		return nil, NOT_FOUND
 	}
@@ -69,6 +69,6 @@ func (u *tokenUserDirectory) FindUserByAuthToken(authToken api.AuthToken) (*api.
 	return &userName, nil
 }
 
-func (u *tokenUserDirectory) IsUserNotFound(err error) bool {
+func (u *directory) IsUserNotFound(err error) bool {
 	return err == NOT_FOUND
 }

@@ -8,10 +8,9 @@ import (
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/application_check"
 	"github.com/bborbe/auth/directory/application_directory"
-	"github.com/bborbe/auth/directory/application_group_directory"
-	"github.com/bborbe/auth/directory/application_group_user_directory"
-	"github.com/bborbe/auth/directory/application_user_directory"
+	"github.com/bborbe/auth/directory/group_user_directory"
 	"github.com/bborbe/auth/directory/token_user_directory"
+	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
 	"github.com/bborbe/auth/filter"
 	"github.com/bborbe/auth/handler/access_denied"
@@ -25,6 +24,7 @@ import (
 	"github.com/bborbe/auth/handler/user_register"
 	"github.com/bborbe/auth/handler/user_unregister"
 	"github.com/bborbe/auth/router"
+	"github.com/bborbe/auth/service/user"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
@@ -87,20 +87,21 @@ func createServer(port int, authApplicationPassword string, adminUserName string
 	tokenUserDirectory := token_user_directory.New(ledisClient)
 	userTokenDirectory := user_token_directory.New(ledisClient)
 	applicationDirectory := application_directory.New(ledisClient)
-	applicationUserDirectory := application_user_directory.New()
-	applicationGroupDirectory := application_group_directory.New()
-	applicationGroupUserDirectory := application_group_user_directory.New()
+	groupUserDirectory := group_user_directory.New(ledisClient)
+	userGroupDirectory := user_group_directory.New(ledisClient)
+
+	userService := user.New(userTokenDirectory, userGroupDirectory, tokenUserDirectory)
 
 	applicationCheck := application_check.New(applicationDirectory.Check)
 	passwordGenerator := generator.New()
-	userRegister := user_register.New(userTokenDirectory.Add, tokenUserDirectory.Add, userTokenDirectory.Exists, tokenUserDirectory.Exists)
-	userUnregister := user_unregister.New(tokenUserDirectory.FindUserByAuthToken, userTokenDirectory.Get, tokenUserDirectory.Remove, userTokenDirectory.Delete)
-	tokenAdder := token_adder.New(userTokenDirectory.Add, tokenUserDirectory.Add, tokenUserDirectory.Exists, tokenUserDirectory.FindUserByAuthToken)
-	tokenRemover := token_remover.New(userTokenDirectory.Remove, tokenUserDirectory.Remove, tokenUserDirectory.FindUserByAuthToken)
+	userRegister := user_register.New(userService.CreateUserWithToken)
+	userUnregister := user_unregister.New(userService.DeleteUserWithToken)
+	tokenAdder := token_adder.New(userService.AddTokenToUserWithToken)
+	tokenRemover := token_remover.New(userService.RemoveTokenFromUserWithToken)
 
 	checkHandler := check.New(ledisClient.Ping)
 	accessDeniedHandler := access_denied.New()
-	loginHandler := filter.New(applicationCheck.Check, login.New(applicationDirectory.Check, tokenUserDirectory.FindUserByAuthToken, tokenUserDirectory.IsUserNotFound, applicationUserDirectory.Contains, applicationGroupUserDirectory.Contains).ServeHTTP, accessDeniedHandler.ServeHTTP)
+	loginHandler := filter.New(applicationCheck.Check, login.New(userService.VerifyTokenHasGroups).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationDirectory.Create, passwordGenerator.GeneratePassword).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationDirectory.Delete).ServeHTTP, accessDeniedHandler.ServeHTTP)
 	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationDirectory.Get, applicationDirectory.IsApplicationNotFound).ServeHTTP, accessDeniedHandler.ServeHTTP)
@@ -112,21 +113,16 @@ func createServer(port int, authApplicationPassword string, adminUserName string
 	go func() {
 		var err error
 		err = applicationDirectory.Create(api.Application{
-			ApplicationName:     application_directory.AUTH_APPLICATION_NAME,
+			ApplicationName:     api.AUTH_APPLICATION_NAME,
 			ApplicationPassword: api.ApplicationPassword(authApplicationPassword),
 		})
 		if err != nil {
 			logger.Warnf("create auth application failed: %v", err)
 			return
 		}
-		err = applicationGroupDirectory.Add(application_directory.AUTH_APPLICATION_NAME, application_group_directory.ADMIN_GROUP)
+		err = groupUserDirectory.Add(api.AUTH_ADMIN_GROUP, api.UserName(adminUserName))
 		if err != nil {
-			logger.Warnf("create admin group failed: %v", err)
-			return
-		}
-		err = applicationGroupUserDirectory.Add(application_directory.AUTH_APPLICATION_NAME, application_group_directory.ADMIN_GROUP, api.UserName(adminUserName))
-		if err != nil {
-			logger.Warnf("create admin user failed: %v", err)
+			logger.Warnf("add user %s to group %v failed: %v", adminUserName, api.AUTH_ADMIN_GROUP, err)
 			return
 		}
 	}()

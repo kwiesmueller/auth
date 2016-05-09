@@ -13,29 +13,17 @@ import (
 
 var logger = log.DefaultLogger
 
-type FindUserByAuthToken func(authToken api.AuthToken) (*api.UserName, error)
-type GetTokensForUser func(userName api.UserName) (*[]api.AuthToken, error)
-type RemoveToken func(authToken api.AuthToken) error
-type RemoveUser func(userName api.UserName) error
+type DeleteUserWithToken func(authToken api.AuthToken) error
 
 type handler struct {
-	findUserByAuthToken FindUserByAuthToken
-	getTokensForUser    GetTokensForUser
-	removeToken         RemoveToken
-	removeUser          RemoveUser
+	deleteUserWithToken DeleteUserWithToken
 }
 
 func New(
-	findUserByAuthToken FindUserByAuthToken,
-	getTokensForUser GetTokensForUser,
-	removeToken RemoveToken,
-	removeUser RemoveUser,
+	deleteUserWithToken DeleteUserWithToken,
 ) *handler {
 	h := new(handler)
-	h.findUserByAuthToken = findUserByAuthToken
-	h.getTokensForUser = getTokensForUser
-	h.removeToken = removeToken
-	h.removeUser = removeUser
+	h.deleteUserWithToken = deleteUserWithToken
 	return h
 }
 
@@ -57,26 +45,9 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 		return fmt.Errorf("invalid request uri: %s", req.RequestURI)
 	}
 	authToken := api.AuthToken(parts[len(parts)-1])
-	logger.Debugf("unregister user with token %v", authToken)
-	userName, err := h.findUserByAuthToken(authToken)
-	if err != nil {
-		logger.Debugf("find user with token %v failed", authToken)
+	if err := h.deleteUserWithToken(authToken); err != nil {
 		return err
 	}
-	tokens, err := h.getTokensForUser(*userName)
-	if err != nil {
-		logger.Debugf("find tokens for user %v failed", *userName)
-		return err
-	}
-	for _, token := range *tokens {
-		if err = h.removeToken(token); err != nil {
-			logger.Debugf("remove token %v failed", token)
-		}
-	}
-	if err = h.removeUser(*userName); err != nil {
-		logger.Debugf("remove user %v failed", *userName)
-		return err
-	}
-	logger.Debugf("unregister user %v successful", *userName)
+	resp.WriteHeader(http.StatusOK)
 	return nil
 }

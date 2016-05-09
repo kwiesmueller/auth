@@ -1,5 +1,10 @@
 package api
 
+const (
+	AUTH_APPLICATION_NAME = ApplicationName("auth")
+	AUTH_ADMIN_GROUP      = GroupName("auth")
+)
+
 type UserName string
 
 type GroupName string

@@ -1,15 +1,14 @@
-package token_remover
+package user_group_directory
 
 import (
-	"net/http"
 	"testing"
 
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsHandler(t *testing.T) {
+func TestImplementsGroupDirectory(t *testing.T) {
 	object := New(nil)
-	var expected *http.Handler
+	var expected *UserGroupDirectory
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)

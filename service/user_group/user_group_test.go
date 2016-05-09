@@ -1,15 +1,14 @@
-package token_remover
+package user_group
 
 import (
-	"net/http"
 	"testing"
 
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsHandler(t *testing.T) {
-	object := New(nil)
-	var expected *http.Handler
+func TestImplementsService(t *testing.T) {
+	object := New(nil, nil)
+	var expected *Service
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)

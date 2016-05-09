@@ -11,25 +11,15 @@ import (
 
 var logger = log.DefaultLogger
 
-type FindUserByAuthToken func(authToken api.AuthToken) (*api.UserName, error)
-type UserRemoveToken func(userName api.UserName, authToken api.AuthToken) error
-type TokenRemove func(authToken api.AuthToken) error
+type RemoveTokenToUserWithToken func(newToken api.AuthToken, userToken api.AuthToken) error
 
 type handler struct {
-	userRemoveToken     UserRemoveToken
-	tokenRemove         TokenRemove
-	findUserByAuthToken FindUserByAuthToken
+	removeTokenToUserWithToken RemoveTokenToUserWithToken
 }
 
-func New(
-	userRemoveToken UserRemoveToken,
-	tokenRemove TokenRemove,
-	findUserByAuthToken FindUserByAuthToken,
-) *handler {
+func New(removeTokenToUserWithToken RemoveTokenToUserWithToken) *handler {
 	h := new(handler)
-	h.userRemoveToken = userRemoveToken
-	h.tokenRemove = tokenRemove
-	h.findUserByAuthToken = findUserByAuthToken
+	h.removeTokenToUserWithToken = removeTokenToUserWithToken
 	return h
 }
 
@@ -58,15 +48,5 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 }
 
 func (h *handler) action(request *api.RemoveTokenRequest, response *api.RemoveTokenResponse) error {
-	userName, err := h.findUserByAuthToken(request.AuthToken)
-	if err != nil {
-		return err
-	}
-	if err := h.tokenRemove(request.Token); err != nil {
-		return err
-	}
-	if err := h.userRemoveToken(*userName, request.Token); err != nil {
-		return err
-	}
-	return nil
+	return h.removeTokenToUserWithToken(request.Token, request.AuthToken)
 }
