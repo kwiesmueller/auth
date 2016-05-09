@@ -22,6 +22,8 @@ func New(
 	userUnregister HandlerFunc,
 	tokenAdd HandlerFunc,
 	tokenRemove HandlerFunc,
+	userGroupAdd HandlerFunc,
+	userGroupRemove HandlerFunc,
 ) *handler {
 	router := mux.NewRouter()
 	router.Path("/healthz").Methods("GET").HandlerFunc(check)
@@ -37,6 +39,9 @@ func New(
 
 	router.Path("/token").Methods("POST").HandlerFunc(tokenAdd)
 	router.Path("/token").Methods("DELETE").HandlerFunc(tokenRemove)
+
+	router.Path("/user_group").Methods("POST").HandlerFunc(userGroupAdd)
+	router.Path("/user_group").Methods("DELETE").HandlerFunc(userGroupRemove)
 
 	h := new(handler)
 	h.router = router

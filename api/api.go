@@ -82,3 +82,19 @@ type RemoveTokenRequest struct {
 
 type RemoveTokenResponse struct {
 }
+
+type AddUserToGroupRequest struct {
+	UserName  UserName  `json:"user"`
+	GroupName GroupName `json:"group"`
+}
+
+type AddUserToGroupResponse struct {
+}
+
+type RemoveUserFromGroupRequest struct {
+	UserName  UserName  `json:"user"`
+	GroupName GroupName `json:"group"`
+}
+
+type RemoveUserFromGroupResponse struct {
+}

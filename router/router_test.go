@@ -21,6 +21,8 @@ type counter struct {
 	userUnregister    int
 	tokenAdd          int
 	tokenRemove       int
+	userGroupAdd      int
+	userGroupRemove   int
 }
 
 func Create(counter *int) func(http.ResponseWriter, *http.Request) {
@@ -30,7 +32,19 @@ func Create(counter *int) func(http.ResponseWriter, *http.Request) {
 }
 
 func newWithCounter(c *counter) *handler {
-	return New(Create(&c.check), Create(&c.login), Create(&c.applicationCreate), Create(&c.applicationDelete), Create(&c.applicationGet), Create(&c.userRegister), Create(&c.userUnregister), Create(&c.tokenAdd), Create(&c.tokenRemove))
+	return New(
+		Create(&c.check),
+		Create(&c.login),
+		Create(&c.applicationCreate),
+		Create(&c.applicationDelete),
+		Create(&c.applicationGet),
+		Create(&c.userRegister),
+		Create(&c.userUnregister),
+		Create(&c.tokenAdd),
+		Create(&c.tokenRemove),
+		Create(&c.userGroupAdd),
+		Create(&c.userGroupRemove),
+	)
 }
 
 func TestHealthz(t *testing.T) {
@@ -222,6 +236,44 @@ func TestTokenRemove(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err = AssertThat(c.tokenRemove, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserGroupAdd(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user_group")
+	rb.SetMethod("POST")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userGroupAdd, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userGroupAdd, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserGroupRemove(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user_group")
+	rb.SetMethod("DELETE")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userGroupRemove, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userGroupRemove, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -19,6 +19,10 @@ type service struct {
 
 type Service interface {
 	CreateApplication(applicationName api.ApplicationName) (*api.Application, error)
+	CreateApplicationWithPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.Application, error)
+	VerifyApplicationPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (bool, error)
+	GetApplication(applicationName api.ApplicationName) (*api.Application, error)
+	DeleteApplication(applicationName api.ApplicationName) error
 }
 
 func New(generatePassword GeneratePassword, applicationDirectory application_directory.ApplicationDirectory) *service {
@@ -28,16 +32,58 @@ func New(generatePassword GeneratePassword, applicationDirectory application_dir
 	return s
 }
 
+func (s *service) DeleteApplication(applicationName api.ApplicationName) error {
+	logger.Debugf("delete application %v", applicationName)
+	err := s.applicationDirectory.Delete(applicationName)
+	if err != nil {
+		logger.Debugf("delete application %v failed: %v", applicationName, err)
+		return err
+	}
+	logger.Debugf("deleted application %v successful", applicationName)
+	return nil
+}
+
 func (s *service) CreateApplication(applicationName api.ApplicationName) (*api.Application, error) {
 	logger.Debugf("create application %v", applicationName)
+	applicationPassword := api.ApplicationPassword(s.generatePassword(PASSWORD_LENGTH))
+	return s.CreateApplicationWithPassword(applicationName, applicationPassword)
+}
+
+func (s *service) CreateApplicationWithPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.Application, error) {
+	logger.Debugf("create application with password %v", applicationName)
 	application := api.Application{
 		ApplicationName:     applicationName,
-		ApplicationPassword: api.ApplicationPassword(s.generatePassword(PASSWORD_LENGTH)),
+		ApplicationPassword: applicationPassword,
 	}
-	if err := s.applicationDirectory.Create(application); err != nil {
+	if err := s.applicationDirectory.Create(applicationName, applicationPassword); err != nil {
 		logger.Debugf("create application %v failed: %v", applicationName, err)
 		return nil, err
 	}
 	logger.Debugf("created application %v successful", applicationName)
+	return &application, nil
+}
+
+func (s *service) VerifyApplicationPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (bool, error) {
+	logger.Debugf("verify password of application %v", applicationName)
+	pw, err := s.applicationDirectory.Get(applicationName)
+	if err != nil {
+		return false, err
+	}
+	if *pw != applicationPassword {
+		return false, nil
+	}
+	return true, nil
+}
+
+func (s *service) GetApplication(applicationName api.ApplicationName) (*api.Application, error) {
+	logger.Debugf("get application %v", applicationName)
+	applicationPassword, err := s.applicationDirectory.Get(applicationName)
+	if err != nil {
+		return nil, err
+	}
+	application := api.Application{
+		ApplicationName:     applicationName,
+		ApplicationPassword: *applicationPassword,
+	}
 	return &application, nil
 }

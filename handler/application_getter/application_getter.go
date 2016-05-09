@@ -15,17 +15,14 @@ import (
 var logger = log.DefaultLogger
 
 type GetApplication func(applicationName api.ApplicationName) (*api.Application, error)
-type IsApplicationNotFound func(err error) bool
 
 type handler struct {
-	getApplication        GetApplication
-	isApplicationNotFound IsApplicationNotFound
+	getApplication GetApplication
 }
 
-func New(getApplication GetApplication, isApplicationNotFound IsApplicationNotFound) *handler {
+func New(getApplication GetApplication) *handler {
 	h := new(handler)
 	h.getApplication = getApplication
-	h.isApplicationNotFound = isApplicationNotFound
 	return h
 }
 
@@ -46,12 +43,9 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	last := parts[len(parts)-1]
 	application, err := h.getApplication(api.ApplicationName(last))
 	if err != nil {
-		if h.isApplicationNotFound(err) {
-			e := error_handler.NewErrorMessage(http.StatusNotFound, err.Error())
-			e.ServeHTTP(resp, req)
-			return nil
-		}
-		return err
+		e := error_handler.NewErrorMessage(http.StatusNotFound, err.Error())
+		e.ServeHTTP(resp, req)
+		return nil
 	}
 	return json.NewEncoder(resp).Encode(&api.GetApplicationResponse{
 		ApplicationName:     application.ApplicationName,

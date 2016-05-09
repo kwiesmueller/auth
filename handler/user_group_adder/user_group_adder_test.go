@@ -1,4 +1,4 @@
-package application_getter
+package user_group_adder
 
 import (
 	"net/http"

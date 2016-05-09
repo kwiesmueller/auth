@@ -8,81 +8,48 @@ import (
 	"github.com/bborbe/log"
 )
 
-var (
-	logger    = log.DefaultLogger
-	NOT_FOUND = fmt.Errorf("application not found")
-)
+var logger = log.DefaultLogger
 
-const (
-	PREFIX         = "application"
-	FIELD_PASSWORD = "password"
-)
+const PREFIX = "application"
 
 type directory struct {
-	ledis ledis.Hash
+	ledis ledis.Kv
 }
 
 type ApplicationDirectory interface {
-	Check(api.ApplicationName, api.ApplicationPassword) error
-	Create(application api.Application) error
+	Create(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) error
 	Delete(applicationName api.ApplicationName) error
-	Get(applicationName api.ApplicationName) (*api.Application, error)
-	IsApplicationNotFound(err error) bool
+	Get(applicationName api.ApplicationName) (*api.ApplicationPassword, error)
 }
 
-func New(ledisClient ledis.Hash) *directory {
+func New(ledisClient ledis.Kv) *directory {
 	a := new(directory)
 	a.ledis = ledisClient
 	return a
-}
-
-func (d *directory) IsApplicationNotFound(err error) bool {
-	return err == NOT_FOUND
-}
-
-func (d *directory) Check(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) error {
-	logger.Debugf("check application: %s", applicationName)
-	value, err := d.ledis.HashGet(createKey(applicationName), FIELD_PASSWORD)
-	if err != nil {
-		return err
-	}
-	if api.ApplicationPassword(value) != applicationPassword {
-		return fmt.Errorf("password invalid")
-	}
-	return nil
-}
-
-func (d *directory) Create(application api.Application) error {
-	logger.Debugf("create application: %s", application.ApplicationName)
-	key := createKey(application.ApplicationName)
-	return d.ledis.HashSet(key, FIELD_PASSWORD, string(application.ApplicationPassword))
-}
-
-func (d *directory) Delete(applicationName api.ApplicationName) error {
-	logger.Debugf("delete application: %s", applicationName)
-	return d.ledis.HashClear(createKey(applicationName))
 }
 
 func createKey(applicationName api.ApplicationName) string {
 	return fmt.Sprintf("%s:%s", PREFIX, applicationName)
 }
 
-func (d *directory) Get(applicationName api.ApplicationName) (*api.Application, error) {
+func (d *directory) Create(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) error {
+	logger.Debugf("create application: %s", applicationName)
+	key := createKey(applicationName)
+	return d.ledis.Set(key, string(applicationPassword))
+}
+
+func (d *directory) Delete(applicationName api.ApplicationName) error {
+	logger.Debugf("delete application: %s", applicationName)
+	return d.ledis.Del(createKey(applicationName))
+}
+
+func (d *directory) Get(applicationName api.ApplicationName) (*api.ApplicationPassword, error) {
 	logger.Debugf("get application: %s", applicationName)
 	key := createKey(applicationName)
-	exists, err := d.ledis.HashExists(key, FIELD_PASSWORD)
+	value, err := d.ledis.Get(key)
 	if err != nil {
 		return nil, err
 	}
-	if !exists {
-		return nil, NOT_FOUND
-	}
-	value, err := d.ledis.HashGet(key, FIELD_PASSWORD)
-	if err != nil {
-		return nil, err
-	}
-	return &api.Application{
-		ApplicationName:     applicationName,
-		ApplicationPassword: api.ApplicationPassword(value),
-	}, nil
+	applicationPassword := api.ApplicationPassword(value)
+	return &applicationPassword, nil
 }

@@ -1,4 +1,4 @@
-package application_getter
+package user_group_remover
 
 import (
 	"net/http"

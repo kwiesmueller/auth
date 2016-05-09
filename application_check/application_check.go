@@ -10,15 +10,15 @@ import (
 
 var logger = log.DefaultLogger
 
-type CheckApplication func(api.ApplicationName, api.ApplicationPassword) error
+type VerifyApplicationPassword func(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (bool, error)
 
 type check struct {
-	checkApplication CheckApplication
+	verifyApplicationPassword VerifyApplicationPassword
 }
 
-func New(checkApplication CheckApplication) *check {
+func New(verifyApplicationPassword VerifyApplicationPassword) *check {
 	c := new(check)
-	c.checkApplication = checkApplication
+	c.verifyApplicationPassword = verifyApplicationPassword
 	return c
 }
 
@@ -28,5 +28,5 @@ func (c *check) Check(req *http.Request) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return c.checkApplication(api.ApplicationName(name), api.ApplicationPassword(pass)) == nil, nil
+	return c.verifyApplicationPassword(api.ApplicationName(name), api.ApplicationPassword(pass))
 }
