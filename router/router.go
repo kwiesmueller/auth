@@ -13,22 +13,22 @@ type handler struct {
 }
 
 func New(
-check HandlerFunc,
-login HandlerFunc,
-applicationCreate HandlerFunc,
-applicationDelete HandlerFunc,
-applicationGet HandlerFunc,
-userRegister HandlerFunc,
-userUnregister HandlerFunc,
-tokenAdd HandlerFunc,
-tokenRemove HandlerFunc,
-userGroupAdd HandlerFunc,
-userGroupRemove HandlerFunc,
-userDataSet HandlerFunc,
-userDataGet                 HandlerFunc,
-userDataGetValue                 HandlerFunc,
-userDataDelete                 HandlerFunc,
-userDataDeleteValue                 HandlerFunc,
+	check HandlerFunc,
+	login HandlerFunc,
+	applicationCreate HandlerFunc,
+	applicationDelete HandlerFunc,
+	applicationGet HandlerFunc,
+	userRegister HandlerFunc,
+	userUnregister HandlerFunc,
+	tokenAdd HandlerFunc,
+	tokenRemove HandlerFunc,
+	userGroupAdd HandlerFunc,
+	userGroupRemove HandlerFunc,
+	userDataSet HandlerFunc,
+	userDataGet HandlerFunc,
+	userDataGetValue HandlerFunc,
+	userDataDelete HandlerFunc,
+	userDataDeleteValue HandlerFunc,
 ) *handler {
 	router := mux.NewRouter()
 

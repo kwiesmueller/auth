@@ -9,7 +9,6 @@ import (
 
 	"github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/server/mock"
-	"fmt"
 )
 
 type counter struct {
