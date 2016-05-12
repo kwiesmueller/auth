@@ -41,5 +41,6 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
+
 	return json.NewEncoder(resp).Encode(response)
 }
