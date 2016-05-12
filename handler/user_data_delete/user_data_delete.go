@@ -1,8 +1,10 @@
 package user_data_delete
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"fmt"
+	"regexp"
 
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/log"
@@ -36,10 +38,13 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	logger.Debugf("deleteUserData")
-	var request api.DeleteUserDataRequest
-	var response api.DeleteUserDataResponse
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
-		return err
+	path := req.URL.Path
+	logger.Debugf("path: %s", path)
+	re := regexp.MustCompile(`/user/([^/]*)/data`)
+	matches := re.FindStringSubmatch(path)
+	fmt.Printf("%v", matches)
+	if len(matches) != 2 {
+		return fmt.Errorf("find user failed")
 	}
-	return json.NewEncoder(resp).Encode(response)
+	return h.deleteUserData(api.UserName(matches[1]))
 }
