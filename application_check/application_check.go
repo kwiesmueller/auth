@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/bborbe/auth/api"
-	"github.com/bborbe/log"
 	"github.com/bborbe/http/header"
+	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger

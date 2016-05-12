@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
 	"github.com/bborbe/auth/api"
+	"github.com/bborbe/http/header"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
-	"github.com/bborbe/http/header"
 )
 
 var logger = log.DefaultLogger
