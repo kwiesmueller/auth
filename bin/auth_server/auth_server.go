@@ -10,6 +10,7 @@ import (
 	"github.com/bborbe/auth/directory/application_directory"
 	"github.com/bborbe/auth/directory/group_user_directory"
 	"github.com/bborbe/auth/directory/token_user_directory"
+	"github.com/bborbe/auth/directory/user_data_directory"
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
 	"github.com/bborbe/auth/filter"
@@ -21,6 +22,12 @@ import (
 	"github.com/bborbe/auth/handler/login"
 	"github.com/bborbe/auth/handler/token_adder"
 	"github.com/bborbe/auth/handler/token_remover"
+	"github.com/bborbe/auth/handler/user_data_delete"
+	"github.com/bborbe/auth/handler/user_data_delete_value"
+	"github.com/bborbe/auth/handler/user_data_get"
+	"github.com/bborbe/auth/handler/user_data_get_value"
+	"github.com/bborbe/auth/handler/user_data_set"
+	"github.com/bborbe/auth/handler/user_data_set_value"
 	"github.com/bborbe/auth/handler/user_group_adder"
 	"github.com/bborbe/auth/handler/user_group_remover"
 	"github.com/bborbe/auth/handler/user_register"
@@ -89,37 +96,60 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	applicationDirectory := application_directory.New(ledisClient)
 	groupUserDirectory := group_user_directory.New(ledisClient)
 	userGroupDirectory := user_group_directory.New(ledisClient)
+	userDataDirectory := user_data_directory.New(ledisClient)
 
 	userService := user.New(userTokenDirectory, userGroupDirectory, tokenUserDirectory)
 	applicationService := application.New(passwordGenerator.GeneratePassword, applicationDirectory)
 	userGroupService := user_group.New(userGroupDirectory, groupUserDirectory)
-
 	applicationCheck := application_check.New(applicationService.VerifyApplicationPassword)
-	userRegister := user_register.New(userService.CreateUserWithToken)
-	userUnregister := user_unregister.New(userService.DeleteUserWithToken)
-	tokenAdder := token_adder.New(userService.AddTokenToUserWithToken)
-	tokenRemover := token_remover.New(userService.RemoveTokenFromUserWithToken)
-	userGroupAdder := user_group_adder.New(userGroupService.AddUserToGroup)
-	userGroupRemover := user_group_remover.New(userGroupService.RemoveUserFromGroup)
 
 	checkHandler := check.New(ledisClient.Ping)
+
 	accessDeniedHandler := access_denied.New()
+
 	loginHandler := filter.New(applicationCheck.Check, login.New(userService.VerifyTokenHasGroups).ServeHTTP, accessDeniedHandler.ServeHTTP)
+
 	applicationCreatorHandler := filter.New(applicationCheck.Check, application_creator.New(applicationService.CreateApplication).ServeHTTP, accessDeniedHandler.ServeHTTP)
+
 	applicationDeletorHandler := filter.New(applicationCheck.Check, application_deletor.New(applicationService.DeleteApplication).ServeHTTP, accessDeniedHandler.ServeHTTP)
+
 	applicationGetterHandler := filter.New(applicationCheck.Check, application_getter.New(applicationService.GetApplication).ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userRegister := user_register.New(userService.CreateUserWithToken)
 	userRegisterHandler := filter.New(applicationCheck.Check, userRegister.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userUnregister := user_unregister.New(userService.DeleteUserWithToken)
 	userUnregisterHandler := filter.New(applicationCheck.Check, userUnregister.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	tokenAdder := token_adder.New(userService.AddTokenToUserWithToken)
 	tokenAddHandler := filter.New(applicationCheck.Check, tokenAdder.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	tokenRemover := token_remover.New(userService.RemoveTokenFromUserWithToken)
 	tokenRemoveHandler := filter.New(applicationCheck.Check, tokenRemover.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userGroupAdder := user_group_adder.New(userGroupService.AddUserToGroup)
 	userGroupAddHandler := filter.New(applicationCheck.Check, userGroupAdder.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userGroupRemover := user_group_remover.New(userGroupService.RemoveUserFromGroup)
 	userGroupRemoveHandler := filter.New(applicationCheck.Check, userGroupRemover.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userDataSet := checkHandler
-	userDataGet := checkHandler
-	userDataGetValue := checkHandler
-	userDataDelete := checkHandler
-	userDataDeleteValue := checkHandler
+	userDataSet := user_data_set.New(userDataDirectory.Set)
+	userDataSetHandler := filter.New(applicationCheck.Check, userDataSet.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userDataSetValue := user_data_set_value.New(userDataDirectory.SetValue)
+	userDataSetValueHandler := filter.New(applicationCheck.Check, userDataSetValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userDataGet := user_data_get.New(userDataDirectory.Get)
+	userDataGetHandler := filter.New(applicationCheck.Check, userDataGet.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userDataGetValue := user_data_get_value.New(userDataDirectory.GetValue)
+	userDataGetValueHandler := filter.New(applicationCheck.Check, userDataGetValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userDataDelete := user_data_delete.New(userDataDirectory.Delete)
+	userDataDeleteHandler := filter.New(applicationCheck.Check, userDataDelete.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
+	userDataDeleteValue := user_data_delete_value.New(userDataDirectory.DeleteValue)
+	userDataDeleteValueHandler := filter.New(applicationCheck.Check, userDataDeleteValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {
 		if _, err := applicationService.CreateApplicationWithPassword(api.AUTH_APPLICATION_NAME, api.ApplicationPassword(authApplicationPassword)); err != nil {
@@ -140,11 +170,12 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		tokenRemoveHandler.ServeHTTP,
 		userGroupAddHandler.ServeHTTP,
 		userGroupRemoveHandler.ServeHTTP,
-		userDataSet.ServeHTTP,
-		userDataGet.ServeHTTP,
-		userDataGetValue.ServeHTTP,
-		userDataDelete.ServeHTTP,
-		userDataDeleteValue.ServeHTTP,
+		userDataSetHandler.ServeHTTP,
+		userDataSetValueHandler.ServeHTTP,
+		userDataGetHandler.ServeHTTP,
+		userDataGetValueHandler.ServeHTTP,
+		userDataDeleteHandler.ServeHTTP,
+		userDataDeleteValueHandler.ServeHTTP,
 	)
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }

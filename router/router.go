@@ -25,6 +25,7 @@ func New(
 	userGroupAdd HandlerFunc,
 	userGroupRemove HandlerFunc,
 	userDataSet HandlerFunc,
+	userDataSetValue HandlerFunc,
 	userDataGet HandlerFunc,
 	userDataGetValue HandlerFunc,
 	userDataDelete HandlerFunc,
@@ -33,6 +34,7 @@ func New(
 	router := mux.NewRouter()
 
 	router.Path("/user/{username}/data").Methods("POST").HandlerFunc(userDataSet)
+	router.Path("/user/{username}/data/{key}").Methods("POST").HandlerFunc(userDataSetValue)
 	router.Path("/user/{username}/data").Methods("GET").HandlerFunc(userDataGet)
 	router.Path("/user/{username}/data/{key}").Methods("GET").HandlerFunc(userDataGetValue)
 	router.Path("/user/{username}/data").Methods("DELETE").HandlerFunc(userDataDelete)

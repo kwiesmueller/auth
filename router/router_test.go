@@ -24,6 +24,7 @@ type counter struct {
 	userGroupAdd        int
 	userGroupRemove     int
 	userDataSet         int
+	userDataSetValue    int
 	userDataGet         int
 	userDataGetValue    int
 	userDataDelete      int
@@ -50,6 +51,7 @@ func newWithCounter(c *counter) *handler {
 		Create(&c.userGroupAdd),
 		Create(&c.userGroupRemove),
 		Create(&c.userDataSet),
+		Create(&c.userDataSetValue),
 		Create(&c.userDataGet),
 		Create(&c.userDataGetValue),
 		Create(&c.userDataDelete),
@@ -303,6 +305,25 @@ func TestUserDataSet(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err = AssertThat(c.userDataSet, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserDataSetValue(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data/keya")
+	rb.SetMethod("POST")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userDataSetValue, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userDataSetValue, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
