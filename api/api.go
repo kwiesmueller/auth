@@ -103,3 +103,8 @@ type SetUserDataRequest map[string]string
 
 type SetUserDataResponse struct {
 }
+
+type SetUserDataValueRequest string
+
+type SetUserDataValueResponse struct {
+}
