@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
 	"github.com/bborbe/auth/api"
-
-	"github.com/bborbe/http/bearer"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
+	"github.com/bborbe/http/header"
 )
 
 var logger = log.DefaultLogger
@@ -54,7 +52,7 @@ func (a *authClient) Auth(authToken api.AuthToken, requiredGroups []api.GroupNam
 	requestbuilder := a.httpRequestBuilderProvider.NewHttpRequestBuilder(target)
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
-	requestbuilder.AddHeader("Authorization", bearer.CreateBearerHeader(string(a.applicationName), string(a.applicationPassword)))
+	requestbuilder.AddHeader("Authorization", header.CreateAuthorizationBearerHeader(string(a.applicationName), string(a.applicationPassword)))
 	content, err := json.Marshal(request)
 	if err != nil {
 		return nil, err

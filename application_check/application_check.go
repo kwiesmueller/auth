@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/bborbe/auth/api"
-	"github.com/bborbe/http/bearer"
 	"github.com/bborbe/log"
+	"github.com/bborbe/http/header"
 )
 
 var logger = log.DefaultLogger
@@ -24,7 +24,7 @@ func New(verifyApplicationPassword VerifyApplicationPassword) *check {
 
 func (c *check) Check(req *http.Request) (bool, error) {
 	logger.Debugf("validate application")
-	name, pass, err := bearer.ParseBearerHttpRequest(req)
+	name, pass, err := header.ParseAuthorizationBearerHttpRequest(req)
 	if err != nil {
 		return false, err
 	}
