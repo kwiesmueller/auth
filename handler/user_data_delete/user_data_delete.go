@@ -36,8 +36,8 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	logger.Debugf("deleteUserData")
-	var request api.SetUserDataRequest
-	var response api.SetUserDataResponse
+	var request api.DeleteUserDataRequest
+	var response api.DeleteUserDataResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}

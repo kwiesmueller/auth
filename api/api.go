@@ -108,3 +108,27 @@ type SetUserDataValueRequest string
 
 type SetUserDataValueResponse struct {
 }
+
+type GetUserDataRequest struct {
+}
+
+type GetUserDataResponse struct {
+}
+
+type GetUserDataValueRequest struct {
+}
+
+type GetUserDataValueResponse struct {
+}
+
+type DeleteUserDataRequest struct {
+}
+
+type DeleteUserDataResponse struct {
+}
+
+type DeleteUserDataValueRequest struct {
+}
+
+type DeleteUserDataValueResponse struct {
+}

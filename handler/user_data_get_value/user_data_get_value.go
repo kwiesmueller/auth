@@ -36,8 +36,8 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	logger.Debugf("getUserDataValue")
-	var request api.SetUserDataRequest
-	var response api.SetUserDataResponse
+	var request api.GetUserDataValueRequest
+	var response api.GetUserDataValueResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
