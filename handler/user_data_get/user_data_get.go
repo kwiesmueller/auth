@@ -43,7 +43,6 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	logger.Debugf("path: %s", path)
 	re := regexp.MustCompile(`/user/([^/]*)/data`)
 	matches := re.FindStringSubmatch(path)
-	fmt.Printf("%v", matches)
 	if len(matches) != 2 {
 		return fmt.Errorf("find user failed")
 	}
