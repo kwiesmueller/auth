@@ -4,13 +4,56 @@
 
 `go get github.com/bborbe/auth/bin/auth_server`
 
-## Usage
+## Actions
+
+### Health-Check
 
 `curl -X GET http://localhost:8080/healthz`
 
+### Readiness-Check
+
 `curl -X GET http://localhost:8080/readiness`
 
+### Register User
+
+`curl -X POST -d '{ ... }' http://localhost:8080/user`
+
+### Unregister User
+
+`curl -X DELETE -d '{ ... }' http://localhost:8080/user/1337`
+
+### Verify Login
+
 `curl -X POST -d '{ "applicatonName": "test", "applicatonPassword": "test", "connectorName": "test", "connectorUserIdentifier": "test", }' http://localhost:8080/login`
+
+### Create application
+
+`curl -X POST -d '{ ... }' http://localhost:8080/application`
+
+### Delete application
+
+`curl -X DELETE http://localhost:8080/application/1337`
+
+### Get application
+
+`curl -X Get http://localhost:8080/application/1337`
+
+### Add authoken to existing user 
+
+`curl -X POST -d '{ ... }' http://localhost:8080/application`
+
+### Remove authtoken from existing user 
+
+`curl -X DELETE -d '{ ... }' http://localhost:8080/application`
+
+
+### Add authoken to existing user 
+
+`curl -X POST -d '{ ... }' http://localhost:8080/user_group`
+
+### Remove authtoken from existing user 
+
+`curl -X DELETE -d '{ ... }' http://localhost:8080/user_group`
 
 ## Continuous integration
 
