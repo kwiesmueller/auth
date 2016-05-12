@@ -98,3 +98,8 @@ type RemoveUserFromGroupRequest struct {
 
 type RemoveUserFromGroupResponse struct {
 }
+
+type SetUserDataRequest map[string]string
+
+type SetUserDataResponse struct {
+}

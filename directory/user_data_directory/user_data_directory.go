@@ -17,12 +17,12 @@ type directory struct {
 }
 
 type UserDataDirectory interface {
-	SetValue(userName api.UserName, key string, value string) error
-	GetValue(userName api.UserName, key string) (string, error)
-	Get(userName api.UserName) (map[string]string, error)
 	Set(userName api.UserName, data map[string]string) error
-	DeleteValue(userName api.UserName, key string) error
+	SetValue(userName api.UserName, key string, value string) error
+	Get(userName api.UserName) (map[string]string, error)
+	GetValue(userName api.UserName, key string) (string, error)
 	Delete(userName api.UserName) error
+	DeleteValue(userName api.UserName, key string) error
 }
 
 func New(ledisClient ledis.Kv) *directory {
