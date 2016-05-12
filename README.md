@@ -4,6 +4,10 @@
 
 `go get github.com/bborbe/auth/bin/auth_server`
 
+## Authorize
+
+Authorization: Bearer YXBwTmFtZTpwYXNzCg== 
+
 ## Actions
 
 ### Health-Check
@@ -46,7 +50,6 @@
 
 `curl -X DELETE -d '{ ... }' http://localhost:8080/application`
 
-
 ### Add authoken to existing user 
 
 `curl -X POST -d '{ ... }' http://localhost:8080/user_group`
@@ -54,6 +57,26 @@
 ### Remove authtoken from existing user 
 
 `curl -X DELETE -d '{ ... }' http://localhost:8080/user_group`
+
+### Create user data
+
+`curl -X POST -d '{ "keya":"valuea", "keyb":"valueb" }' http://localhost:8080/user/tester/data`
+
+### Get user data
+
+`curl -X GET http://localhost:8080/user/tester/data`
+
+### Get user data key
+
+`curl -X GET http://localhost:8080/user/tester/data/keya`
+
+### Delete user data
+
+`curl -X DELETE http://localhost:8080/user/tester/data`
+
+### Delete user data key
+
+`curl -X DELETE http://localhost:8080/user/tester/data/keya`
 
 ## Continuous integration
 
