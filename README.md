@@ -4,6 +4,25 @@
 
 `go get github.com/bborbe/auth/bin/auth_server`
 
+## Run
+
+Start ledis database
+
+```
+ledis-server \
+-databases=1 \
+-addr=localhost:6380
+```
+
+Start auth-server
+
+```
+auth_server \
+-loglevel debug \
+-ledisdb-address localhost:6380 \
+-port 8080
+```
+
 ## Authorize
 
 Authorization: Bearer YXBwTmFtZTpwYXNzCg== 
