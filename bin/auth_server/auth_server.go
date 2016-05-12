@@ -39,20 +39,20 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	DEFAULT_PORT                        = 8080
-	PARAMETER_LOGLEVEL                  = "loglevel"
-	PARAMETER_PORT                      = "port"
+	DEFAULT_PORT = 8080
+	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_PORT = "port"
 	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
-	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
+	PARAMETER_LEDISDB_ADDRESS = "ledisdb-address"
+	PARAMETER_LEDISDB_PASSWORD = "ledisdb-password"
 )
 
 var (
-	logLevelPtr                = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
-	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	logLevelPtr = flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, "one of OFF,TRACE,DEBUG,INFO,WARN,ERROR")
+	portPtr = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
 	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
-	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
+	ledisdbAddressPtr = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
+	ledisdbPasswordPtr = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 )
 
 func main() {
@@ -115,6 +115,12 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	userGroupAddHandler := filter.New(applicationCheck.Check, userGroupAdder.ServeHTTP, accessDeniedHandler.ServeHTTP)
 	userGroupRemoveHandler := filter.New(applicationCheck.Check, userGroupRemover.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
+	userDataSet := checkHandler
+	userDataGet := checkHandler
+	userDataGetValue := checkHandler
+	userDataDelete := checkHandler
+	userDataDeleteValue := checkHandler
+
 	go func() {
 		if _, err := applicationService.CreateApplicationWithPassword(api.AUTH_APPLICATION_NAME, api.ApplicationPassword(authApplicationPassword)); err != nil {
 			logger.Warnf("create auth application failed: %v", err)
@@ -134,6 +140,11 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		tokenRemoveHandler.ServeHTTP,
 		userGroupAddHandler.ServeHTTP,
 		userGroupRemoveHandler.ServeHTTP,
+		userDataSet.ServeHTTP,
+		userDataGet.ServeHTTP,
+		userDataGetValue.ServeHTTP,
+		userDataDelete.ServeHTTP,
+		userDataDeleteValue.ServeHTTP,
 	)
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }

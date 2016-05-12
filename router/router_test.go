@@ -9,20 +9,26 @@ import (
 
 	"github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/server/mock"
+	"fmt"
 )
 
 type counter struct {
-	check             int
-	login             int
-	applicationCreate int
-	applicationDelete int
-	applicationGet    int
-	userRegister      int
-	userUnregister    int
-	tokenAdd          int
-	tokenRemove       int
-	userGroupAdd      int
-	userGroupRemove   int
+	check               int
+	login               int
+	applicationCreate   int
+	applicationDelete   int
+	applicationGet      int
+	userRegister        int
+	userUnregister      int
+	tokenAdd            int
+	tokenRemove         int
+	userGroupAdd        int
+	userGroupRemove     int
+	userDataSet         int
+	userDataGet         int
+	userDataGetValue    int
+	userDataDelete      int
+	userDataDeleteValue int
 }
 
 func Create(counter *int) func(http.ResponseWriter, *http.Request) {
@@ -44,6 +50,11 @@ func newWithCounter(c *counter) *handler {
 		Create(&c.tokenRemove),
 		Create(&c.userGroupAdd),
 		Create(&c.userGroupRemove),
+		Create(&c.userDataSet),
+		Create(&c.userDataGet),
+		Create(&c.userDataGetValue),
+		Create(&c.userDataDelete),
+		Create(&c.userDataDeleteValue),
 	)
 }
 
@@ -274,6 +285,102 @@ func TestUserGroupRemove(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err = AssertThat(c.userGroupRemove, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserDataSet(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data")
+	rb.SetMethod("POST")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userDataSet, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userDataSet, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserDataGet(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data")
+	rb.SetMethod("GET")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userDataGet, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userDataGet, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserDataGetValue(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data/keya")
+	rb.SetMethod("GET")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userDataGetValue, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userDataGetValue, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserDataDelete(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data")
+	rb.SetMethod("DELETE")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userDataDelete, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userDataDelete, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserDataDeleteValue(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data/keya")
+	rb.SetMethod("DELETE")
+
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userDataDeleteValue, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userDataDeleteValue, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

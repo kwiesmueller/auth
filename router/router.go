@@ -13,21 +13,34 @@ type handler struct {
 }
 
 func New(
-	check HandlerFunc,
-	login HandlerFunc,
-	applicationCreate HandlerFunc,
-	applicationDelete HandlerFunc,
-	applicationGet HandlerFunc,
-	userRegister HandlerFunc,
-	userUnregister HandlerFunc,
-	tokenAdd HandlerFunc,
-	tokenRemove HandlerFunc,
-	userGroupAdd HandlerFunc,
-	userGroupRemove HandlerFunc,
+check HandlerFunc,
+login HandlerFunc,
+applicationCreate HandlerFunc,
+applicationDelete HandlerFunc,
+applicationGet HandlerFunc,
+userRegister HandlerFunc,
+userUnregister HandlerFunc,
+tokenAdd HandlerFunc,
+tokenRemove HandlerFunc,
+userGroupAdd HandlerFunc,
+userGroupRemove HandlerFunc,
+userDataSet HandlerFunc,
+userDataGet                 HandlerFunc,
+userDataGetValue                 HandlerFunc,
+userDataDelete                 HandlerFunc,
+userDataDeleteValue                 HandlerFunc,
 ) *handler {
 	router := mux.NewRouter()
+
+	router.Path("/user/{username}/data").Methods("POST").HandlerFunc(userDataSet)
+	router.Path("/user/{username}/data").Methods("GET").HandlerFunc(userDataGet)
+	router.Path("/user/{username}/data/{key}").Methods("GET").HandlerFunc(userDataGetValue)
+	router.Path("/user/{username}/data").Methods("DELETE").HandlerFunc(userDataDelete)
+	router.Path("/user/{username}/data/{key}").Methods("DELETE").HandlerFunc(userDataDeleteValue)
+
 	router.Path("/healthz").Methods("GET").HandlerFunc(check)
 	router.Path("/readiness").Methods("GET").HandlerFunc(check)
+
 	router.Path("/login").Methods("POST").HandlerFunc(login)
 
 	router.Path("/application").Methods("POST").HandlerFunc(applicationCreate)
