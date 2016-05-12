@@ -11,22 +11,22 @@ import (
 
 var logger = log.DefaultLogger
 
-type SetUserData func(userName api.UserName, data map[string]string) error
+type SetUserDataValue func(userName api.UserName, key string, value string) error
 
 type handler struct {
-	setUserData SetUserData
+	setUserDataValue SetUserDataValue
 }
 
 func New(
-	setUserData SetUserData,
+	setUserDataValue SetUserDataValue,
 ) *handler {
 	h := new(handler)
-	h.setUserData = setUserData
+	h.setUserDataValue = setUserDataValue
 	return h
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("setUserData")
+	logger.Debugf("setUserDataValue")
 	if err := h.serveHTTP(resp, req); err != nil {
 		logger.Debugf("Marshal json failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
@@ -35,7 +35,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	logger.Debugf("setUserData")
+	logger.Debugf("setUserDataValue")
 	var request api.SetUserDataValueRequest
 	var response api.SetUserDataValueResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
