@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"fmt"
+	"regexp"
+
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/log"
 	error_handler "github.com/bborbe/server/handler/error"
@@ -35,11 +38,19 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	logger.Debugf("getUserDataValue")
-	var request api.GetUserDataValueRequest
-	var response api.GetUserDataValueResponse
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+	logger.Debugf("getUserData")
+	path := req.URL.Path
+	logger.Debugf("path: %s", path)
+	re := regexp.MustCompile(`/user/([^/]*)/data/(.*)`)
+	matches := re.FindStringSubmatch(path)
+	fmt.Printf("%v", matches)
+	if len(matches) != 3 {
+		return fmt.Errorf("find user failed")
+	}
+	data, err := h.getUserDataValue(api.UserName(matches[1]), matches[2])
+	if err != nil {
 		return err
 	}
-	return json.NewEncoder(resp).Encode(response)
+	response := api.GetUserDataValueResponse(data)
+	return json.NewEncoder(resp).Encode(&response)
 }

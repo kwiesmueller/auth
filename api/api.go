@@ -112,14 +112,12 @@ type SetUserDataValueResponse struct {
 type GetUserDataRequest struct {
 }
 
-type GetUserDataResponse struct {
-}
+type GetUserDataResponse map[string]string
 
 type GetUserDataValueRequest struct {
 }
 
-type GetUserDataValueResponse struct {
-}
+type GetUserDataValueResponse string
 
 type DeleteUserDataRequest struct {
 }

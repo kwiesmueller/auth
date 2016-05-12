@@ -37,7 +37,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	logger.Debugf("deleteUserData")
+	logger.Debugf("deleteUserDataValue")
 	path := req.URL.Path
 	logger.Debugf("path: %s", path)
 	re := regexp.MustCompile(`/user/([^/]*)/data/(.*)`)

@@ -1,8 +1,11 @@
 package user_data_get
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"encoding/json"
+	"fmt"
+	"regexp"
 
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/log"
@@ -36,10 +39,18 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	logger.Debugf("getUserData")
-	var request api.GetUserDataRequest
-	var response api.GetUserDataResponse
-	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
+	path := req.URL.Path
+	logger.Debugf("path: %s", path)
+	re := regexp.MustCompile(`/user/([^/]*)/data`)
+	matches := re.FindStringSubmatch(path)
+	fmt.Printf("%v", matches)
+	if len(matches) != 2 {
+		return fmt.Errorf("find user failed")
+	}
+	data, err := h.getUserData(api.UserName(matches[1]))
+	if err != nil {
 		return err
 	}
-	return json.NewEncoder(resp).Encode(response)
+	response := api.GetUserDataResponse(data)
+	return json.NewEncoder(resp).Encode(&response)
 }
