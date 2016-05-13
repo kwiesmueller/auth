@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/bborbe/auth/handler/not_found"
 	"github.com/gorilla/mux"
 )
 
@@ -57,6 +58,8 @@ func New(
 
 	router.Path("/user_group").Methods("POST").HandlerFunc(userGroupAdd)
 	router.Path("/user_group").Methods("DELETE").HandlerFunc(userGroupRemove)
+
+	router.NotFoundHandler = not_found.New()
 
 	h := new(handler)
 	h.router = router
