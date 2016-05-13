@@ -20,82 +20,177 @@ Start auth-server
 auth_server \
 -loglevel debug \
 -ledisdb-address localhost:6380 \
+-auth-application-password test123
 -port 8080
 ```
 
 ## Authorize
 
-Authorization: Bearer YXBwTmFtZTpwYXNzCg== 
+`echo -n 'auth:test123' | base64`
+
+`Authorization: Bearer YXV0aDp0ZXN0MTIz` 
 
 ## Actions
 
 ### Health-Check
 
-`curl -X GET http://localhost:8080/healthz`
+```
+curl \
+-X GET \ 
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/healthz
+```
 
 ### Readiness-Check
 
-`curl -X GET http://localhost:8080/readiness`
+```
+curl \
+-X GET \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/readiness
+```
 
 ### Register User
 
-`curl -X POST -d '{ ... }' http://localhost:8080/user`
+```
+curl \
+-X POST \
+-d '{ ... }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user
+```
 
 ### Unregister User
 
-`curl -X DELETE -d '{ ... }' http://localhost:8080/user/1337`
+```
+curl \
+-X DELETE \
+-d '{ ... }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user/1337
+```
 
 ### Verify Login
 
-`curl -X POST -d '{ "applicatonName": "test", "applicatonPassword": "test", "connectorName": "test", "connectorUserIdentifier": "test", }' http://localhost:8080/login`
+```
+curl \
+-X POST \
+-d '{ "applicatonName": "test", "applicatonPassword": "test", "connectorName": "test", "connectorUserIdentifier": "test", }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:8080/login
+```
 
 ### Create application
 
-`curl -X POST -d '{ ... }' http://localhost:8080/application`
+```
+curl \
+-X POST \
+-d '{ ... }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:8080/application
+```
 
 ### Delete application
 
-`curl -X DELETE http://localhost:8080/application/1337`
+```
+curl \
+-X DELETE \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/application/1337
+```
 
 ### Get application
 
-`curl -X Get http://localhost:8080/application/1337`
+```
+curl \
+-X Get \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/application/1337
+```
 
 ### Add authoken to existing user 
 
-`curl -X POST -d '{ ... }' http://localhost:8080/application`
+```
+curl \
+-X POST \
+-d '{ ... }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/application
+```
 
 ### Remove authtoken from existing user 
 
-`curl -X DELETE -d '{ ... }' http://localhost:8080/application`
+```
+curl \
+-X DELETE \
+-d '{ ... }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/application
+```
 
 ### Add authoken to existing user 
 
-`curl -X POST -d '{ ... }' http://localhost:8080/user_group`
+```
+curl \
+-X POST \
+-d '{ ... }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user_group
+```
 
 ### Remove authtoken from existing user 
 
-`curl -X DELETE -d '{ ... }' http://localhost:8080/user_group`
+```
+curl \
+-X DELETE \
+-d '{ ... }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user_group
+```
 
 ### Create user data
 
-`curl -X POST -d '{ "keya":"valuea", "keyb":"valueb" }' http://localhost:8080/user/tester/data`
+```
+curl \
+-X POST \
+-d '{ "keya":"valuea", "keyb":"valueb" }' \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user/tester/data
+```
 
 ### Get user data
 
-`curl -X GET http://localhost:8080/user/tester/data`
+```
+curl \
+-X GET \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user/tester/data
+```
 
 ### Get user data key
 
-`curl -X GET http://localhost:8080/user/tester/data/keya`
+```
+curl \
+-X GET \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user/tester/data/keya
+```
 
 ### Delete user data
 
-`curl -X DELETE http://localhost:8080/user/tester/data`
+```
+curl \
+-X DELETE \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user/tester/data
+```
 
 ### Delete user data key
 
-`curl -X DELETE http://localhost:8080/user/tester/data/keya`
+```
+curl \
+-X DELETE \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:8080/user/tester/data/keya
+```
 
 ## Continuous integration
 
