@@ -70,8 +70,8 @@ func (a *authClient) Auth(authToken api.AuthToken, requiredGroups []api.GroupNam
 		return nil, err
 	}
 	logger.Debugf("auth response status: %s", resp.Status)
-	if resp.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("request not success. status: %d", resp.Status)
+	if resp.StatusCode / 100 != 2 {
+		return nil, fmt.Errorf("request not success. status: %s", resp.Status)
 	}
 	responseContent, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
