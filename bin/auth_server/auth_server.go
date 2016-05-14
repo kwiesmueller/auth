@@ -28,6 +28,7 @@ import (
 	"github.com/bborbe/auth/handler/user_data_get_value"
 	"github.com/bborbe/auth/handler/user_data_set"
 	"github.com/bborbe/auth/handler/user_data_set_value"
+	"github.com/bborbe/auth/handler/user_delete"
 	"github.com/bborbe/auth/handler/user_group_adder"
 	"github.com/bborbe/auth/handler/user_group_remover"
 	"github.com/bborbe/auth/handler/user_register"
@@ -121,6 +122,9 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	userUnregister := user_unregister.New(userService.DeleteUserWithToken)
 	userUnregisterHandler := filter.New(applicationCheck.Check, userUnregister.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
+	userDelete := user_delete.New(userService.DeleteUser)
+	userDeleteHandler := filter.New(applicationCheck.Check, userDelete.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
 	tokenAdder := token_adder.New(userService.AddTokenToUserWithToken)
 	tokenAddHandler := filter.New(applicationCheck.Check, tokenAdder.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
@@ -166,6 +170,7 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 		applicationGetterHandler.ServeHTTP,
 		userRegisterHandler.ServeHTTP,
 		userUnregisterHandler.ServeHTTP,
+		userDeleteHandler.ServeHTTP,
 		tokenAddHandler.ServeHTTP,
 		tokenRemoveHandler.ServeHTTP,
 		userGroupAddHandler.ServeHTTP,

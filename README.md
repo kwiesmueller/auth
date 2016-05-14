@@ -70,7 +70,16 @@ http://localhost:6666/user
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user/dGVzdGVyOnNlY3JldA==
+http://localhost:6666/token/dGVzdGVyOnNlY3JldA==
+```
+
+### Delete User
+
+```
+curl \
+-X DELETE \
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
+http://localhost:6666/user/tester
 ```
 
 ### Verify Login

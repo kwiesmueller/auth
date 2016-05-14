@@ -19,6 +19,7 @@ type service struct {
 }
 
 type Service interface {
+	DeleteUser(userName api.UserName) error
 	DeleteUserWithToken(authToken api.AuthToken) error
 	CreateUserWithToken(userName api.UserName, authToken api.AuthToken) error
 	AddTokenToUserWithToken(newToken api.AuthToken, userToken api.AuthToken) error
@@ -45,9 +46,14 @@ func (s *service) DeleteUserWithToken(authToken api.AuthToken) error {
 		logger.Debugf("find user with token %v failed", authToken)
 		return err
 	}
-	tokens, err := s.userTokenDirectory.Get(*userName)
+	return s.DeleteUser(*userName)
+}
+
+func (s *service) DeleteUser(userName api.UserName) error {
+	logger.Debugf("delete user %v", userName)
+	tokens, err := s.userTokenDirectory.Get(userName)
 	if err != nil {
-		logger.Debugf("find tokens for user %v failed", *userName)
+		logger.Debugf("find tokens for user %v failed", userName)
 		return err
 	}
 	for _, token := range *tokens {
@@ -55,11 +61,11 @@ func (s *service) DeleteUserWithToken(authToken api.AuthToken) error {
 			logger.Debugf("remove token %v failed", token)
 		}
 	}
-	if err = s.userTokenDirectory.Delete(*userName); err != nil {
-		logger.Debugf("remove user %v failed", *userName)
+	if err = s.userTokenDirectory.Delete(userName); err != nil {
+		logger.Debugf("remove user %v failed", userName)
 		return err
 	}
-	logger.Debugf("delete user %v successful", *userName)
+	logger.Debugf("delete user %v successful", userName)
 	return nil
 }
 

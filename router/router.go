@@ -21,6 +21,7 @@ func New(
 	applicationGet HandlerFunc,
 	userRegister HandlerFunc,
 	userUnregister HandlerFunc,
+	userDelete HandlerFunc,
 	tokenAdd HandlerFunc,
 	tokenRemove HandlerFunc,
 	userGroupAdd HandlerFunc,
@@ -50,9 +51,10 @@ func New(
 	router.PathPrefix("/application/").Methods("DELETE").HandlerFunc(applicationDelete)
 	router.PathPrefix("/application/").Methods("GET").HandlerFunc(applicationGet)
 
+	router.Path("/user/{username}").Methods("DELETE").HandlerFunc(userDelete)
 	router.Path("/user").Methods("POST").HandlerFunc(userRegister)
-	router.PathPrefix("/user/").Methods("DELETE").HandlerFunc(userUnregister)
 
+	router.Path("/token/{token}").Methods("DELETE").HandlerFunc(userUnregister)
 	router.Path("/token").Methods("POST").HandlerFunc(tokenAdd)
 	router.Path("/token").Methods("DELETE").HandlerFunc(tokenRemove)
 

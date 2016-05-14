@@ -19,6 +19,7 @@ type counter struct {
 	applicationGet      int
 	userRegister        int
 	userUnregister      int
+	userDelete          int
 	tokenAdd            int
 	tokenRemove         int
 	userGroupAdd        int
@@ -46,6 +47,7 @@ func newWithCounter(c *counter) *handler {
 		Create(&c.applicationGet),
 		Create(&c.userRegister),
 		Create(&c.userUnregister),
+		Create(&c.userDelete),
 		Create(&c.tokenAdd),
 		Create(&c.tokenRemove),
 		Create(&c.userGroupAdd),
@@ -195,11 +197,30 @@ func TestUserRegister(t *testing.T) {
 	}
 }
 
-func TestUnregister(t *testing.T) {
+func TestUserDelete(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/123")
+	rb.SetMethod("DELETE")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userDelete, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userDelete, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUnregister(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/token/123")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
 	if err = AssertThat(err, NilValue()); err != nil {
