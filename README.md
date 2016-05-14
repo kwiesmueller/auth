@@ -13,17 +13,17 @@ Start ledis database
 ```
 ledis-server \
 -databases=1 \
--addr=localhost:6380
+-addr=localhost:5555
 ```
 
 Start auth-server
 
 ```
 auth_server \
--loglevel debug \
--ledisdb-address localhost:6380 \
--auth-application-password test123
--port 8080
+-loglevel=debug \
+-port=6666 \
+-ledisdb-address=localhost:5555 \
+-auth-application-password=test123
 ```
 
 ## Authorize
@@ -40,7 +40,7 @@ auth_server \
 curl \
 -X GET \ 
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/healthz
+http://localhost:6666/healthz
 ```
 
 ### Readiness-Check
@@ -49,17 +49,19 @@ http://localhost:8080/healthz
 curl \
 -X GET \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/readiness
+http://localhost:6666/readiness
 ```
 
 ### Register User
 
+`echo -n 'tester:secret' | base64`
+
 ```
 curl \
 -X POST \
--d '{ ... }' \
+-d '{ "authToken":"dGVzdGVyOnNlY3JldA==","user":"tester" }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user
+http://localhost:6666/user
 ```
 
 ### Unregister User
@@ -67,9 +69,8 @@ http://localhost:8080/user
 ```
 curl \
 -X DELETE \
--d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user/1337
+http://localhost:6666/user/dGVzdGVyOnNlY3JldA==
 ```
 
 ### Verify Login
@@ -78,7 +79,7 @@ http://localhost:8080/user/1337
 curl \
 -X POST \
 -d '{ "applicatonName": "test", "applicatonPassword": "test", "connectorName": "test", "connectorUserIdentifier": "test", }' \
--H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:8080/login
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:6666/login
 ```
 
 ### Create application
@@ -87,7 +88,7 @@ curl \
 curl \
 -X POST \
 -d '{ ... }' \
--H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:8080/application
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:6666/application
 ```
 
 ### Delete application
@@ -96,7 +97,7 @@ curl \
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/application/1337
+http://localhost:6666/application/1337
 ```
 
 ### Get application
@@ -105,7 +106,7 @@ http://localhost:8080/application/1337
 curl \
 -X Get \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/application/1337
+http://localhost:6666/application/1337
 ```
 
 ### Add authoken to existing user 
@@ -115,7 +116,7 @@ curl \
 -X POST \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/application
+http://localhost:6666/application
 ```
 
 ### Remove authtoken from existing user 
@@ -125,7 +126,7 @@ curl \
 -X DELETE \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/application
+http://localhost:6666/application
 ```
 
 ### Add authoken to existing user 
@@ -135,7 +136,7 @@ curl \
 -X POST \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user_group
+http://localhost:6666/user_group
 ```
 
 ### Remove authtoken from existing user 
@@ -145,7 +146,7 @@ curl \
 -X DELETE \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user_group
+http://localhost:6666/user_group
 ```
 
 ### Create user data
@@ -155,7 +156,7 @@ curl \
 -X POST \
 -d '{ "keya":"valuea", "keyb":"valueb" }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user/tester/data
+http://localhost:6666/user/tester/data
 ```
 
 ### Get user data
@@ -164,7 +165,7 @@ http://localhost:8080/user/tester/data
 curl \
 -X GET \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user/tester/data
+http://localhost:6666/user/tester/data
 ```
 
 ### Get user data key
@@ -173,7 +174,7 @@ http://localhost:8080/user/tester/data
 curl \
 -X GET \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user/tester/data/keya
+http://localhost:6666/user/tester/data/keya
 ```
 
 ### Delete user data
@@ -182,7 +183,7 @@ http://localhost:8080/user/tester/data/keya
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user/tester/data
+http://localhost:6666/user/tester/data
 ```
 
 ### Delete user data key
@@ -191,7 +192,7 @@ http://localhost:8080/user/tester/data
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:8080/user/tester/data/keya
+http://localhost:6666/user/tester/data/keya
 ```
 
 ## Continuous integration
