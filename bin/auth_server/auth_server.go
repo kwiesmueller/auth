@@ -36,6 +36,7 @@ import (
 	"github.com/bborbe/auth/router"
 	"github.com/bborbe/auth/service/application"
 	"github.com/bborbe/auth/service/user"
+	"github.com/bborbe/auth/service/user_data"
 	"github.com/bborbe/auth/service/user_group"
 	flag "github.com/bborbe/flagenv"
 	"github.com/bborbe/ledis"
@@ -99,10 +100,11 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	userGroupDirectory := user_group_directory.New(ledisClient)
 	userDataDirectory := user_data_directory.New(ledisClient)
 
-	userService := user.New(userTokenDirectory, userGroupDirectory, tokenUserDirectory)
+	userService := user.New(userTokenDirectory, userGroupDirectory, tokenUserDirectory, userDataDirectory)
 	applicationService := application.New(passwordGenerator.GeneratePassword, applicationDirectory)
 	userGroupService := user_group.New(userGroupDirectory, groupUserDirectory)
 	applicationCheck := application_check.New(applicationService.VerifyApplicationPassword)
+	userDataService := user_data.New(userDataDirectory)
 
 	checkHandler := check.New(ledisClient.Ping)
 
@@ -137,22 +139,22 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	userGroupRemover := user_group_remover.New(userGroupService.RemoveUserFromGroup)
 	userGroupRemoveHandler := filter.New(applicationCheck.Check, userGroupRemover.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userDataSet := user_data_set.New(userDataDirectory.Set)
+	userDataSet := user_data_set.New(userDataService.Set)
 	userDataSetHandler := filter.New(applicationCheck.Check, userDataSet.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userDataSetValue := user_data_set_value.New(userDataDirectory.SetValue)
+	userDataSetValue := user_data_set_value.New(userDataService.SetValue)
 	userDataSetValueHandler := filter.New(applicationCheck.Check, userDataSetValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userDataGet := user_data_get.New(userDataDirectory.Get)
+	userDataGet := user_data_get.New(userDataService.Get)
 	userDataGetHandler := filter.New(applicationCheck.Check, userDataGet.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userDataGetValue := user_data_get_value.New(userDataDirectory.GetValue)
+	userDataGetValue := user_data_get_value.New(userDataService.GetValue)
 	userDataGetValueHandler := filter.New(applicationCheck.Check, userDataGetValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userDataDelete := user_data_delete.New(userDataDirectory.Delete)
+	userDataDelete := user_data_delete.New(userDataService.Delete)
 	userDataDeleteHandler := filter.New(applicationCheck.Check, userDataDelete.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userDataDeleteValue := user_data_delete_value.New(userDataDirectory.DeleteValue)
+	userDataDeleteValue := user_data_delete_value.New(userDataService.DeleteValue)
 	userDataDeleteValueHandler := filter.New(applicationCheck.Check, userDataDeleteValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	go func() {

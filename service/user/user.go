@@ -5,6 +5,7 @@ import (
 
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/directory/token_user_directory"
+	"github.com/bborbe/auth/directory/user_data_directory"
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
 	"github.com/bborbe/log"
@@ -16,6 +17,7 @@ type service struct {
 	userTokenDirectory user_token_directory.UserTokenDirectory
 	userGroupDirectory user_group_directory.UserGroupDirectory
 	tokenUserDirectory token_user_directory.TokenUserDirectory
+	userDataDirectory  user_data_directory.UserDataDirectory
 }
 
 type Service interface {
@@ -31,11 +33,13 @@ func New(
 	userTokenDirectory user_token_directory.UserTokenDirectory,
 	userGroupDirectory user_group_directory.UserGroupDirectory,
 	tokenUserDirectory token_user_directory.TokenUserDirectory,
+	userDataDirectory user_data_directory.UserDataDirectory,
 ) *service {
 	s := new(service)
 	s.userTokenDirectory = userTokenDirectory
 	s.userGroupDirectory = userGroupDirectory
 	s.tokenUserDirectory = tokenUserDirectory
+	s.userDataDirectory = userDataDirectory
 	return s
 }
 
@@ -60,6 +64,10 @@ func (s *service) DeleteUser(userName api.UserName) error {
 		if err = s.tokenUserDirectory.Remove(token); err != nil {
 			logger.Debugf("remove token %v failed", token)
 		}
+	}
+	if err = s.userDataDirectory.Delete(userName); err != nil {
+		logger.Debugf("remove user data %v failed", userName)
+		return err
 	}
 	if err = s.userTokenDirectory.Delete(userName); err != nil {
 		logger.Debugf("remove user %v failed", userName)
