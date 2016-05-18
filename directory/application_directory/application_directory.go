@@ -20,6 +20,7 @@ type ApplicationDirectory interface {
 	Create(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) error
 	Delete(applicationName api.ApplicationName) error
 	Get(applicationName api.ApplicationName) (*api.ApplicationPassword, error)
+	Exists(applicationName api.ApplicationName) (bool, error)
 }
 
 func New(ledisClient ledis.Kv) *directory {
@@ -41,6 +42,11 @@ func (d *directory) Create(applicationName api.ApplicationName, applicationPassw
 func (d *directory) Delete(applicationName api.ApplicationName) error {
 	logger.Debugf("delete application: %s", applicationName)
 	return d.ledis.Del(createKey(applicationName))
+}
+
+func (d *directory) Exists(applicationName api.ApplicationName) (bool, error) {
+	logger.Debugf("exists application: %s", applicationName)
+	return d.ledis.Exists(createKey(applicationName))
 }
 
 func (d *directory) Get(applicationName api.ApplicationName) (*api.ApplicationPassword, error) {

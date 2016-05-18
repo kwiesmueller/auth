@@ -1,6 +1,8 @@
 package application
 
 import (
+	"fmt"
+
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/directory/application_directory"
 	"github.com/bborbe/log"
@@ -23,6 +25,7 @@ type Service interface {
 	VerifyApplicationPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (bool, error)
 	GetApplication(applicationName api.ApplicationName) (*api.Application, error)
 	DeleteApplication(applicationName api.ApplicationName) error
+	ExistsApplication(applicationName api.ApplicationName) (bool, error)
 }
 
 func New(generatePassword GeneratePassword, applicationDirectory application_directory.ApplicationDirectory) *service {
@@ -43,14 +46,30 @@ func (s *service) DeleteApplication(applicationName api.ApplicationName) error {
 	return nil
 }
 
+func (s *service) ExistsApplication(applicationName api.ApplicationName) (bool, error) {
+	logger.Debugf("exists application %v", applicationName)
+	return s.applicationDirectory.Exists(applicationName)
+}
+
 func (s *service) CreateApplication(applicationName api.ApplicationName) (*api.Application, error) {
 	logger.Debugf("create application %v", applicationName)
 	applicationPassword := api.ApplicationPassword(s.generatePassword(PASSWORD_LENGTH))
-	return s.CreateApplicationWithPassword(applicationName, applicationPassword)
+	return s.createApplicationWithPassword(applicationName, applicationPassword)
 }
 
 func (s *service) CreateApplicationWithPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.Application, error) {
 	logger.Debugf("create application with password %v", applicationName)
+	return s.createApplicationWithPassword(applicationName, applicationPassword)
+}
+
+func (s *service) createApplicationWithPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.Application, error) {
+	exists, err := s.ExistsApplication(applicationName)
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return nil, fmt.Errorf("applicaton %v already exists", applicationName)
+	}
 	application := api.Application{
 		ApplicationName:     applicationName,
 		ApplicationPassword: applicationPassword,
