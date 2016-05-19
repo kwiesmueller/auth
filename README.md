@@ -2,9 +2,9 @@
 
 ## Install
 
-`go get github.com/bborbe/auth/bin/auth_server`
+`go get -u github.com/bborbe/auth/bin/auth_server`
 
-`go get go get github.com/siddontang/ledisdb/cmd/ledis-server`
+`go get -u github.com/siddontang/ledisdb/cmd/ledis-server`
 
 ## Run
 
