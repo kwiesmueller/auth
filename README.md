@@ -87,7 +87,7 @@ http://localhost:6666/user/tester
 ```
 curl \
 -X POST \
--d '{ "applicatonName": "test", "applicatonPassword": "test", "connectorName": "test", "connectorUserIdentifier": "test", }' \
+-d '{ "authToken": "abc", "groups": ["admin"] }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:6666/login
 ```
 
