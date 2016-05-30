@@ -15,6 +15,8 @@ type ApplicationName string
 
 type ApplicationPassword string
 
+type Address string
+
 type Application struct {
 	ApplicationName     ApplicationName
 	ApplicationPassword ApplicationPassword
