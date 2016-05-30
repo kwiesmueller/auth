@@ -18,7 +18,6 @@ import (
 	"github.com/bborbe/auth/handler/application_creator"
 	"github.com/bborbe/auth/handler/application_deletor"
 	"github.com/bborbe/auth/handler/application_getter"
-	"github.com/bborbe/auth/handler/check"
 	"github.com/bborbe/auth/handler/login"
 	"github.com/bborbe/auth/handler/token_adder"
 	"github.com/bborbe/auth/handler/token_remover"
@@ -42,6 +41,8 @@ import (
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
+	"github.com/bborbe/server/handler/check"
+	"github.com/bborbe/server/handler/not_found"
 	"github.com/facebookgo/grace/gracehttp"
 )
 
@@ -157,6 +158,8 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	userDataDeleteValue := user_data_delete_value.New(userDataService.DeleteValue)
 	userDataDeleteValueHandler := filter.New(applicationCheck.Check, userDataDeleteValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
+	notFoundHandler := not_found.New()
+
 	go func() {
 		if _, err := applicationService.CreateApplicationWithPassword(api.AUTH_APPLICATION_NAME, api.ApplicationPassword(authApplicationPassword)); err != nil {
 			logger.Warnf("create auth application failed: %v", err)
@@ -165,6 +168,7 @@ func createServer(port int, authApplicationPassword string, ledisdbAddress strin
 	}()
 
 	handler := router.New(
+		notFoundHandler.ServeHTTP,
 		checkHandler.ServeHTTP,
 		loginHandler.ServeHTTP,
 		applicationCreatorHandler.ServeHTTP,

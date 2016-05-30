@@ -3,35 +3,34 @@ package router
 import (
 	"net/http"
 
-	"github.com/bborbe/auth/handler/not_found"
+	"github.com/bborbe/server/handler/adapter"
 	"github.com/gorilla/mux"
 )
-
-type HandlerFunc func(http.ResponseWriter, *http.Request)
 
 type handler struct {
 	router http.Handler
 }
 
 func New(
-	check HandlerFunc,
-	login HandlerFunc,
-	applicationCreate HandlerFunc,
-	applicationDelete HandlerFunc,
-	applicationGet HandlerFunc,
-	userRegister HandlerFunc,
-	userUnregister HandlerFunc,
-	userDelete HandlerFunc,
-	tokenAdd HandlerFunc,
-	tokenRemove HandlerFunc,
-	userGroupAdd HandlerFunc,
-	userGroupRemove HandlerFunc,
-	userDataSet HandlerFunc,
-	userDataSetValue HandlerFunc,
-	userDataGet HandlerFunc,
-	userDataGetValue HandlerFunc,
-	userDataDelete HandlerFunc,
-	userDataDeleteValue HandlerFunc,
+	notFound http.HandlerFunc,
+	check http.HandlerFunc,
+	login http.HandlerFunc,
+	applicationCreate http.HandlerFunc,
+	applicationDelete http.HandlerFunc,
+	applicationGet http.HandlerFunc,
+	userRegister http.HandlerFunc,
+	userUnregister http.HandlerFunc,
+	userDelete http.HandlerFunc,
+	tokenAdd http.HandlerFunc,
+	tokenRemove http.HandlerFunc,
+	userGroupAdd http.HandlerFunc,
+	userGroupRemove http.HandlerFunc,
+	userDataSet http.HandlerFunc,
+	userDataSetValue http.HandlerFunc,
+	userDataGet http.HandlerFunc,
+	userDataGetValue http.HandlerFunc,
+	userDataDelete http.HandlerFunc,
+	userDataDeleteValue http.HandlerFunc,
 ) *handler {
 	router := mux.NewRouter()
 
@@ -61,7 +60,7 @@ func New(
 	router.Path("/user_group").Methods("POST").HandlerFunc(userGroupAdd)
 	router.Path("/user_group").Methods("DELETE").HandlerFunc(userGroupRemove)
 
-	router.NotFoundHandler = not_found.New()
+	router.NotFoundHandler = adapter.New(notFound)
 
 	h := new(handler)
 	h.router = router

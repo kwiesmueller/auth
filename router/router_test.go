@@ -12,6 +12,7 @@ import (
 )
 
 type counter struct {
+	notFound            int
 	check               int
 	login               int
 	applicationCreate   int
@@ -40,6 +41,7 @@ func Create(counter *int) func(http.ResponseWriter, *http.Request) {
 
 func newWithCounter(c *counter) *handler {
 	return New(
+		Create(&c.notFound),
 		Create(&c.check),
 		Create(&c.login),
 		Create(&c.applicationCreate),
