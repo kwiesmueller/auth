@@ -44,6 +44,7 @@ import (
 	"github.com/bborbe/server/handler/check"
 	"github.com/bborbe/server/handler/not_found"
 	"github.com/facebookgo/grace/gracehttp"
+	"runtime"
 )
 
 var logger = log.DefaultLogger
@@ -71,6 +72,8 @@ func main() {
 
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	server, err := createServer(*portPtr, *authApplicationPasswordPtr, *ledisdbAddressPtr, *ledisdbPasswordPtr)
 	if err != nil {
