@@ -1,4 +1,4 @@
-package client
+package verify_group_service
 
 import (
 	"bytes"
