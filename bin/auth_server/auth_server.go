@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 
+	"runtime"
+
 	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/application_check"
 	"github.com/bborbe/auth/directory/application_directory"
@@ -44,7 +46,6 @@ import (
 	"github.com/bborbe/server/handler/check"
 	"github.com/bborbe/server/handler/not_found"
 	"github.com/facebookgo/grace/gracehttp"
-	"runtime"
 )
 
 var logger = log.DefaultLogger
