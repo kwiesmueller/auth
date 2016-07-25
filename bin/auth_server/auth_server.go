@@ -15,7 +15,6 @@ import (
 	"github.com/bborbe/auth/directory/user_data_directory"
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
-	"github.com/bborbe/auth/filter"
 	"github.com/bborbe/auth/handler/access_denied"
 	"github.com/bborbe/auth/handler/application_creator"
 	"github.com/bborbe/auth/handler/application_deletor"
@@ -44,6 +43,7 @@ import (
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
 	"github.com/bborbe/server/handler/check"
+	"github.com/bborbe/server/handler/filter"
 	"github.com/bborbe/server/handler/not_found"
 	"github.com/facebookgo/grace/gracehttp"
 )
