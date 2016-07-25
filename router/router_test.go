@@ -7,8 +7,8 @@ import (
 
 	"net/http"
 
+	"github.com/bborbe/http/mock"
 	"github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/server/mock"
 )
 
 type counter struct {

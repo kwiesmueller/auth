@@ -8,8 +8,8 @@ import (
 
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/auth/api"
+	"github.com/bborbe/http/mock"
 	"github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/server/mock"
 )
 
 func TestImplementsHandler(t *testing.T) {
