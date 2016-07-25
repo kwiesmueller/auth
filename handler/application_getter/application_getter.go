@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/bborbe/auth/api"
+	error_handler "github.com/bborbe/http_handler/error"
 	"github.com/bborbe/log"
-	error_handler "github.com/bborbe/server/handler/error"
 )
 
 var logger = log.DefaultLogger

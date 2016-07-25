@@ -39,12 +39,12 @@ import (
 	"github.com/bborbe/auth/service/user_data"
 	"github.com/bborbe/auth/service/user_group"
 	flag "github.com/bborbe/flagenv"
+	"github.com/bborbe/http_handler/check"
+	"github.com/bborbe/http_handler/filter"
+	"github.com/bborbe/http_handler/not_found"
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
-	"github.com/bborbe/server/handler/check"
-	"github.com/bborbe/server/handler/filter"
-	"github.com/bborbe/server/handler/not_found"
 	"github.com/facebookgo/grace/gracehttp"
 )
 

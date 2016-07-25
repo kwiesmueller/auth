@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/bborbe/server/handler/adapter"
+	"github.com/bborbe/http_handler/adapter"
 	"github.com/gorilla/mux"
 )
 
