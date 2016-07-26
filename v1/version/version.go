@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
 	"github.com/bborbe/log"
-	"github.com/bborbe/wiki/v1"
 )
 
 var logger = log.DefaultLogger
