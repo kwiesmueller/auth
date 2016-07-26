@@ -12,7 +12,7 @@ import (
 
 var logger = log.DefaultLogger
 
-type ListUsers func() ([]model.UserName, error)
+type ListUsers func() (*[]model.UserName, error)
 
 type handler struct {
 	listUsers ListUsers
@@ -38,11 +38,11 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	var response v1.UserListResponse
 	var err error
-	var userNames []model.UserName
+	var userNames *[]model.UserName
 	if userNames, err = h.listUsers(); err != nil {
 		return err
 	}
-	for _, userName := range userNames {
+	for _, userName := range *userNames {
 		response = append(response, v1.User{UserName: userName})
 	}
 	return json.NewEncoder(resp).Encode(&response)

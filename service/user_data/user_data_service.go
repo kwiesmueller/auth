@@ -12,7 +12,6 @@ type UserDataService interface {
 	GetValue(userName model.UserName, key string) (string, error)
 	Delete(userName model.UserName) error
 	DeleteValue(userName model.UserName, key string) error
-	List() ([]model.UserName, error)
 }
 
 type service struct {
@@ -47,8 +46,4 @@ func (s *service) Delete(userName model.UserName) error {
 
 func (s *service) DeleteValue(userName model.UserName, key string) error {
 	return s.userDataDirectory.DeleteValue(userName, key)
-}
-
-func (s *service) List() ([]model.UserName, error) {
-	return nil, nil
 }

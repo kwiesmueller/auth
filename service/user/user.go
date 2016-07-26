@@ -27,6 +27,7 @@ type Service interface {
 	AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
 	RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
 	VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
+	List() (*[]model.UserName, error)
 }
 
 func New(
@@ -187,4 +188,8 @@ func (s *service) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupN
 	}
 	logger.Debugf("token %v has all required groups", authToken)
 	return userName, nil
+}
+
+func (s *service) List() (*[]model.UserName, error) {
+	return s.userTokenDirectory.List()
 }

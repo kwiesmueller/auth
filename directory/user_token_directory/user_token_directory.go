@@ -23,6 +23,7 @@ type UserTokenDirectory interface {
 	Remove(userName model.UserName, authToken model.AuthToken) error
 	Get(userName model.UserName) (*[]model.AuthToken, error)
 	Delete(userName model.UserName) error
+	List() (*[]model.UserName, error)
 }
 
 func New(ledisClient ledis.Set) *directory {
@@ -77,4 +78,16 @@ func (d *directory) Delete(userName model.UserName) error {
 	logger.Debugf("delete user %v", userName)
 	key := createKey(userName)
 	return d.ledis.SetClear(key)
+}
+
+func (d *directory) List() (*[]model.UserName, error) {
+	c, err := d.ledis.SetList(fmt.Sprintf("%s:", PREFIX))
+	if err != nil {
+		return nil, err
+	}
+	var result []model.UserName
+	for name := range c {
+		result = append(result, model.UserName(name))
+	}
+	return &result, nil
 }

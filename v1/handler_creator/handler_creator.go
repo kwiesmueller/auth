@@ -113,7 +113,7 @@ func (h *handlerCreator) CreateHandler(
 	userDataDeleteValue := user_data_delete_value.New(userDataService.DeleteValue)
 	userDataDeleteValueHandler := filter.New(applicationCheck.Check, userDataDeleteValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
-	userList := user_list.New(userDataService.List)
+	userList := user_list.New(userService.List)
 	userListHandler := filter.New(applicationCheck.Check, userList.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
 	notFoundHandler := not_found.New()
