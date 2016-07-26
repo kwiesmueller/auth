@@ -21,7 +21,7 @@ type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 type authClient struct {
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 	executeRequest             ExecuteRequest
-	address                    model.Address
+	url                        model.Url
 	applicationName            model.ApplicationName
 	applicationPassword        model.ApplicationPassword
 }
@@ -30,11 +30,11 @@ type AuthClient interface {
 	Auth(authToken model.AuthToken, requiredGroups []model.GroupName) (*model.UserName, error)
 }
 
-func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, address model.Address, applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) *authClient {
+func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, url model.Url, applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) *authClient {
 	a := new(authClient)
 	a.executeRequest = executeRequest
 	a.httpRequestBuilderProvider = httpRequestBuilderProvider
-	a.address = address
+	a.url = url
 	a.applicationName = applicationName
 	a.applicationPassword = applicationPassword
 	return a
@@ -49,7 +49,7 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 		AuthToken:      authToken,
 		RequiredGroups: requiredGroups,
 	}
-	target := fmt.Sprintf("http://%v/api/1.0/login", a.address)
+	target := fmt.Sprintf("%v/api/1.0/login", a.url)
 	logger.Debugf("send request to %s", target)
 	requestbuilder := a.httpRequestBuilderProvider.NewHttpRequestBuilder(target)
 	requestbuilder.SetMethod("POST")
