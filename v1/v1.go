@@ -4,6 +4,10 @@ import "github.com/bborbe/auth/model"
 
 const VERSION = "1.0"
 
+type User struct {
+	UserName model.UserName `json:"username"`
+}
+
 type LoginRequest struct {
 	AuthToken      model.AuthToken   `json:"authToken"`
 	RequiredGroups []model.GroupName `json:"groups"`
@@ -115,6 +119,7 @@ type DeleteUserDataValueRequest struct {
 type DeleteUserDataValueResponse struct {
 }
 
-type User struct {
-	UserName model.UserName `json:"username"`
+type UserListRequest struct {
 }
+
+type UserListResponse []User

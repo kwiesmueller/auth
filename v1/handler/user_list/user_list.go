@@ -36,9 +36,10 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	var response []v1.User
-	userNames, err := h.listUsers()
-	if err != nil {
+	var response v1.UserListResponse
+	var err error
+	var userNames []model.UserName
+	if userNames, err = h.listUsers(); err != nil {
 		return err
 	}
 	for _, userName := range userNames {
