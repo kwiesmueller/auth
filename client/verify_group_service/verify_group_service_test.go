@@ -23,7 +23,7 @@ func TestRequest(t *testing.T) {
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	c := New(func(req *http.Request) (resp *http.Response, err error) {
 		counter++
-		if err := AssertThat(req.URL.String(), Is("http://auth-api.auth.svc.cluster.local:8080/api/v1.0/login")); err != nil {
+		if err := AssertThat(req.URL.String(), Is("http://auth-api.auth.svc.cluster.local:8080/api/1.0/login")); err != nil {
 			t.Fatal(err)
 		}
 		if err := AssertThat(req.Method, Is("POST")); err != nil {

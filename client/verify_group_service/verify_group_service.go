@@ -49,7 +49,7 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 		AuthToken:      authToken,
 		RequiredGroups: requiredGroups,
 	}
-	target := fmt.Sprintf("http://%v/api/v1.0/login", a.address)
+	target := fmt.Sprintf("http://%v/api/1.0/login", a.address)
 	logger.Debugf("send request to %s", target)
 	requestbuilder := a.httpRequestBuilderProvider.NewHttpRequestBuilder(target)
 	requestbuilder.SetMethod("POST")
