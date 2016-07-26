@@ -3,8 +3,8 @@ package application
 import (
 	"fmt"
 
-	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/directory/application_directory"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/log"
 )
 
@@ -20,12 +20,12 @@ type service struct {
 }
 
 type Service interface {
-	CreateApplication(applicationName api.ApplicationName) (*api.Application, error)
-	CreateApplicationWithPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.Application, error)
-	VerifyApplicationPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (bool, error)
-	GetApplication(applicationName api.ApplicationName) (*api.Application, error)
-	DeleteApplication(applicationName api.ApplicationName) error
-	ExistsApplication(applicationName api.ApplicationName) (bool, error)
+	CreateApplication(applicationName model.ApplicationName) (*model.Application, error)
+	CreateApplicationWithPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (*model.Application, error)
+	VerifyApplicationPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (bool, error)
+	GetApplication(applicationName model.ApplicationName) (*model.Application, error)
+	DeleteApplication(applicationName model.ApplicationName) error
+	ExistsApplication(applicationName model.ApplicationName) (bool, error)
 }
 
 func New(generatePassword GeneratePassword, applicationDirectory application_directory.ApplicationDirectory) *service {
@@ -35,7 +35,7 @@ func New(generatePassword GeneratePassword, applicationDirectory application_dir
 	return s
 }
 
-func (s *service) DeleteApplication(applicationName api.ApplicationName) error {
+func (s *service) DeleteApplication(applicationName model.ApplicationName) error {
 	logger.Debugf("delete application %v", applicationName)
 	err := s.applicationDirectory.Delete(applicationName)
 	if err != nil {
@@ -46,23 +46,23 @@ func (s *service) DeleteApplication(applicationName api.ApplicationName) error {
 	return nil
 }
 
-func (s *service) ExistsApplication(applicationName api.ApplicationName) (bool, error) {
+func (s *service) ExistsApplication(applicationName model.ApplicationName) (bool, error) {
 	logger.Debugf("exists application %v", applicationName)
 	return s.applicationDirectory.Exists(applicationName)
 }
 
-func (s *service) CreateApplication(applicationName api.ApplicationName) (*api.Application, error) {
+func (s *service) CreateApplication(applicationName model.ApplicationName) (*model.Application, error) {
 	logger.Debugf("create application %v", applicationName)
-	applicationPassword := api.ApplicationPassword(s.generatePassword(PASSWORD_LENGTH))
+	applicationPassword := model.ApplicationPassword(s.generatePassword(PASSWORD_LENGTH))
 	return s.createApplicationWithPassword(applicationName, applicationPassword)
 }
 
-func (s *service) CreateApplicationWithPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.Application, error) {
+func (s *service) CreateApplicationWithPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (*model.Application, error) {
 	logger.Debugf("create application with password %v", applicationName)
 	return s.createApplicationWithPassword(applicationName, applicationPassword)
 }
 
-func (s *service) createApplicationWithPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (*api.Application, error) {
+func (s *service) createApplicationWithPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (*model.Application, error) {
 	exists, err := s.ExistsApplication(applicationName)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (s *service) createApplicationWithPassword(applicationName api.ApplicationN
 	if exists {
 		return nil, fmt.Errorf("applicaton %v already exists", applicationName)
 	}
-	application := api.Application{
+	application := model.Application{
 		ApplicationName:     applicationName,
 		ApplicationPassword: applicationPassword,
 	}
@@ -82,7 +82,7 @@ func (s *service) createApplicationWithPassword(applicationName api.ApplicationN
 	return &application, nil
 }
 
-func (s *service) VerifyApplicationPassword(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (bool, error) {
+func (s *service) VerifyApplicationPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (bool, error) {
 	logger.Debugf("verify password of application %v", applicationName)
 	pw, err := s.applicationDirectory.Get(applicationName)
 	if err != nil {
@@ -94,13 +94,13 @@ func (s *service) VerifyApplicationPassword(applicationName api.ApplicationName,
 	return true, nil
 }
 
-func (s *service) GetApplication(applicationName api.ApplicationName) (*api.Application, error) {
+func (s *service) GetApplication(applicationName model.ApplicationName) (*model.Application, error) {
 	logger.Debugf("get application %v", applicationName)
 	applicationPassword, err := s.applicationDirectory.Get(applicationName)
 	if err != nil {
 		return nil, err
 	}
-	application := api.Application{
+	application := model.Application{
 		ApplicationName:     applicationName,
 		ApplicationPassword: *applicationPassword,
 	}

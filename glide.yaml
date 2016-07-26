@@ -1,0 +1,25 @@
+package: github.com/bborbe/auth
+import:
+- package: github.com/bborbe/flagenv
+- package: github.com/bborbe/http
+  subpackages:
+  - header
+  - requestbuilder
+- package: github.com/bborbe/http_handler
+  subpackages:
+  - adapter
+  - check
+  - error
+  - filter
+  - not_found
+- package: github.com/bborbe/ledis
+- package: github.com/bborbe/log
+- package: github.com/bborbe/password
+  subpackages:
+  - generator
+- package: github.com/facebookgo/grace
+  subpackages:
+  - gracehttp
+- package: github.com/gorilla/mux
+testImport:
+- package: github.com/bborbe/assert

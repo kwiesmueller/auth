@@ -3,22 +3,22 @@ package verify_group_handler
 import (
 	"net/http"
 
-	"github.com/bborbe/auth/api"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/http/header"
 	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
-type Auth func(authToken api.AuthToken, requiredGroups []api.GroupName) (*api.UserName, error)
+type Auth func(authToken model.AuthToken, requiredGroups []model.GroupName) (*model.UserName, error)
 
 type handler struct {
 	auth           Auth
 	handler        http.Handler
-	requiredGroups []api.GroupName
+	requiredGroups []model.GroupName
 }
 
-func New(subhandler http.Handler, auth Auth, requiredGroups ...api.GroupName) *handler {
+func New(subhandler http.Handler, auth Auth, requiredGroups ...model.GroupName) *handler {
 	h := new(handler)
 	h.handler = subhandler
 	h.auth = auth
@@ -44,7 +44,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	}
 	token := header.CreateAuthorizationToken(name, value)
 	logger.Debugf("token: %s", token)
-	user, err := h.auth(api.AuthToken(token), h.requiredGroups)
+	user, err := h.auth(model.AuthToken(token), h.requiredGroups)
 	if err != nil {
 		logger.Debugf("get user with token %s and group %v faild", token, h.requiredGroups)
 		return err

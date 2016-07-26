@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	. "github.com/bborbe/assert"
-	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/directory/application_directory"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/ledis/mock"
 )
 
@@ -23,7 +23,7 @@ func TestApplicationCreateOnlyOnce(t *testing.T) {
 	applicationService := New(func(length int) string {
 		return "a"
 	}, applicationDirectory)
-	name := api.ApplicationName("app")
+	name := model.ApplicationName("app")
 	application, err := applicationService.CreateApplication(name)
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)

@@ -1,9 +1,9 @@
 package user_group
 
 import (
-	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/directory/group_user_directory"
 	"github.com/bborbe/auth/directory/user_group_directory"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/log"
 )
 
@@ -15,8 +15,8 @@ type service struct {
 }
 
 type Service interface {
-	AddUserToGroup(userName api.UserName, groupName api.GroupName) error
-	RemoveUserFromGroup(userName api.UserName, groupName api.GroupName) error
+	AddUserToGroup(userName model.UserName, groupName model.GroupName) error
+	RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error
 }
 
 func New(userGroupDirectory user_group_directory.UserGroupDirectory, groupUserDirectory group_user_directory.GroupUserDirectory) *service {
@@ -26,7 +26,7 @@ func New(userGroupDirectory user_group_directory.UserGroupDirectory, groupUserDi
 	return s
 }
 
-func (s *service) AddUserToGroup(userName api.UserName, groupName api.GroupName) error {
+func (s *service) AddUserToGroup(userName model.UserName, groupName model.GroupName) error {
 	logger.Debugf("add user %v to group %v", userName, groupName)
 	if err := s.userGroupDirectory.Add(userName, groupName); err != nil {
 		logger.Debugf("add user %v to group %v failed: %v", userName, groupName, err)
@@ -40,7 +40,7 @@ func (s *service) AddUserToGroup(userName api.UserName, groupName api.GroupName)
 	return nil
 }
 
-func (s *service) RemoveUserFromGroup(userName api.UserName, groupName api.GroupName) error {
+func (s *service) RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error {
 	logger.Debugf("remove user %v from group %v", userName, groupName)
 	if err := s.userGroupDirectory.Remove(userName, groupName); err != nil {
 		logger.Debugf("remove user %v from group %v failed: %v", userName, groupName, err)

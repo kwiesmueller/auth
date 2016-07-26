@@ -7,7 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/bborbe/auth/api"
+	"github.com/bborbe/auth/model"
+	"github.com/bborbe/auth/v1"
 	"github.com/bborbe/http/header"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
@@ -20,16 +21,16 @@ type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 type authClient struct {
 	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
 	executeRequest             ExecuteRequest
-	address                    api.Address
-	applicationName            api.ApplicationName
-	applicationPassword        api.ApplicationPassword
+	address                    model.Address
+	applicationName            model.ApplicationName
+	applicationPassword        model.ApplicationPassword
 }
 
 type AuthClient interface {
-	Auth(authToken api.AuthToken, requiredGroups []api.GroupName) (*api.UserName, error)
+	Auth(authToken model.AuthToken, requiredGroups []model.GroupName) (*model.UserName, error)
 }
 
-func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, address api.Address, applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) *authClient {
+func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, address model.Address, applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) *authClient {
 	a := new(authClient)
 	a.executeRequest = executeRequest
 	a.httpRequestBuilderProvider = httpRequestBuilderProvider
@@ -43,12 +44,12 @@ func (a *authClient) createBearer() string {
 	return fmt.Sprintf("%s:%s", a.applicationName, a.applicationPassword)
 }
 
-func (a *authClient) Auth(authToken api.AuthToken, requiredGroups []api.GroupName) (*api.UserName, error) {
-	request := api.LoginRequest{
+func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.GroupName) (*model.UserName, error) {
+	request := v1.LoginRequest{
 		AuthToken:      authToken,
 		RequiredGroups: requiredGroups,
 	}
-	target := fmt.Sprintf("http://%v/login", a.address)
+	target := fmt.Sprintf("http://%v/api/v1.0/login", a.address)
 	logger.Debugf("send request to %s", target)
 	requestbuilder := a.httpRequestBuilderProvider.NewHttpRequestBuilder(target)
 	requestbuilder.SetMethod("POST")
@@ -78,7 +79,7 @@ func (a *authClient) Auth(authToken api.AuthToken, requiredGroups []api.GroupNam
 		return nil, err
 	}
 	logger.Debugf("response %s", string(responseContent))
-	var response api.LoginResponse
+	var response v1.LoginResponse
 	err = json.Unmarshal(responseContent, &response)
 	if err != nil {
 		return nil, err

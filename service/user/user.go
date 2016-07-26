@@ -3,11 +3,11 @@ package user
 import (
 	"fmt"
 
-	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/directory/token_user_directory"
 	"github.com/bborbe/auth/directory/user_data_directory"
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/log"
 )
 
@@ -21,12 +21,12 @@ type service struct {
 }
 
 type Service interface {
-	DeleteUser(userName api.UserName) error
-	DeleteUserWithToken(authToken api.AuthToken) error
-	CreateUserWithToken(userName api.UserName, authToken api.AuthToken) error
-	AddTokenToUserWithToken(newToken api.AuthToken, userToken api.AuthToken) error
-	RemoveTokenFromUserWithToken(newToken api.AuthToken, userToken api.AuthToken) error
-	VerifyTokenHasGroups(authToken api.AuthToken, requiredGroupNames []api.GroupName) (*api.UserName, error)
+	DeleteUser(userName model.UserName) error
+	DeleteUserWithToken(authToken model.AuthToken) error
+	CreateUserWithToken(userName model.UserName, authToken model.AuthToken) error
+	AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
+	RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
+	VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
 }
 
 func New(
@@ -43,7 +43,7 @@ func New(
 	return s
 }
 
-func (s *service) DeleteUserWithToken(authToken api.AuthToken) error {
+func (s *service) DeleteUserWithToken(authToken model.AuthToken) error {
 	logger.Debugf("delete user with token %v", authToken)
 	userName, err := s.tokenUserDirectory.FindUserByAuthToken(authToken)
 	if err != nil {
@@ -53,7 +53,7 @@ func (s *service) DeleteUserWithToken(authToken api.AuthToken) error {
 	return s.DeleteUser(*userName)
 }
 
-func (s *service) DeleteUser(userName api.UserName) error {
+func (s *service) DeleteUser(userName model.UserName) error {
 	logger.Debugf("delete user %v", userName)
 	tokens, err := s.userTokenDirectory.Get(userName)
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *service) DeleteUser(userName api.UserName) error {
 	return nil
 }
 
-func (h *service) CreateUserWithToken(userName api.UserName, authToken api.AuthToken) error {
+func (h *service) CreateUserWithToken(userName model.UserName, authToken model.AuthToken) error {
 	logger.Debugf("add token user %v with token %v", userName, authToken)
 	if err := h.assertTokenNotUsed(authToken); err != nil {
 		logger.Debugf("token %v already used", authToken)
@@ -99,7 +99,7 @@ func (h *service) CreateUserWithToken(userName api.UserName, authToken api.AuthT
 	return nil
 }
 
-func (h *service) assertTokenNotUsed(authToken api.AuthToken) error {
+func (h *service) assertTokenNotUsed(authToken model.AuthToken) error {
 	logger.Debugf("assert token %s not used", authToken)
 	exists, err := h.tokenUserDirectory.Exists(authToken)
 	if err != nil {
@@ -113,7 +113,7 @@ func (h *service) assertTokenNotUsed(authToken api.AuthToken) error {
 	return nil
 }
 
-func (h *service) assertUserNameNotUser(userName api.UserName) error {
+func (h *service) assertUserNameNotUser(userName model.UserName) error {
 	logger.Debugf("assert user %s not existing", userName)
 	exists, err := h.userTokenDirectory.Exists(userName)
 	if err != nil {
@@ -127,7 +127,7 @@ func (h *service) assertUserNameNotUser(userName api.UserName) error {
 	return nil
 }
 
-func (h *service) AddTokenToUserWithToken(newToken api.AuthToken, userToken api.AuthToken) error {
+func (h *service) AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
 	logger.Debugf("add token %v to user with token %v", newToken, userToken)
 	if err := h.assertTokenNotUsed(newToken); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (h *service) AddTokenToUserWithToken(newToken api.AuthToken, userToken api.
 	return nil
 }
 
-func (h *service) RemoveTokenFromUserWithToken(newToken api.AuthToken, userToken api.AuthToken) error {
+func (h *service) RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
 	logger.Debugf("remove token %v from user with token %v", newToken, userToken)
 	userName, err := h.tokenUserDirectory.FindUserByAuthToken(userToken)
 	if err != nil {
@@ -168,7 +168,7 @@ func (h *service) RemoveTokenFromUserWithToken(newToken api.AuthToken, userToken
 	return nil
 }
 
-func (s *service) VerifyTokenHasGroups(authToken api.AuthToken, requiredGroupNames []api.GroupName) (*api.UserName, error) {
+func (s *service) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error) {
 	logger.Debugf("verify token %v has groups %v", authToken, requiredGroupNames)
 	userName, err := s.tokenUserDirectory.FindUserByAuthToken(authToken)
 	if err != nil {

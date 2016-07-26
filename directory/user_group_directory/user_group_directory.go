@@ -3,7 +3,7 @@ package user_group_directory
 import (
 	"fmt"
 
-	"github.com/bborbe/auth/api"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 )
@@ -17,12 +17,12 @@ type directory struct {
 }
 
 type UserGroupDirectory interface {
-	Add(userName api.UserName, groupName api.GroupName) error
-	Exists(userName api.UserName) (bool, error)
-	Get(userName api.UserName) (*[]api.GroupName, error)
-	Remove(userName api.UserName, groupName api.GroupName) error
-	Contains(userName api.UserName, groupName api.GroupName) (bool, error)
-	Delete(userName api.UserName) error
+	Add(userName model.UserName, groupName model.GroupName) error
+	Exists(userName model.UserName) (bool, error)
+	Get(userName model.UserName) (*[]model.GroupName, error)
+	Remove(userName model.UserName, groupName model.GroupName) error
+	Contains(userName model.UserName, groupName model.GroupName) (bool, error)
+	Delete(userName model.UserName) error
 }
 
 func New(ledisClient ledis.Set) *directory {
@@ -31,49 +31,49 @@ func New(ledisClient ledis.Set) *directory {
 	return d
 }
 
-func createKey(userName api.UserName) string {
+func createKey(userName model.UserName) string {
 	return fmt.Sprintf("%s:%s", PREFIX, userName)
 }
 
-func (d *directory) Add(userName api.UserName, groupName api.GroupName) error {
+func (d *directory) Add(userName model.UserName, groupName model.GroupName) error {
 	logger.Debugf("add group %v to user %v", groupName, userName)
 	key := createKey(userName)
 	return d.ledis.SetAdd(key, string(groupName))
 }
 
-func (d *directory) Exists(userName api.UserName) (bool, error) {
+func (d *directory) Exists(userName model.UserName) (bool, error) {
 	logger.Debugf("exists user %v", userName)
 	key := createKey(userName)
 	return d.ledis.SetExists(key)
 }
 
-func (d *directory) Get(userName api.UserName) (*[]api.GroupName, error) {
+func (d *directory) Get(userName model.UserName) (*[]model.GroupName, error) {
 	logger.Debugf("get groups of user %v", userName)
 	key := createKey(userName)
 	groups, err := d.ledis.SetGet(key)
 	if err != nil {
 		return nil, err
 	}
-	var result []api.GroupName
+	var result []model.GroupName
 	for _, group := range groups {
-		result = append(result, api.GroupName(group))
+		result = append(result, model.GroupName(group))
 	}
 	return &result, nil
 }
 
-func (d *directory) Remove(userName api.UserName, groupName api.GroupName) error {
+func (d *directory) Remove(userName model.UserName, groupName model.GroupName) error {
 	logger.Debugf("remove group %v from user %v", groupName, groupName)
 	key := createKey(userName)
 	return d.ledis.SetRemove(key, string(groupName))
 }
 
-func (d *directory) Contains(userName api.UserName, groupName api.GroupName) (bool, error) {
+func (d *directory) Contains(userName model.UserName, groupName model.GroupName) (bool, error) {
 	logger.Debugf("contains user %v group %v", userName, groupName)
 	key := createKey(userName)
 	return d.ledis.SetContains(key, string(groupName))
 }
 
-func (d *directory) Delete(userName api.UserName) error {
+func (d *directory) Delete(userName model.UserName) error {
 	logger.Debugf("delete user %v", userName)
 	key := createKey(userName)
 	return d.ledis.SetClear(key)

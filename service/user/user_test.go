@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	. "github.com/bborbe/assert"
-	"github.com/bborbe/auth/api"
 	"github.com/bborbe/auth/directory/token_user_directory"
 	"github.com/bborbe/auth/directory/user_data_directory"
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/ledis/mock"
 )
 
@@ -28,7 +28,7 @@ func TestDeleteUserData(t *testing.T) {
 	userDataDirectory := user_data_directory.New(mock.NewHash())
 	userService := New(userTokenDirectory, userGroupDirectory, tokenUserDirectory, userDataDirectory)
 
-	user := api.UserName("test")
+	user := model.UserName("test")
 	key := "key"
 	value := "value"
 	if err := userDataDirectory.SetValue(user, key, value); err != nil {

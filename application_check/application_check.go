@@ -3,14 +3,14 @@ package application_check
 import (
 	"net/http"
 
-	"github.com/bborbe/auth/api"
+	"github.com/bborbe/auth/model"
 	"github.com/bborbe/http/header"
 	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
-type VerifyApplicationPassword func(applicationName api.ApplicationName, applicationPassword api.ApplicationPassword) (bool, error)
+type VerifyApplicationPassword func(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (bool, error)
 
 type check struct {
 	verifyApplicationPassword VerifyApplicationPassword
@@ -28,5 +28,5 @@ func (c *check) Check(req *http.Request) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return c.verifyApplicationPassword(api.ApplicationName(name), api.ApplicationPassword(pass))
+	return c.verifyApplicationPassword(model.ApplicationName(name), model.ApplicationPassword(pass))
 }
