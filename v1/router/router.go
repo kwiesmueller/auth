@@ -34,10 +34,13 @@ func New(
 	userDataGetValue http.HandlerFunc,
 	userDataDelete http.HandlerFunc,
 	userDataDeleteValue http.HandlerFunc,
+	userList http.HandlerFunc,
 ) *handler {
 	router := mux.NewRouter()
 
 	router.Path(fmt.Sprintf("%s/version", prefix)).Methods("GET").HandlerFunc(version)
+
+	router.Path(fmt.Sprintf("%s/user", prefix)).Methods("GET").HandlerFunc(userList)
 
 	router.Path(fmt.Sprintf("%s/user/{username}/data", prefix)).Methods("POST").HandlerFunc(userDataSet)
 	router.Path(fmt.Sprintf("%s/user/{username}/data/{key}", prefix)).Methods("POST").HandlerFunc(userDataSetValue)

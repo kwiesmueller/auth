@@ -24,6 +24,7 @@ import (
 	"github.com/bborbe/auth/v1/handler/user_delete"
 	"github.com/bborbe/auth/v1/handler/user_group_adder"
 	"github.com/bborbe/auth/v1/handler/user_group_remover"
+	"github.com/bborbe/auth/v1/handler/user_list"
 	"github.com/bborbe/auth/v1/handler/user_register"
 	"github.com/bborbe/auth/v1/handler/user_unregister"
 	"github.com/bborbe/auth/v1/router"
@@ -112,6 +113,9 @@ func (h *handlerCreator) CreateHandler(
 	userDataDeleteValue := user_data_delete_value.New(userDataService.DeleteValue)
 	userDataDeleteValueHandler := filter.New(applicationCheck.Check, userDataDeleteValue.ServeHTTP, accessDeniedHandler.ServeHTTP)
 
+	userList := user_list.New(userDataService.List)
+	userListHandler := filter.New(applicationCheck.Check, userList.ServeHTTP, accessDeniedHandler.ServeHTTP)
+
 	notFoundHandler := not_found.New()
 
 	versionHandler := version.New()
@@ -137,6 +141,7 @@ func (h *handlerCreator) CreateHandler(
 		userDataGetValueHandler.ServeHTTP,
 		userDataDeleteHandler.ServeHTTP,
 		userDataDeleteValueHandler.ServeHTTP,
+		userListHandler.ServeHTTP,
 	)
 	return handler, nil
 }

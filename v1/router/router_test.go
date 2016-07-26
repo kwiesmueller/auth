@@ -31,6 +31,7 @@ type counter struct {
 	userDataDelete      int
 	userDataDeleteValue int
 	version             int
+	userList            int
 }
 
 func Create(counter *int) func(http.ResponseWriter, *http.Request) {
@@ -61,6 +62,7 @@ func newWithCounter(c *counter) *handler {
 		Create(&c.userDataGetValue),
 		Create(&c.userDataDelete),
 		Create(&c.userDataDeleteValue),
+		Create(&c.userList),
 	)
 }
 
@@ -405,6 +407,26 @@ func TestVersion(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err = AssertThat(c.version, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUserList(t *testing.T) {
+	c := new(counter)
+	r := newWithCounter(c)
+	resp := mock.NewHttpResponseWriterMock()
+
+	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user")
+	rb.SetMethod("GET")
+	req, err := rb.Build()
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(c.userList, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err = AssertThat(c.userList, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
