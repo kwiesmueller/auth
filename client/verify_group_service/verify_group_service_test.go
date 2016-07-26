@@ -23,14 +23,14 @@ func TestRequest(t *testing.T) {
 	httpRequestBuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	c := New(func(req *http.Request) (resp *http.Response, err error) {
 		counter++
-		if err := AssertThat(req.URL.String(), Is("http://auth-api.auth.svc.cluster.local:8080/api/1.0/login")); err != nil {
+		if err := AssertThat(req.URL.String(), Is("http://auth-api.auth.svc.cluster.local:8080/auth/api/1.0/login")); err != nil {
 			t.Fatal(err)
 		}
 		if err := AssertThat(req.Method, Is("POST")); err != nil {
 			t.Fatal(err)
 		}
 		return &http.Response{}, nil
-	}, httpRequestBuilderProvider, "auth-api.auth.svc.cluster.local:8080", "", "")
+	}, httpRequestBuilderProvider, "http://auth-api.auth.svc.cluster.local:8080/auth", "", "")
 	if err := AssertThat(counter, Is(0)); err != nil {
 		t.Fatal(err)
 	}
