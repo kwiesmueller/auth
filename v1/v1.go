@@ -114,3 +114,7 @@ type DeleteUserDataValueRequest struct {
 
 type DeleteUserDataValueResponse struct {
 }
+
+type User struct {
+	UserName model.UserName `json:"username"`
+}
