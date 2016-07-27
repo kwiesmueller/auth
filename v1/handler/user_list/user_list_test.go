@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"fmt"
+
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/http/mock"
