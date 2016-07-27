@@ -18,7 +18,6 @@ func New(
 	prefix string,
 	notFound http.HandlerFunc,
 	check http.HandlerFunc,
-	fileHandlerFunc http.HandlerFunc,
 	v1_router http.HandlerFunc,
 ) *handler {
 	router := mux.NewRouter()
@@ -28,7 +27,6 @@ func New(
 	router.Path(fmt.Sprintf("%s/healthz", prefix)).Methods("GET").HandlerFunc(check)
 	router.Path(fmt.Sprintf("%s/readiness", prefix)).Methods("GET").HandlerFunc(check)
 
-	router.PathPrefix(fmt.Sprintf("%s/", prefix)).HandlerFunc(fileHandlerFunc)
 	router.NotFoundHandler = adapter.New(notFound)
 
 	h := new(handler)

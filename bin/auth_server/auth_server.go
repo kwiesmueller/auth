@@ -8,7 +8,6 @@ import (
 
 	"github.com/bborbe/auth/handler_creator"
 	flag "github.com/bborbe/flagenv"
-	io_util "github.com/bborbe/io/util"
 	"github.com/bborbe/log"
 	"github.com/facebookgo/grace/gracehttp"
 )
@@ -23,7 +22,6 @@ const (
 	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
 	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
 	PARAMETER_PREFIX                    = "prefix"
-	PARAMETER_ROOT                      = "root"
 )
 
 var (
@@ -33,7 +31,6 @@ var (
 	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
 	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 	prefixPtr                  = flag.String(PARAMETER_PREFIX, "", "prefix")
-	rootPtr                    = flag.String(PARAMETER_ROOT, "", "root")
 )
 
 func main() {
@@ -48,7 +45,6 @@ func main() {
 	server, err := createServer(
 		*portPtr,
 		*prefixPtr,
-		*rootPtr,
 		*authApplicationPasswordPtr,
 		*ledisdbAddressPtr,
 		*ledisdbPasswordPtr,
@@ -65,7 +61,6 @@ func main() {
 func createServer(
 	port int,
 	prefix string,
-	documentRoot string,
 	authApplicationPassword string,
 	ledisdbAddress string,
 	ledisdbPassword string,
@@ -74,20 +69,12 @@ func createServer(
 	if port <= 0 {
 		return nil, fmt.Errorf("parameter %s invalid", PARAMETER_PORT)
 	}
-	if len(documentRoot) == 0 {
-		return nil, fmt.Errorf("parameter %s invalid", PARAMETER_ROOT)
-	}
-	documentRoot, err := io_util.NormalizePath(documentRoot)
-	if err != nil {
-		return nil, err
-	}
 	if len(ledisdbAddress) == 0 {
 		return nil, fmt.Errorf("parameter %s missing", PARAMETER_LEDISDB_ADDRESS)
 	}
 	handlerCreator := handler_creator.New()
 	handler, err := handlerCreator.CreateHandler(
 		prefix,
-		documentRoot,
 		authApplicationPassword,
 		ledisdbAddress,
 		ledisdbPassword,

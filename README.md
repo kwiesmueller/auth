@@ -23,7 +23,8 @@ auth_server \
 -loglevel=debug \
 -port=6666 \
 -ledisdb-address=localhost:5555 \
--auth-application-password=test123
+-auth-application-password=test123 \
+-prefix=
 ```
 
 ## Authorize

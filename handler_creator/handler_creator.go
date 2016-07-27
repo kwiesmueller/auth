@@ -20,7 +20,6 @@ import (
 	"github.com/bborbe/auth/v1/handler_creator"
 	"github.com/bborbe/http_handler/check"
 	"github.com/bborbe/http_handler/not_found"
-	"github.com/bborbe/http_handler/remove_prefix"
 	"github.com/bborbe/ledis"
 	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
@@ -31,7 +30,6 @@ var logger = log.DefaultLogger
 type HandlerCreator interface {
 	CreateHandler(
 		prefix string,
-		documentRoot string,
 		authApplicationPassword string,
 		ledisdbAddress string,
 		ledisdbPassword string,
@@ -48,7 +46,6 @@ func New() *handlerCreator {
 
 func (h *handlerCreator) CreateHandler(
 	prefix string,
-	documentRoot string,
 	authApplicationPassword string,
 	ledisdbAddress string,
 	ledisdbPassword string,
@@ -77,7 +74,6 @@ func (h *handlerCreator) CreateHandler(
 
 	checkHandler := check.New(ledisClient.Ping)
 	notFoundHandler := not_found.New()
-	fileServer := remove_prefix.New(prefix, http.FileServer(http.Dir(documentRoot)).ServeHTTP)
 	v1HandlerCreator := handler_creator.New()
 	v1Handler, err := v1HandlerCreator.CreateHandler(
 		fmt.Sprintf("%s/api/%s", prefix, v1.VERSION),
@@ -94,7 +90,6 @@ func (h *handlerCreator) CreateHandler(
 		prefix,
 		notFoundHandler.ServeHTTP,
 		checkHandler.ServeHTTP,
-		fileServer.ServeHTTP,
 		v1Handler.ServeHTTP,
 	)
 	return handler, nil

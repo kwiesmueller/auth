@@ -12,8 +12,7 @@ run:
 	-port=6666 \
 	-ledisdb-address=localhost:5555 \
 	-auth-application-password=test123 \
-	-prefix "/auth" \
-	-root "./files"
+	-prefix "/auth"
 open:
 	open http://localhost:6666/auth/
 format:
