@@ -8,6 +8,7 @@ import (
 
 	"github.com/bborbe/auth/handler_creator"
 	flag "github.com/bborbe/flagenv"
+	debug_handler "github.com/bborbe/http_handler/debug"
 	"github.com/bborbe/log"
 	"github.com/facebookgo/grace/gracehttp"
 )
@@ -22,6 +23,7 @@ const (
 	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
 	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
 	PARAMETER_PREFIX                    = "prefix"
+	PARAMETER_DEBUG                     = "debug"
 )
 
 var (
@@ -31,6 +33,7 @@ var (
 	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
 	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 	prefixPtr                  = flag.String(PARAMETER_PREFIX, "", "prefix")
+	debugPtr                   = flag.Bool(PARAMETER_DEBUG, false, "debug")
 )
 
 func main() {
@@ -44,6 +47,7 @@ func main() {
 
 	server, err := createServer(
 		*portPtr,
+		*debugPtr,
 		*prefixPtr,
 		*authApplicationPasswordPtr,
 		*ledisdbAddressPtr,
@@ -60,6 +64,7 @@ func main() {
 
 func createServer(
 	port int,
+	debug bool,
 	prefix string,
 	authApplicationPassword string,
 	ledisdbAddress string,
@@ -82,5 +87,10 @@ func createServer(
 	if err != nil {
 		return nil, err
 	}
+
+	if debug {
+		handler = debug_handler.New(handler)
+	}
+
 	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
 }
