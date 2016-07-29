@@ -71,6 +71,9 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 		return nil, err
 	}
 	logger.Debugf("auth response status: %s", resp.Status)
+	if resp.StatusCode == 404 {
+		return nil, nil
+	}
 	if resp.StatusCode/100 != 2 {
 		return nil, fmt.Errorf("request not success. status: %s", resp.Status)
 	}
