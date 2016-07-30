@@ -19,7 +19,7 @@ type directory struct {
 type UserGroupDirectory interface {
 	Add(userName model.UserName, groupName model.GroupName) error
 	Exists(userName model.UserName) (bool, error)
-	Get(userName model.UserName) (*[]model.GroupName, error)
+	Get(userName model.UserName) ([]model.GroupName, error)
 	Remove(userName model.UserName, groupName model.GroupName) error
 	Contains(userName model.UserName, groupName model.GroupName) (bool, error)
 	Delete(userName model.UserName) error
@@ -47,7 +47,7 @@ func (d *directory) Exists(userName model.UserName) (bool, error) {
 	return d.ledis.SetExists(key)
 }
 
-func (d *directory) Get(userName model.UserName) (*[]model.GroupName, error) {
+func (d *directory) Get(userName model.UserName) ([]model.GroupName, error) {
 	logger.Debugf("get groups of user %v", userName)
 	key := createKey(userName)
 	groups, err := d.ledis.SetGet(key)
@@ -58,7 +58,7 @@ func (d *directory) Get(userName model.UserName) (*[]model.GroupName, error) {
 	for _, group := range groups {
 		result = append(result, model.GroupName(group))
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (d *directory) Remove(userName model.UserName, groupName model.GroupName) error {

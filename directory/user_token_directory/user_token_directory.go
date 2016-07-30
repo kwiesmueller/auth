@@ -21,9 +21,9 @@ type UserTokenDirectory interface {
 	Exists(userName model.UserName) (bool, error)
 	Contains(userName model.UserName, authToken model.AuthToken) (bool, error)
 	Remove(userName model.UserName, authToken model.AuthToken) error
-	Get(userName model.UserName) (*[]model.AuthToken, error)
+	Get(userName model.UserName) ([]model.AuthToken, error)
 	Delete(userName model.UserName) error
-	List() (*[]model.UserName, error)
+	List() ([]model.UserName, error)
 }
 
 func New(ledisClient ledis.Set) *directory {
@@ -48,7 +48,7 @@ func (d *directory) Exists(userName model.UserName) (bool, error) {
 	return d.ledis.SetExists(key)
 }
 
-func (d *directory) Get(userName model.UserName) (*[]model.AuthToken, error) {
+func (d *directory) Get(userName model.UserName) ([]model.AuthToken, error) {
 	logger.Debugf("get tokens for user %v", userName)
 	key := createKey(userName)
 	tokens, err := d.ledis.SetGet(key)
@@ -59,7 +59,7 @@ func (d *directory) Get(userName model.UserName) (*[]model.AuthToken, error) {
 	for _, token := range tokens {
 		result = append(result, model.AuthToken(token))
 	}
-	return &result, nil
+	return result, nil
 }
 
 func (d *directory) Contains(userName model.UserName, authToken model.AuthToken) (bool, error) {
@@ -80,14 +80,16 @@ func (d *directory) Delete(userName model.UserName) error {
 	return d.ledis.SetClear(key)
 }
 
-func (d *directory) List() (*[]model.UserName, error) {
-	c, err := d.ledis.SetList(fmt.Sprintf("%s:", PREFIX))
+func (d *directory) List() ([]model.UserName, error) {
+	prefix := fmt.Sprintf("%s:", PREFIX)
+	list, err := d.ledis.SetList(prefix)
 	if err != nil {
 		return nil, err
 	}
 	var result []model.UserName
-	for name := range c {
+	for key := range list {
+		name := key[len(prefix):]
 		result = append(result, model.UserName(name))
 	}
-	return &result, nil
+	return result, nil
 }

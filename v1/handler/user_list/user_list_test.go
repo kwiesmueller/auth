@@ -22,7 +22,7 @@ func TestImplementsHandler(t *testing.T) {
 }
 
 func TestResponseError(t *testing.T) {
-	handler := New(func() (*[]model.UserName, error) {
+	handler := New(func() ([]model.UserName, error) {
 		return nil, fmt.Errorf("foo")
 	})
 	resp := mock.NewHttpResponseWriterMock()
@@ -38,9 +38,8 @@ func TestResponseError(t *testing.T) {
 }
 
 func TestResponseSuccess(t *testing.T) {
-	handler := New(func() (*[]model.UserName, error) {
-		result := []model.UserName{model.UserName("foo")}
-		return &result, nil
+	handler := New(func() ([]model.UserName, error) {
+		return []model.UserName{model.UserName("foo")}, nil
 	})
 	resp := mock.NewHttpResponseWriterMock()
 	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/healthz")

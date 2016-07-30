@@ -27,7 +27,7 @@ type Service interface {
 	AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
 	RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
 	VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
-	List() (*[]model.UserName, error)
+	List() ([]model.UserName, error)
 }
 
 func New(
@@ -61,7 +61,7 @@ func (s *service) DeleteUser(userName model.UserName) error {
 		logger.Debugf("find tokens for user %v failed", userName)
 		return err
 	}
-	for _, token := range *tokens {
+	for _, token := range tokens {
 		if err = s.tokenUserDirectory.Remove(token); err != nil {
 			logger.Debugf("remove token %v failed", token)
 		}
@@ -190,6 +190,6 @@ func (s *service) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupN
 	return userName, nil
 }
 
-func (s *service) List() (*[]model.UserName, error) {
+func (s *service) List() ([]model.UserName, error) {
 	return s.userTokenDirectory.List()
 }
