@@ -2,6 +2,9 @@ install:
 	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/auth_server/auth_server.go
 test:
 	GO15VENDOREXPERIMENT=1 go test `glide novendor`
+check:
+	golint ./...
+	errcheck ./...
 runledis:
 	ledis-server \
 	-addr=localhost:5555 \
@@ -22,6 +25,8 @@ prepare:
 	go get -u golang.org/x/tools/cmd/goimports
 	go get -u github.com/Masterminds/glide
 	go get -u github.com/siddontang/ledisdb/cmd/ledis-server
+	go get -u github.com/golang/lint/golint
+  go get -u github.com/kisielk/errcheck
 	glide install
 update:
 	glide up
