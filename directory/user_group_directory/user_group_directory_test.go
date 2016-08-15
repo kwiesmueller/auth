@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	. "github.com/bborbe/assert"
+	"github.com/bborbe/auth/model"
 )
 
 func TestImplementsGroupDirectory(t *testing.T) {
@@ -11,6 +12,13 @@ func TestImplementsGroupDirectory(t *testing.T) {
 	var expected *UserGroupDirectory
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateKey(t *testing.T) {
+	key := createKey(model.UserName("test"))
+	if err := AssertThat(key, Is("user_group:test")); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -1,6 +1,7 @@
 package model
 
 const (
+	Seperator             = ":"
 	AUTH_APPLICATION_NAME = ApplicationName("auth")
 	AUTH_ADMIN_GROUP      = GroupName("auth")
 )

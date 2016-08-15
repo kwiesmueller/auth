@@ -47,3 +47,10 @@ func TestList(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCreateKey(t *testing.T) {
+	key := createKey(model.UserName("test"))
+	if err := AssertThat(key, Is("user_token:test")); err != nil {
+		t.Fatal(err)
+	}
+}
