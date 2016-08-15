@@ -32,7 +32,7 @@ func New(ledisClient ledis.Set) *directory {
 }
 
 func createKey(groupName model.GroupName) string {
-	return fmt.Sprintf("%s:%s", PREFIX, groupName)
+	return fmt.Sprintf("%s%s%s", PREFIX, model.Seperator, groupName)
 }
 
 func (d *directory) Add(groupName model.GroupName, userName model.UserName) error {

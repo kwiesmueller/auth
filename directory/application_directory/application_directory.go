@@ -30,7 +30,7 @@ func New(ledisClient ledis.Kv) *directory {
 }
 
 func createKey(applicationName model.ApplicationName) string {
-	return fmt.Sprintf("%s:%s", PREFIX, applicationName)
+	return fmt.Sprintf("%s%s%s", PREFIX, model.Seperator, applicationName)
 }
 
 func (d *directory) Create(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) error {

@@ -30,7 +30,7 @@ func New(ledisClient ledis.Kv) *directory {
 }
 
 func createKey(authToken model.AuthToken) string {
-	return fmt.Sprintf("%s:%s", PREFIX, authToken)
+	return fmt.Sprintf("%s%s%s", PREFIX, model.Seperator, authToken)
 }
 
 func (d *directory) Add(authToken model.AuthToken, userName model.UserName) error {
