@@ -9,7 +9,7 @@ import (
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/ledis/mock"
+	ledis "github.com/bborbe/ledis/mock"
 )
 
 func TestImplementsService(t *testing.T) {
@@ -22,10 +22,11 @@ func TestImplementsService(t *testing.T) {
 }
 
 func TestDeleteUserData(t *testing.T) {
-	userTokenDirectory := user_token_directory.New(mock.NewSet())
-	userGroupDirectory := user_group_directory.New(mock.NewSet())
-	tokenUserDirectory := token_user_directory.New(mock.NewKv())
-	userDataDirectory := user_data_directory.New(mock.NewHash())
+	client := ledis.New()
+	userTokenDirectory := user_token_directory.New(client)
+	userGroupDirectory := user_group_directory.New(client)
+	tokenUserDirectory := token_user_directory.New(client)
+	userDataDirectory := user_data_directory.New(client)
 	userService := New(userTokenDirectory, userGroupDirectory, tokenUserDirectory, userDataDirectory)
 
 	user := model.UserName("test")

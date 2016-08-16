@@ -6,7 +6,7 @@ import (
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/auth/directory/application_directory"
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/ledis/mock"
+	ledis "github.com/bborbe/ledis/mock"
 )
 
 func TestImplementsService(t *testing.T) {
@@ -18,8 +18,7 @@ func TestImplementsService(t *testing.T) {
 }
 
 func TestApplicationCreateOnlyOnce(t *testing.T) {
-	ledis := mock.NewKv()
-	applicationDirectory := application_directory.New(ledis)
+	applicationDirectory := application_directory.New(ledis.New())
 	applicationService := New(func(length int) string {
 		return "a"
 	}, applicationDirectory)

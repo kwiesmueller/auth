@@ -5,7 +5,7 @@ import (
 
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/ledis/mock"
+	ledis "github.com/bborbe/ledis/mock"
 )
 
 func TestImplementsUserTokenDirectory(t *testing.T) {
@@ -17,7 +17,7 @@ func TestImplementsUserTokenDirectory(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	userTokenDirectory := New(mock.NewSet())
+	userTokenDirectory := New(ledis.New())
 	userName := model.UserName("user")
 	authToken := model.AuthToken("token")
 	var err error

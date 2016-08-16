@@ -1,10 +1,10 @@
 hash: 19d59b26ea954fd8bfd6ef12e4b77919685ec5bbed0a3d35c487608d727d5671
-updated: 2016-07-28T16:50:40.474585043+02:00
+updated: 2016-08-16T20:57:14.509703948+02:00
 imports:
 - name: github.com/bborbe/flagenv
   version: a711a961081a928e1a3bfe2a047d59a69fa6b506
 - name: github.com/bborbe/http
-  version: 34e4298cd85477cdb5e89efd3b143a2e4f5c9959
+  version: ba3b05652664169dbef4c3c1c326db4929b0cec2
   subpackages:
   - header
   - requestbuilder
@@ -45,9 +45,9 @@ imports:
 - name: github.com/facebookgo/stats
   version: 1b76add642e42c6ffba7211ad7b3939ce654526e
 - name: github.com/gorilla/context
-  version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
+  version: 01ef6ff48fdcdcb29ae84f90f10f33dac24845a0
 - name: github.com/gorilla/mux
-  version: a49d62f618e6dc4a7a7d1f0ad69744a158c21f23
+  version: cf79e51a62d8219d52060dfc1b4e810414ba2d15
 - name: github.com/siddontang/goredis
   version: 760763f78400635ed7b9b115511b8ed06035e908
 testImports:
