@@ -1,16 +1,16 @@
 hash: 19d59b26ea954fd8bfd6ef12e4b77919685ec5bbed0a3d35c487608d727d5671
-updated: 2016-08-16T20:57:14.509703948+02:00
+updated: 2016-08-25T20:04:41.228256832+02:00
 imports:
 - name: github.com/bborbe/flagenv
-  version: a711a961081a928e1a3bfe2a047d59a69fa6b506
+  version: 0977949b20c82a7cad254644637f29c72205d61d
 - name: github.com/bborbe/http
-  version: ba3b05652664169dbef4c3c1c326db4929b0cec2
+  version: 1a08a16fd2cc75228b32afadd7126f7372cb4780
   subpackages:
   - header
   - requestbuilder
   - mock
 - name: github.com/bborbe/http_handler
-  version: 9157ff259dd5b969462691e14184e2fb71ba8512
+  version: 88aeecad6b6b07bc2ec369c4e147b7081310c726
   subpackages:
   - adapter
   - check
@@ -19,18 +19,19 @@ imports:
   - not_found
   - debug
 - name: github.com/bborbe/io
-  version: 56d91e8345e4418981a56bc4b8466b4096138f08
+  version: a92503d8d6377ff0e8b24ad2007cc83546a50817
   subpackages:
   - buffered_writer
+  - reader_nop_close
   - writer_nop_close
 - name: github.com/bborbe/ledis
-  version: e06b0dce4d30f5fe0676571dc20fbde635468f3d
+  version: 7758bf2dabfd1d14b1224b68b8d394e4e41adfb6
   subpackages:
   - mock
 - name: github.com/bborbe/log
-  version: c4d96aa2d0cc39cbc38a942d6f11046381bf2a46
+  version: 0250bb5b2e2bd833cb9a47333c28aa46751cdbfe
 - name: github.com/bborbe/password
-  version: 6443b9f22591f87bb784084b43348cf4e3b45d78
+  version: 800e8fbf423dd6daa123e4df0fc253306ded2d26
   subpackages:
   - generator
 - name: github.com/facebookgo/clock
@@ -45,11 +46,11 @@ imports:
 - name: github.com/facebookgo/stats
   version: 1b76add642e42c6ffba7211ad7b3939ce654526e
 - name: github.com/gorilla/context
-  version: 01ef6ff48fdcdcb29ae84f90f10f33dac24845a0
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
-  version: cf79e51a62d8219d52060dfc1b4e810414ba2d15
+  version: 34bf6dc9faa08144e925df4fa1838551b16d6c2a
 - name: github.com/siddontang/goredis
   version: 760763f78400635ed7b9b115511b8ed06035e908
 testImports:
 - name: github.com/bborbe/assert
-  version: cd6d0ec67c40ced8ca6cf72773b9e4b44420fbd2
+  version: f767bd2fffab5a86d5a887e2415d399e8aade8bf
