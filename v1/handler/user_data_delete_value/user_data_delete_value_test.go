@@ -32,17 +32,17 @@ func TestHandleRequest(t *testing.T) {
 		return nil
 	})
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data/keya")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/user/tester/data/keya")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
 	err = h.serveHTTP(resp, req)
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(counter, Is(1)); err != nil {
+	if err := AssertThat(counter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

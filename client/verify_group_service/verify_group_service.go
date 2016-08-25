@@ -19,7 +19,7 @@ var logger = log.DefaultLogger
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
 type authClient struct {
-	httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider
+	httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider
 	executeRequest             ExecuteRequest
 	url                        model.Url
 	applicationName            model.ApplicationName
@@ -30,7 +30,7 @@ type AuthClient interface {
 	Auth(authToken model.AuthToken, requiredGroups []model.GroupName) (*model.UserName, error)
 }
 
-func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HttpRequestBuilderProvider, url model.Url, applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) *authClient {
+func New(executeRequest ExecuteRequest, httpRequestBuilderProvider http_requestbuilder.HTTPRequestBuilderProvider, url model.Url, applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) *authClient {
 	a := new(authClient)
 	a.executeRequest = executeRequest
 	a.httpRequestBuilderProvider = httpRequestBuilderProvider
@@ -51,7 +51,7 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 	}
 	target := fmt.Sprintf("%v/api/1.0/login", a.url)
 	logger.Debugf("send request to %s", target)
-	requestbuilder := a.httpRequestBuilderProvider.NewHttpRequestBuilder(target)
+	requestbuilder := a.httpRequestBuilderProvider.NewHTTPRequestBuilder(target)
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
 	requestbuilder.AddHeader("Authorization", header.CreateAuthorizationBearerHeader(string(a.applicationName), string(a.applicationPassword)))

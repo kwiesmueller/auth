@@ -37,17 +37,17 @@ func TestHealthz(t *testing.T) {
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/healthz")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/healthz")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.check, Is(0)); err != nil {
+	if err := AssertThat(c.check, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.check, Is(1)); err != nil {
+	if err := AssertThat(c.check, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -57,17 +57,17 @@ func TestReadiness(t *testing.T) {
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/readiness")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/readiness")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.check, Is(0)); err != nil {
+	if err := AssertThat(c.check, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.check, Is(1)); err != nil {
+	if err := AssertThat(c.check, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -77,17 +77,17 @@ func TestV1Router(t *testing.T) {
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/api/1.0/version")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/api/1.0/version")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.v1Router, Is(0)); err != nil {
+	if err := AssertThat(c.v1Router, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.v1Router, Is(1)); err != nil {
+	if err := AssertThat(c.v1Router, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

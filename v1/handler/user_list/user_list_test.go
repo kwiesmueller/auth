@@ -26,13 +26,13 @@ func TestResponseError(t *testing.T) {
 		return nil, fmt.Errorf("foo")
 	})
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/healthz")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/healthz")
 	req, err := rb.Build()
-	if AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
 	err = handler.serveHTTP(resp, req)
-	if err = AssertThat(err, NotNilValue()); err != nil {
+	if err := AssertThat(err, NotNilValue()); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -42,13 +42,13 @@ func TestResponseSuccess(t *testing.T) {
 		return []model.UserName{model.UserName("foo")}, nil
 	})
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/healthz")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/healthz")
 	req, err := rb.Build()
-	if AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
 	err = handler.serveHTTP(resp, req)
-	if AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
 	if err := AssertThat(string(resp.Bytes()), Is("[{\"username\":\"foo\"}]\n")); err != nil {

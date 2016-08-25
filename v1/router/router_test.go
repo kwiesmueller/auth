@@ -71,17 +71,17 @@ func TestLogin(t *testing.T) {
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/login")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/login")
 	rb.SetMethod("POST")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.login, Is(0)); err != nil {
+	if err := AssertThat(c.login, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.login, Is(1)); err != nil {
+	if err := AssertThat(c.login, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -90,17 +90,17 @@ func TestApplicationCreate(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/application")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/application")
 	rb.SetMethod("POST")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.applicationCreate, Is(0)); err != nil {
+	if err := AssertThat(c.applicationCreate, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.applicationCreate, Is(1)); err != nil {
+	if err := AssertThat(c.applicationCreate, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -109,17 +109,17 @@ func TestApplicationDelete(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/application/test123")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/application/test123")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.applicationDelete, Is(0)); err != nil {
+	if err := AssertThat(c.applicationDelete, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.applicationDelete, Is(1)); err != nil {
+	if err := AssertThat(c.applicationDelete, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -128,17 +128,17 @@ func TestApplicationGet(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/application/test123")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/application/test123")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.applicationGet, Is(0)); err != nil {
+	if err := AssertThat(c.applicationGet, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.applicationGet, Is(1)); err != nil {
+	if err := AssertThat(c.applicationGet, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -147,17 +147,17 @@ func TestUserRegister(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user")
 	rb.SetMethod("POST")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userRegister, Is(0)); err != nil {
+	if err := AssertThat(c.userRegister, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userRegister, Is(1)); err != nil {
+	if err := AssertThat(c.userRegister, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -166,17 +166,17 @@ func TestUserDelete(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user/123")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user/123")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userDelete, Is(0)); err != nil {
+	if err := AssertThat(c.userDelete, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userDelete, Is(1)); err != nil {
+	if err := AssertThat(c.userDelete, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -185,17 +185,17 @@ func TestUnregister(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/token/123")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/token/123")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userUnregister, Is(0)); err != nil {
+	if err := AssertThat(c.userUnregister, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userUnregister, Is(1)); err != nil {
+	if err := AssertThat(c.userUnregister, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -204,17 +204,17 @@ func TestTokenAdd(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/token")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/token")
 	rb.SetMethod("POST")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.tokenAdd, Is(0)); err != nil {
+	if err := AssertThat(c.tokenAdd, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.tokenAdd, Is(1)); err != nil {
+	if err := AssertThat(c.tokenAdd, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -223,17 +223,17 @@ func TestTokenRemove(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/token")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/token")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.tokenRemove, Is(0)); err != nil {
+	if err := AssertThat(c.tokenRemove, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.tokenRemove, Is(1)); err != nil {
+	if err := AssertThat(c.tokenRemove, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -242,17 +242,17 @@ func TestUserGroupAdd(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user_group")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user_group")
 	rb.SetMethod("POST")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userGroupAdd, Is(0)); err != nil {
+	if err := AssertThat(c.userGroupAdd, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userGroupAdd, Is(1)); err != nil {
+	if err := AssertThat(c.userGroupAdd, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -261,17 +261,17 @@ func TestUserGroupRemove(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user_group")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user_group")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userGroupRemove, Is(0)); err != nil {
+	if err := AssertThat(c.userGroupRemove, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userGroupRemove, Is(1)); err != nil {
+	if err := AssertThat(c.userGroupRemove, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -280,17 +280,17 @@ func TestUserDataSet(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user/tester/data")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user/tester/data")
 	rb.SetMethod("POST")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userDataSet, Is(0)); err != nil {
+	if err := AssertThat(c.userDataSet, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userDataSet, Is(1)); err != nil {
+	if err := AssertThat(c.userDataSet, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -299,17 +299,17 @@ func TestUserDataSetValue(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user/tester/data/keya")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user/tester/data/keya")
 	rb.SetMethod("POST")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userDataSetValue, Is(0)); err != nil {
+	if err := AssertThat(c.userDataSetValue, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userDataSetValue, Is(1)); err != nil {
+	if err := AssertThat(c.userDataSetValue, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -318,17 +318,17 @@ func TestUserDataGet(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user/tester/data")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user/tester/data")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userDataGet, Is(0)); err != nil {
+	if err := AssertThat(c.userDataGet, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userDataGet, Is(1)); err != nil {
+	if err := AssertThat(c.userDataGet, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -337,17 +337,17 @@ func TestUserDataGetValue(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user/tester/data/keya")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user/tester/data/keya")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userDataGetValue, Is(0)); err != nil {
+	if err := AssertThat(c.userDataGetValue, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userDataGetValue, Is(1)); err != nil {
+	if err := AssertThat(c.userDataGetValue, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -356,17 +356,17 @@ func TestUserDataDelete(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user/tester/data")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user/tester/data")
 	rb.SetMethod("DELETE")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userDataDelete, Is(0)); err != nil {
+	if err := AssertThat(c.userDataDelete, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userDataDelete, Is(1)); err != nil {
+	if err := AssertThat(c.userDataDelete, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -375,18 +375,18 @@ func TestUserDataDeleteValue(t *testing.T) {
 	c := new(counter)
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user/tester/data/keya")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user/tester/data/keya")
 	rb.SetMethod("DELETE")
 
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userDataDeleteValue, Is(0)); err != nil {
+	if err := AssertThat(c.userDataDeleteValue, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userDataDeleteValue, Is(1)); err != nil {
+	if err := AssertThat(c.userDataDeleteValue, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -396,17 +396,17 @@ func TestVersion(t *testing.T) {
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/version")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/version")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.version, Is(0)); err != nil {
+	if err := AssertThat(c.version, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.version, Is(1)); err != nil {
+	if err := AssertThat(c.version, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -416,17 +416,17 @@ func TestUserList(t *testing.T) {
 	r := newWithCounter(c)
 	resp := mock.NewHttpResponseWriterMock()
 
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/prefix/user")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/user")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(c.userList, Is(0)); err != nil {
+	if err := AssertThat(c.userList, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err = AssertThat(c.userList, Is(1)); err != nil {
+	if err := AssertThat(c.userList, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

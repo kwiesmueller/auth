@@ -31,20 +31,20 @@ func TestHandleRequest(t *testing.T) {
 		return map[string]string{"keya": "valuea"}, nil
 	})
 	resp := mock.NewHttpResponseWriterMock()
-	rb := requestbuilder.NewHttpRequestBuilder("http://example.com/user/tester/data")
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/user/tester/data")
 	rb.SetMethod("GET")
 	req, err := rb.Build()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
 	err = h.serveHTTP(resp, req)
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(counter, Is(1)); err != nil {
+	if err := AssertThat(counter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(string(resp.Bytes()), Is(fmt.Sprintln(`{"keya":"valuea"}`))); err != nil {
+	if err := AssertThat(string(resp.Bytes()), Is(fmt.Sprintln(`{"keya":"valuea"}`))); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -23,27 +23,27 @@ func TestList(t *testing.T) {
 	var err error
 	var userNames []model.UserName
 	userNames, err = userTokenDirectory.List()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(len(userNames), Is(0)); err != nil {
+	if err := AssertThat(len(userNames), Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	err = userTokenDirectory.Add(userName, authToken)
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
 	userNames, err = userTokenDirectory.List()
-	if err = AssertThat(err, NilValue()); err != nil {
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(userNames, NotNilValue()); err != nil {
+	if err := AssertThat(userNames, NotNilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(len(userNames), Is(1)); err != nil {
+	if err := AssertThat(len(userNames), Is(1)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(userNames[0], Is(userName)); err != nil {
+	if err := AssertThat(userNames[0], Is(userName)); err != nil {
 		t.Fatal(err)
 	}
 }
