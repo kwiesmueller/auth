@@ -5,12 +5,10 @@ import (
 
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/ledis"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 const PREFIX = "user_token"
-
-var logger = log.DefaultLogger
 
 type directory struct {
 	ledis ledis.Set
@@ -37,19 +35,19 @@ func createKey(userName model.UserName) string {
 }
 
 func (d *directory) Add(userName model.UserName, authToken model.AuthToken) error {
-	logger.Debugf("add token %v user %v", authToken, userName)
+	glog.V(2).Infof("add token %v user %v", authToken, userName)
 	key := createKey(userName)
 	return d.ledis.SetAdd(key, string(authToken))
 }
 
 func (d *directory) Exists(userName model.UserName) (bool, error) {
-	logger.Debugf("exists user %v", userName)
+	glog.V(2).Infof("exists user %v", userName)
 	key := createKey(userName)
 	return d.ledis.SetExists(key)
 }
 
 func (d *directory) Get(userName model.UserName) ([]model.AuthToken, error) {
-	logger.Debugf("get tokens for user %v", userName)
+	glog.V(2).Infof("get tokens for user %v", userName)
 	key := createKey(userName)
 	tokens, err := d.ledis.SetGet(key)
 	if err != nil {
@@ -63,19 +61,19 @@ func (d *directory) Get(userName model.UserName) ([]model.AuthToken, error) {
 }
 
 func (d *directory) Contains(userName model.UserName, authToken model.AuthToken) (bool, error) {
-	logger.Debugf("contains user %v token %v", userName, authToken)
+	glog.V(2).Infof("contains user %v token %v", userName, authToken)
 	key := createKey(userName)
 	return d.ledis.SetContains(key, string(authToken))
 }
 
 func (d *directory) Remove(userName model.UserName, authToken model.AuthToken) error {
-	logger.Debugf("remove token %v from user %v", authToken, userName)
+	glog.V(2).Infof("remove token %v from user %v", authToken, userName)
 	key := createKey(userName)
 	return d.ledis.SetRemove(key, string(authToken))
 }
 
 func (d *directory) Delete(userName model.UserName) error {
-	logger.Debugf("delete user %v", userName)
+	glog.V(2).Infof("delete user %v", userName)
 	key := createKey(userName)
 	return d.ledis.SetClear(key)
 }

@@ -5,10 +5,8 @@ import (
 
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/ledis"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 const PREFIX = "user_data"
 
@@ -36,7 +34,7 @@ func createKey(userName model.UserName) string {
 }
 
 func (d *directory) Set(userName model.UserName, data map[string]string) error {
-	logger.Debugf("set %v for user %v %v", data, userName)
+	glog.V(2).Infof("set %v for user %v %v", data, userName)
 	key := createKey(userName)
 	for k, v := range data {
 		if err := d.ledis.HashSet(key, k, v); err != nil {
@@ -47,31 +45,31 @@ func (d *directory) Set(userName model.UserName, data map[string]string) error {
 }
 
 func (d *directory) SetValue(userName model.UserName, field string, value string) error {
-	logger.Debugf("set %s=%s for user %v", field, value, userName)
+	glog.V(2).Infof("set %s=%s for user %v", field, value, userName)
 	key := createKey(userName)
 	return d.ledis.HashSet(key, field, value)
 }
 
 func (d *directory) Get(userName model.UserName) (map[string]string, error) {
-	logger.Debugf("get data of user %v", userName)
+	glog.V(2).Infof("get data of user %v", userName)
 	key := createKey(userName)
 	return d.ledis.HashGetAll(key)
 }
 
 func (d *directory) GetValue(userName model.UserName, field string) (string, error) {
-	logger.Debugf("get %s of user %v", field, userName)
+	glog.V(2).Infof("get %s of user %v", field, userName)
 	key := createKey(userName)
 	return d.ledis.HashGet(key, field)
 }
 
 func (d *directory) Delete(userName model.UserName) error {
-	logger.Debugf("delete data of user %v", userName)
+	glog.V(2).Infof("delete data of user %v", userName)
 	key := createKey(userName)
 	return d.ledis.HashClear(key)
 }
 
 func (d *directory) DeleteValue(userName model.UserName, field string) error {
-	logger.Debugf("delete %s of user %v", field, userName)
+	glog.V(2).Infof("delete %s of user %v", field, userName)
 	key := createKey(userName)
 	return d.ledis.HashDel(key, field)
 }

@@ -7,10 +7,8 @@ import (
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type CreateApplication func(applicationName model.ApplicationName) (*model.Application, error)
 type handler struct {
@@ -24,13 +22,13 @@ func New(createApplication CreateApplication) *handler {
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("create application")
+	glog.V(2).Infof("create application")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("create application failed: %v", err)
+		glog.V(2).Infof("create application failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	} else {
-		logger.Debugf("create application success")
+		glog.V(2).Infof("create application success")
 	}
 }
 

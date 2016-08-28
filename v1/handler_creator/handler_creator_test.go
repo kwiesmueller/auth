@@ -5,22 +5,13 @@ import (
 
 	"os"
 
-	"bytes"
-	"fmt"
-
 	. "github.com/bborbe/assert"
-	"github.com/bborbe/io/writer_nop_close"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 func TestMain(m *testing.M) {
-	buffer := bytes.NewBufferString("")
-	log.DefaultLogger = log.NewLogger(writer_nop_close.New(buffer))
 	exit := m.Run()
-	if exit != 0 {
-		logger.Close()
-		fmt.Print(buffer.String())
-	}
+	glog.Flush()
 	os.Exit(exit)
 }
 

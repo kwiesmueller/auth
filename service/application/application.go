@@ -5,12 +5,10 @@ import (
 
 	"github.com/bborbe/auth/directory/application_directory"
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 const PASSWORD_LENGTH = 16
-
-var logger = log.DefaultLogger
 
 type GeneratePassword func(length int) string
 
@@ -36,29 +34,29 @@ func New(generatePassword GeneratePassword, applicationDirectory application_dir
 }
 
 func (s *service) DeleteApplication(applicationName model.ApplicationName) error {
-	logger.Debugf("delete application %v", applicationName)
+	glog.V(2).Infof("delete application %v", applicationName)
 	err := s.applicationDirectory.Delete(applicationName)
 	if err != nil {
-		logger.Debugf("delete application %v failed: %v", applicationName, err)
+		glog.V(2).Infof("delete application %v failed: %v", applicationName, err)
 		return err
 	}
-	logger.Debugf("deleted application %v successful", applicationName)
+	glog.V(2).Infof("deleted application %v successful", applicationName)
 	return nil
 }
 
 func (s *service) ExistsApplication(applicationName model.ApplicationName) (bool, error) {
-	logger.Debugf("exists application %v", applicationName)
+	glog.V(2).Infof("exists application %v", applicationName)
 	return s.applicationDirectory.Exists(applicationName)
 }
 
 func (s *service) CreateApplication(applicationName model.ApplicationName) (*model.Application, error) {
-	logger.Debugf("create application %v", applicationName)
+	glog.V(2).Infof("create application %v", applicationName)
 	applicationPassword := model.ApplicationPassword(s.generatePassword(PASSWORD_LENGTH))
 	return s.createApplicationWithPassword(applicationName, applicationPassword)
 }
 
 func (s *service) CreateApplicationWithPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (*model.Application, error) {
-	logger.Debugf("create application with password %v", applicationName)
+	glog.V(2).Infof("create application with password %v", applicationName)
 	return s.createApplicationWithPassword(applicationName, applicationPassword)
 }
 
@@ -75,15 +73,15 @@ func (s *service) createApplicationWithPassword(applicationName model.Applicatio
 		ApplicationPassword: applicationPassword,
 	}
 	if err := s.applicationDirectory.Create(applicationName, applicationPassword); err != nil {
-		logger.Debugf("create application %v failed: %v", applicationName, err)
+		glog.V(2).Infof("create application %v failed: %v", applicationName, err)
 		return nil, err
 	}
-	logger.Debugf("created application %v successful", applicationName)
+	glog.V(2).Infof("created application %v successful", applicationName)
 	return &application, nil
 }
 
 func (s *service) VerifyApplicationPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (bool, error) {
-	logger.Debugf("verify password of application %v", applicationName)
+	glog.V(2).Infof("verify password of application %v", applicationName)
 	pw, err := s.applicationDirectory.Get(applicationName)
 	if err != nil {
 		return false, err
@@ -95,7 +93,7 @@ func (s *service) VerifyApplicationPassword(applicationName model.ApplicationNam
 }
 
 func (s *service) GetApplication(applicationName model.ApplicationName) (*model.Application, error) {
-	logger.Debugf("get application %v", applicationName)
+	glog.V(2).Infof("get application %v", applicationName)
 	applicationPassword, err := s.applicationDirectory.Get(applicationName)
 	if err != nil {
 		return nil, err

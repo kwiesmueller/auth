@@ -31,10 +31,8 @@ import (
 	"github.com/bborbe/auth/v1/version"
 	"github.com/bborbe/http_handler/filter"
 	"github.com/bborbe/http_handler/not_found"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type HandlerCreator interface {
 	CreateHandler(
@@ -61,6 +59,7 @@ func (h *handlerCreator) CreateHandler(
 	userGroupService user_group.Service,
 	userDataService user_data.UserDataService,
 ) (http.Handler, error) {
+	glog.V(2).Infof("create handler with prefix: %v", prefix)
 
 	applicationCheck := application_check.New(applicationService.VerifyApplicationPassword)
 

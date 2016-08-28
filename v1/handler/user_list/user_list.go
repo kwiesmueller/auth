@@ -7,10 +7,8 @@ import (
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type ListUsers func() ([]model.UserName, error)
 
@@ -25,13 +23,13 @@ func New(removeTokenToUserWithToken ListUsers) *handler {
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("list user")
+	glog.V(2).Infof("list user")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("list user failed: %v", err)
+		glog.V(2).Infof("list user failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	} else {
-		logger.Debugf("list user success")
+		glog.V(2).Infof("list user success")
 	}
 }
 

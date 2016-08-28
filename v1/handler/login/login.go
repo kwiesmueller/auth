@@ -7,10 +7,8 @@ import (
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type VerifyTokenHasGroups func(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
 
@@ -27,16 +25,16 @@ func New(
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("login")
+	glog.V(2).Infof("login")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("Marshal json failed: %v", err)
+		glog.V(2).Infof("Marshal json failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	}
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	logger.Debugf("login")
+	glog.V(2).Infof("login")
 	var request v1.LoginRequest
 	var response v1.LoginResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
@@ -45,7 +43,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	userName, err := h.verifyTokenHasGroups(request.AuthToken, request.RequiredGroups)
 	if err != nil {
 		if userName == nil {
-			logger.Infof("user not found: %s", request.AuthToken)
+			glog.Infof("user not found: %s", request.AuthToken)
 			resp.WriteHeader(http.StatusNotFound)
 			return nil
 		}

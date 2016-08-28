@@ -5,10 +5,8 @@ import (
 
 	"fmt"
 
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type handler struct {
 	message string
@@ -23,6 +21,6 @@ func New() *handler {
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("%d => %s", h.status, h.message)
+	glog.V(2).Infof("%d => %s", h.status, h.message)
 	http.Error(resp, fmt.Sprintf(h.message), h.status)
 }

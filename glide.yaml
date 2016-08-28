@@ -13,7 +13,7 @@ import:
   - filter
   - not_found
 - package: github.com/bborbe/ledis
-- package: github.com/bborbe/log
+- package: github.com/golang/glog
 - package: github.com/bborbe/password
   subpackages:
   - generator

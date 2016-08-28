@@ -5,10 +5,8 @@ import (
 
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/http/header"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type Auth func(authToken model.AuthToken, requiredGroups []model.GroupName) (*model.UserName, error)
 
@@ -27,10 +25,10 @@ func New(subhandler http.Handler, auth Auth, requiredGroups ...model.GroupName) 
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("auth handler")
+	glog.V(2).Infof("auth handler")
 	if err := h.serveHTTP(resp, req); err != nil {
 		status := http.StatusUnauthorized
-		logger.Debugf("auth failed => send %s", http.StatusText(status))
+		glog.V(2).Infof("auth failed => send %s", http.StatusText(status))
 		resp.WriteHeader(status)
 	} else {
 		h.handler.ServeHTTP(resp, req)
@@ -43,12 +41,12 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 		return err
 	}
 	token := header.CreateAuthorizationToken(name, value)
-	logger.Debugf("token: %s", token)
+	glog.V(2).Infof("token: %s", token)
 	user, err := h.auth(model.AuthToken(token), h.requiredGroups)
 	if err != nil {
-		logger.Debugf("get user with token %s and group %v faild", token, h.requiredGroups)
+		glog.V(2).Infof("get user with token %s and group %v faild", token, h.requiredGroups)
 		return err
 	}
-	logger.Debugf("user %v is in group %v", *user, h.requiredGroups)
+	glog.V(2).Infof("user %v is in group %v", *user, h.requiredGroups)
 	return nil
 }

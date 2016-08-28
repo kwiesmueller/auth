@@ -21,11 +21,9 @@ import (
 	"github.com/bborbe/http_handler/check"
 	"github.com/bborbe/http_handler/not_found"
 	"github.com/bborbe/ledis"
-	"github.com/bborbe/log"
 	"github.com/bborbe/password/generator"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type HandlerCreator interface {
 	CreateHandler(
@@ -67,7 +65,7 @@ func (h *handlerCreator) CreateHandler(
 
 	go func() {
 		if _, err := applicationService.CreateApplicationWithPassword(model.AUTH_APPLICATION_NAME, model.ApplicationPassword(authApplicationPassword)); err != nil {
-			logger.Warnf("create auth application failed: %v", err)
+			glog.Warningf("create auth application failed: %v", err)
 			return
 		}
 	}()

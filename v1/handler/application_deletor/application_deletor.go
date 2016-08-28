@@ -8,10 +8,8 @@ import (
 
 	"github.com/bborbe/auth/model"
 	error_handler "github.com/bborbe/http_handler/error"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type DeleteApplication func(applicationName model.ApplicationName) error
 
@@ -26,13 +24,13 @@ func New(deleteApplication DeleteApplication) *handler {
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("create application")
+	glog.V(2).Infof("create application")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("create application failed: %v", err)
+		glog.V(2).Infof("create application failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	} else {
-		logger.Debugf("create application success")
+		glog.V(2).Infof("create application success")
 	}
 }
 
@@ -47,6 +45,6 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	logger.Debugf("application deleted")
+	glog.V(2).Infof("application deleted")
 	return nil
 }

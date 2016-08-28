@@ -5,12 +5,10 @@ import (
 
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/ledis"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 const PREFIX = "user_group"
-
-var logger = log.DefaultLogger
 
 type directory struct {
 	ledis ledis.Set
@@ -36,19 +34,19 @@ func createKey(userName model.UserName) string {
 }
 
 func (d *directory) Add(userName model.UserName, groupName model.GroupName) error {
-	logger.Debugf("add group %v to user %v", groupName, userName)
+	glog.V(2).Infof("add group %v to user %v", groupName, userName)
 	key := createKey(userName)
 	return d.ledis.SetAdd(key, string(groupName))
 }
 
 func (d *directory) Exists(userName model.UserName) (bool, error) {
-	logger.Debugf("exists user %v", userName)
+	glog.V(2).Infof("exists user %v", userName)
 	key := createKey(userName)
 	return d.ledis.SetExists(key)
 }
 
 func (d *directory) Get(userName model.UserName) ([]model.GroupName, error) {
-	logger.Debugf("get groups of user %v", userName)
+	glog.V(2).Infof("get groups of user %v", userName)
 	key := createKey(userName)
 	groups, err := d.ledis.SetGet(key)
 	if err != nil {
@@ -62,19 +60,19 @@ func (d *directory) Get(userName model.UserName) ([]model.GroupName, error) {
 }
 
 func (d *directory) Remove(userName model.UserName, groupName model.GroupName) error {
-	logger.Debugf("remove group %v from user %v", groupName, groupName)
+	glog.V(2).Infof("remove group %v from user %v", groupName, groupName)
 	key := createKey(userName)
 	return d.ledis.SetRemove(key, string(groupName))
 }
 
 func (d *directory) Contains(userName model.UserName, groupName model.GroupName) (bool, error) {
-	logger.Debugf("contains user %v group %v", userName, groupName)
+	glog.V(2).Infof("contains user %v group %v", userName, groupName)
 	key := createKey(userName)
 	return d.ledis.SetContains(key, string(groupName))
 }
 
 func (d *directory) Delete(userName model.UserName) error {
-	logger.Debugf("delete user %v", userName)
+	glog.V(2).Infof("delete user %v", userName)
 	key := createKey(userName)
 	return d.ledis.SetClear(key)
 }

@@ -5,10 +5,8 @@ import (
 
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/ledis"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 const PREFIX = "application"
 
@@ -34,23 +32,23 @@ func createKey(applicationName model.ApplicationName) string {
 }
 
 func (d *directory) Create(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) error {
-	logger.Debugf("create application: %s", applicationName)
+	glog.V(2).Infof("create application: %s", applicationName)
 	key := createKey(applicationName)
 	return d.ledis.Set(key, string(applicationPassword))
 }
 
 func (d *directory) Delete(applicationName model.ApplicationName) error {
-	logger.Debugf("delete application: %s", applicationName)
+	glog.V(2).Infof("delete application: %s", applicationName)
 	return d.ledis.Del(createKey(applicationName))
 }
 
 func (d *directory) Exists(applicationName model.ApplicationName) (bool, error) {
-	logger.Debugf("exists application: %s", applicationName)
+	glog.V(2).Infof("exists application: %s", applicationName)
 	return d.ledis.Exists(createKey(applicationName))
 }
 
 func (d *directory) Get(applicationName model.ApplicationName) (*model.ApplicationPassword, error) {
-	logger.Debugf("get application: %s", applicationName)
+	glog.V(2).Infof("get application: %s", applicationName)
 	key := createKey(applicationName)
 	value, err := d.ledis.Get(key)
 	if err != nil {

@@ -11,10 +11,8 @@ import (
 	"github.com/bborbe/auth/v1"
 	"github.com/bborbe/http/header"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
@@ -50,7 +48,7 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 		RequiredGroups: requiredGroups,
 	}
 	target := fmt.Sprintf("%v/api/1.0/login", a.url)
-	logger.Debugf("send request to %s", target)
+	glog.V(2).Infof("send request to %s", target)
 	requestbuilder := a.httpRequestBuilderProvider.NewHTTPRequestBuilder(target)
 	requestbuilder.SetMethod("POST")
 	requestbuilder.AddContentType("application/json")
@@ -59,7 +57,7 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 	if err != nil {
 		return nil, err
 	}
-	logger.Debugf("auth request message: %s", string(content))
+	glog.V(2).Infof("auth request message: %s", string(content))
 	requestbuilder.SetBody(bytes.NewBuffer(content))
 	req, err := requestbuilder.Build()
 	if err != nil {
@@ -67,10 +65,10 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 	}
 	resp, err := a.executeRequest(req)
 	if err != nil {
-		logger.Debugf("auth request failed: %v", err)
+		glog.V(2).Infof("auth request failed: %v", err)
 		return nil, err
 	}
-	logger.Debugf("auth response status: %s", resp.Status)
+	glog.V(2).Infof("auth response status: %s", resp.Status)
 	if resp.StatusCode == 404 {
 		return nil, nil
 	}
@@ -81,7 +79,7 @@ func (a *authClient) Auth(authToken model.AuthToken, requiredGroups []model.Grou
 	if err != nil {
 		return nil, err
 	}
-	logger.Debugf("response %s", string(responseContent))
+	glog.V(2).Infof("response %s", string(responseContent))
 	var response v1.LoginResponse
 	err = json.Unmarshal(responseContent, &response)
 	if err != nil {

@@ -8,10 +8,8 @@ import (
 
 	"github.com/bborbe/auth/model"
 	error_handler "github.com/bborbe/http_handler/error"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type DeleteUserWithToken func(authToken model.AuthToken) error
 
@@ -28,20 +26,20 @@ func New(
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	logger.Debugf("unregister user")
+	glog.V(2).Infof("unregister user")
 	if err := h.serveHTTP(resp, req); err != nil {
-		logger.Debugf("unregister user failed: %v", err)
+		glog.V(2).Infof("unregister user failed: %v", err)
 		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	} else {
-		logger.Debugf("unregister user success")
+		glog.V(2).Infof("unregister user success")
 	}
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	parts := strings.Split(req.RequestURI, "/")
 	if len(parts) == 0 {
-		logger.Debugf("auth token missing")
+		glog.V(2).Infof("auth token missing")
 		return fmt.Errorf("invalid request uri: %s", req.RequestURI)
 	}
 	authToken := model.AuthToken(parts[len(parts)-1])

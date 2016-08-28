@@ -5,10 +5,8 @@ import (
 
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/http/header"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type VerifyApplicationPassword func(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (bool, error)
 
@@ -23,7 +21,7 @@ func New(verifyApplicationPassword VerifyApplicationPassword) *check {
 }
 
 func (c *check) Check(req *http.Request) (bool, error) {
-	logger.Debugf("validate application")
+	glog.V(2).Infof("validate application")
 	name, pass, err := header.ParseAuthorizationBearerHttpRequest(req)
 	if err != nil {
 		return false, err
