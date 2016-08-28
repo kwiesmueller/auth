@@ -20,7 +20,8 @@ Start auth-server
 
 ```
 auth_server \
--loglevel=debug \
+-logtostderr \
+-v=2 \
 -port=6666 \
 -ledisdb-address=localhost:5555 \
 -auth-application-password=test123 \
