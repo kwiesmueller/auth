@@ -29,7 +29,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	glog.V(2).Infof("get application")
 	if err := h.serveHTTP(resp, req); err != nil {
 		glog.V(2).Infof("Marshal json failed: %v", err)
-		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
+		e := error_handler.NewMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	}
 }
@@ -42,7 +42,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	last := parts[len(parts)-1]
 	application, err := h.getApplication(model.ApplicationName(last))
 	if err != nil {
-		e := error_handler.NewErrorMessage(http.StatusNotFound, err.Error())
+		e := error_handler.NewMessage(http.StatusNotFound, err.Error())
 		e.ServeHTTP(resp, req)
 		return nil
 	}

@@ -26,7 +26,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	glog.V(2).Infof("add user to group")
 	if err := h.serveHTTP(resp, req); err != nil {
 		glog.V(2).Infof("add user to group failed: %v", err)
-		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
+		e := error_handler.NewMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	} else {
 		glog.V(2).Infof("add user to group success")

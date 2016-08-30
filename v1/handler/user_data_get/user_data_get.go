@@ -31,7 +31,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	glog.V(2).Infof("getUserData")
 	if err := h.serveHTTP(resp, req); err != nil {
 		glog.V(2).Infof("Marshal json failed: %v", err)
-		e := error_handler.NewErrorMessage(http.StatusInternalServerError, err.Error())
+		e := error_handler.NewMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
 	}
 }
