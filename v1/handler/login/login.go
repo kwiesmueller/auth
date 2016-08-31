@@ -43,7 +43,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	userName, err := h.verifyTokenHasGroups(request.AuthToken, request.RequiredGroups)
 	if err != nil {
 		if userName == nil {
-			glog.Infof("user not found: %s", request.AuthToken)
+			glog.V(1).Infof("user not found: %s", request.AuthToken)
 			resp.WriteHeader(http.StatusNotFound)
 			return nil
 		}
