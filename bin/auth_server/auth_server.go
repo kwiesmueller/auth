@@ -19,7 +19,6 @@ const (
 	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
 	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
 	PARAMETER_PREFIX                    = "prefix"
-	PARAMETER_DEBUG                     = "debug"
 )
 
 var (
@@ -28,7 +27,6 @@ var (
 	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
 	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
 	prefixPtr                  = flag.String(PARAMETER_PREFIX, "", "prefix")
-	debugPtr                   = flag.Bool(PARAMETER_DEBUG, false, "debug")
 )
 
 func main() {
@@ -39,7 +37,6 @@ func main() {
 
 	err := do(
 		*portPtr,
-		*debugPtr,
 		*prefixPtr,
 		*authApplicationPasswordPtr,
 		*ledisdbAddressPtr,
@@ -52,7 +49,6 @@ func main() {
 
 func do(
 	port int,
-	debug bool,
 	prefix string,
 	authApplicationPassword string,
 	ledisdbAddress string,
@@ -60,7 +56,6 @@ func do(
 ) error {
 	server, err := createServer(
 		port,
-		debug,
 		prefix,
 		authApplicationPassword,
 		ledisdbAddress,
@@ -75,7 +70,6 @@ func do(
 
 func createServer(
 	port int,
-	debug bool,
 	prefix string,
 	authApplicationPassword string,
 	ledisdbAddress string,
@@ -99,7 +93,7 @@ func createServer(
 		return nil, err
 	}
 
-	if debug {
+	if glog.V(4) {
 		handler = debug_handler.New(handler)
 	}
 
