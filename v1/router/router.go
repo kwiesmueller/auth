@@ -41,7 +41,8 @@ func New(
 	router.Path(fmt.Sprintf("%s/version", prefix)).Methods("GET").HandlerFunc(version)
 
 	router.Path(fmt.Sprintf("%s/user", prefix)).Methods("GET").HandlerFunc(userList)
-
+	router.Path(fmt.Sprintf("%s/user", prefix)).Methods("POST").HandlerFunc(userRegister)
+	router.Path(fmt.Sprintf("%s/user/{username}", prefix)).Methods("DELETE").HandlerFunc(userDelete)
 	router.Path(fmt.Sprintf("%s/user/{username}/data", prefix)).Methods("POST").HandlerFunc(userDataSet)
 	router.Path(fmt.Sprintf("%s/user/{username}/data/{key}", prefix)).Methods("POST").HandlerFunc(userDataSetValue)
 	router.Path(fmt.Sprintf("%s/user/{username}/data", prefix)).Methods("GET").HandlerFunc(userDataGet)
@@ -54,9 +55,6 @@ func New(
 	router.Path(fmt.Sprintf("%s/application", prefix)).Methods("POST").HandlerFunc(applicationCreate)
 	router.PathPrefix(fmt.Sprintf("%s/application/", prefix)).Methods("DELETE").HandlerFunc(applicationDelete)
 	router.PathPrefix(fmt.Sprintf("%s/application/", prefix)).Methods("GET").HandlerFunc(applicationGet)
-
-	router.Path(fmt.Sprintf("%s/user/{username}", prefix)).Methods("DELETE").HandlerFunc(userDelete)
-	router.Path(fmt.Sprintf("%s/user", prefix)).Methods("POST").HandlerFunc(userRegister)
 
 	router.Path(fmt.Sprintf("%s/token/{token}", prefix)).Methods("DELETE").HandlerFunc(userUnregister)
 	router.Path(fmt.Sprintf("%s/token", prefix)).Methods("POST").HandlerFunc(tokenAdd)
