@@ -29,6 +29,10 @@ func CreateGroupsFromString(groupNames string) []GroupName {
 
 type AuthToken string
 
+func (a AuthToken) String() string {
+	return string(a)
+}
+
 type ApplicationName string
 
 type ApplicationPassword string
