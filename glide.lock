@@ -1,35 +1,35 @@
 hash: 208e11518e71198c2c12a9af6e8f241536270898dee327b548c9310aa942322c
-updated: 2016-08-30T10:05:46.927496508+02:00
+updated: 2016-10-05T13:33:53.778637205+02:00
 imports:
 - name: github.com/bborbe/flagenv
   version: 96aab95bb1341e7a7ccf9160e49792e2ad3b0e08
 - name: github.com/bborbe/http
-  version: addca5fc2e2de1bef39a64990873806e7fc9c0a9
+  version: 356ba8175de4264aedb8337322827961b7c3e927
   subpackages:
   - header
-  - requestbuilder
   - mock
+  - requestbuilder
 - name: github.com/bborbe/http_handler
-  version: 3ce100a4d1664348a31553631244fe337df991f5
+  version: d93b87c7bc033a90a3893aae44e0925092c984f1
   subpackages:
   - adapter
   - check
+  - debug
   - error
   - filter
   - not_found
-  - debug
 - name: github.com/bborbe/ledis
   version: b510d0554dcff86441a1d7fb16f52ad60b434f13
   subpackages:
   - mock
 - name: github.com/bborbe/password
-  version: 0a2871e7b05126d05e9114d4e5dfba84b56dd529
+  version: 06dc0e1a989ebd79f383f5d05b8fc067c9b5d50f
   subpackages:
   - generator
 - name: github.com/facebookgo/clock
   version: 600d898af40aa09a7a93ecb9265d87b0504b6f03
 - name: github.com/facebookgo/grace
-  version: 053ab5d25436faedf3fe76fbf3da797c8c27c659
+  version: 5729e484473f52048578af1b80d0008c7024089b
   subpackages:
   - gracehttp
   - gracenet
@@ -42,13 +42,13 @@ imports:
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/mux
-  version: 0b13a922203ebdbfd236c818efcd5ed46097d690
+  version: 757bef944d0f21880861c2dd9c871ca543023cba
 - name: github.com/siddontang/goredis
   version: 760763f78400635ed7b9b115511b8ed06035e908
 testImports:
 - name: github.com/bborbe/assert
-  version: 2db035a4c0870f6f48d1955f7b9542f9dbd4fb64
+  version: d2b3a7c4c731ac8cc63c6f5a1ea7d401e7547d42
 - name: github.com/bborbe/io
-  version: f014e6fbe9170c0692122497023eedb9d6e53cc2
+  version: c2c48bf5bd136037d775f6fabe5caaba93b341b5
   subpackages:
   - reader_nop_close
