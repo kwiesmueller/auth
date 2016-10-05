@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/golang/glog"
 	"strings"
+
+	"github.com/golang/glog"
 )
 
 const (

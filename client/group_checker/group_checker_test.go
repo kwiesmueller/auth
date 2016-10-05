@@ -1,13 +1,15 @@
 package group_checker
 
 import (
-	auth_model "github.com/bborbe/auth/model"
 	"testing"
 
+	auth_model "github.com/bborbe/auth/model"
+
 	"fmt"
+	"os"
+
 	. "github.com/bborbe/assert"
 	"github.com/golang/glog"
-	"os"
 )
 
 func TestMain(m *testing.M) {
