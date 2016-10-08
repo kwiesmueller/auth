@@ -38,13 +38,13 @@ func (d *directory) Add(authToken model.AuthToken, userName model.UserName) erro
 }
 
 func (d *directory) Exists(authToken model.AuthToken) (bool, error) {
-	glog.V(2).Infof("exists token %v for user %v", authToken)
+	glog.V(2).Infof("exists token %v", authToken)
 	key := createKey(authToken)
 	return d.ledis.Exists(key)
 }
 
 func (d *directory) Remove(authToken model.AuthToken) error {
-	glog.V(2).Infof("remove token %v from user %v", authToken)
+	glog.V(2).Infof("remove token %v", authToken)
 	key := createKey(authToken)
 	return d.ledis.Del(key)
 }
