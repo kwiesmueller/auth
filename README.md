@@ -28,13 +28,13 @@ auth_server \
 -prefix=
 ```
 
-## Authorize
+## Authorize Header
 
 `echo -n 'auth:test123' | base64`
 
 `Authorization: Bearer YXV0aDp0ZXN0MTIz` 
 
-## Actions
+## Actions Global
 
 ### Health-Check
 
@@ -54,6 +54,8 @@ curl \
 http://localhost:6666/readiness
 ```
 
+## Actions Api 1.0
+
 ### Register User
 
 `echo -n 'tester:secret' | base64`
@@ -63,7 +65,7 @@ curl \
 -X POST \
 -d '{ "authToken":"dGVzdGVyOnNlY3JldA==","user":"tester" }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user
+http://localhost:6666/api/1.0/user
 ```
 
 ### Unregister User
@@ -72,7 +74,7 @@ http://localhost:6666/user
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/token/dGVzdGVyOnNlY3JldA==
+http://localhost:6666/api/1.0/token/dGVzdGVyOnNlY3JldA==
 ```
 
 ### Delete User
@@ -81,7 +83,7 @@ http://localhost:6666/token/dGVzdGVyOnNlY3JldA==
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user/tester
+http://localhost:6666/api/1.0/user/tester
 ```
 
 ### Verify Login
@@ -90,7 +92,7 @@ http://localhost:6666/user/tester
 curl \
 -X POST \
 -d '{ "authToken": "abc", "groups": ["admin"] }' \
--H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:6666/login
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:6666/api/1.0/login
 ```
 
 ### Create application
@@ -99,7 +101,7 @@ curl \
 curl \
 -X POST \
 -d '{ ... }' \
--H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:6666/application
+-H "Authorization: Bearer YXV0aDp0ZXN0MTIz" http://localhost:6666/api/1.0/application
 ```
 
 ### Delete application
@@ -108,7 +110,7 @@ curl \
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/application/1337
+http://localhost:6666/api/1.0/application/1337
 ```
 
 ### Get application
@@ -117,7 +119,7 @@ http://localhost:6666/application/1337
 curl \
 -X Get \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/application/1337
+http://localhost:6666/api/1.0/application/1337
 ```
 
 ### Add authoken to existing user 
@@ -127,7 +129,7 @@ curl \
 -X POST \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/application
+http://localhost:6666/api/1.0/application
 ```
 
 ### Remove authtoken from existing user 
@@ -137,7 +139,7 @@ curl \
 -X DELETE \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/application
+http://localhost:6666/api/1.0/application
 ```
 
 ### Add authoken to existing user 
@@ -147,7 +149,7 @@ curl \
 -X POST \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user_group
+http://localhost:6666/api/1.0/user_group
 ```
 
 ### Remove authtoken from existing user 
@@ -157,7 +159,7 @@ curl \
 -X DELETE \
 -d '{ ... }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user_group
+http://localhost:6666/api/1.0/user_group
 ```
 
 ### Create user data
@@ -167,7 +169,7 @@ curl \
 -X POST \
 -d '{ "keya":"valuea", "keyb":"valueb" }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user/tester/data
+http://localhost:6666/api/1.0/user/tester/data
 ```
 
 ### Get user data
@@ -176,7 +178,7 @@ http://localhost:6666/user/tester/data
 curl \
 -X GET \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user/tester/data
+http://localhost:6666/api/1.0/user/tester/data
 ```
 
 ### Get user data key
@@ -185,7 +187,7 @@ http://localhost:6666/user/tester/data
 curl \
 -X GET \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user/tester/data/keya
+http://localhost:6666/api/1.0/user/tester/data/keya
 ```
 
 ### Delete user data
@@ -194,7 +196,7 @@ http://localhost:6666/user/tester/data/keya
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user/tester/data
+http://localhost:6666/api/1.0/user/tester/data
 ```
 
 ### Delete user data key
@@ -203,7 +205,7 @@ http://localhost:6666/user/tester/data
 curl \
 -X DELETE \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
-http://localhost:6666/user/tester/data/keya
+http://localhost:6666/api/1.0/user/tester/data/keya
 ```
 
 ## Continuous integration
