@@ -9,7 +9,7 @@ import (
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
 	"github.com/bborbe/auth/model"
-	ledis "github.com/bborbe/ledis/mock"
+	ledis "github.com/bborbe/redis_client/mock"
 )
 
 func TestImplementsService(t *testing.T) {

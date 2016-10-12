@@ -6,7 +6,7 @@ import (
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/auth/directory/application_directory"
 	"github.com/bborbe/auth/model"
-	ledis "github.com/bborbe/ledis/mock"
+	ledis "github.com/bborbe/redis_client/mock"
 )
 
 func TestImplementsService(t *testing.T) {

@@ -12,7 +12,7 @@ import:
   - error
   - filter
   - not_found
-- package: github.com/bborbe/ledis
+- package: github.com/bborbe/redis_client/ledis
 - package: github.com/golang/glog
 - package: github.com/bborbe/password
   subpackages:

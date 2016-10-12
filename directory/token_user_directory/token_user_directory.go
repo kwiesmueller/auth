@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/ledis"
+	redis "github.com/bborbe/redis_client"
 	"github.com/golang/glog"
 )
 
 const PREFIX = "token_user"
 
 type directory struct {
-	ledis ledis.Kv
+	redis redis.Kv
 }
 
 type TokenUserDirectory interface {
@@ -21,9 +21,9 @@ type TokenUserDirectory interface {
 	FindUserByAuthToken(authToken model.AuthToken) (*model.UserName, error)
 }
 
-func New(ledisClient ledis.Kv) *directory {
+func New(ledisClient redis.Kv) *directory {
 	u := new(directory)
-	u.ledis = ledisClient
+	u.redis = ledisClient
 	return u
 }
 
@@ -34,25 +34,25 @@ func createKey(authToken model.AuthToken) string {
 func (d *directory) Add(authToken model.AuthToken, userName model.UserName) error {
 	glog.V(2).Infof("add token %v to user %v", authToken, userName)
 	key := createKey(authToken)
-	return d.ledis.Set(key, string(userName))
+	return d.redis.Set(key, string(userName))
 }
 
 func (d *directory) Exists(authToken model.AuthToken) (bool, error) {
 	glog.V(2).Infof("exists token %v", authToken)
 	key := createKey(authToken)
-	return d.ledis.Exists(key)
+	return d.redis.Exists(key)
 }
 
 func (d *directory) Remove(authToken model.AuthToken) error {
 	glog.V(2).Infof("remove token %v", authToken)
 	key := createKey(authToken)
-	return d.ledis.Del(key)
+	return d.redis.Del(key)
 }
 
 func (d *directory) FindUserByAuthToken(authToken model.AuthToken) (*model.UserName, error) {
 	glog.V(2).Infof("find user for token %v", authToken)
 	key := createKey(authToken)
-	value, err := d.ledis.Get(key)
+	value, err := d.redis.Get(key)
 	if err != nil {
 		return nil, err
 	}

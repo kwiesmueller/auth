@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/ledis"
+	redis "github.com/bborbe/redis_client"
 	"github.com/golang/glog"
 )
 
 const PREFIX = "user_token"
 
 type directory struct {
-	ledis ledis.Set
+	redis redis.Set
 }
 
 type UserTokenDirectory interface {
@@ -24,9 +24,9 @@ type UserTokenDirectory interface {
 	List() ([]model.UserName, error)
 }
 
-func New(ledisClient ledis.Set) *directory {
+func New(ledisClient redis.Set) *directory {
 	u := new(directory)
-	u.ledis = ledisClient
+	u.redis = ledisClient
 	return u
 }
 
@@ -37,19 +37,19 @@ func createKey(userName model.UserName) string {
 func (d *directory) Add(userName model.UserName, authToken model.AuthToken) error {
 	glog.V(2).Infof("add token %v user %v", authToken, userName)
 	key := createKey(userName)
-	return d.ledis.SetAdd(key, string(authToken))
+	return d.redis.SetAdd(key, string(authToken))
 }
 
 func (d *directory) Exists(userName model.UserName) (bool, error) {
 	glog.V(2).Infof("exists user %v", userName)
 	key := createKey(userName)
-	return d.ledis.SetExists(key)
+	return d.redis.SetExists(key)
 }
 
 func (d *directory) Get(userName model.UserName) ([]model.AuthToken, error) {
 	glog.V(2).Infof("get tokens for user %v", userName)
 	key := createKey(userName)
-	tokens, err := d.ledis.SetGet(key)
+	tokens, err := d.redis.SetGet(key)
 	if err != nil {
 		return nil, err
 	}
@@ -63,24 +63,24 @@ func (d *directory) Get(userName model.UserName) ([]model.AuthToken, error) {
 func (d *directory) Contains(userName model.UserName, authToken model.AuthToken) (bool, error) {
 	glog.V(2).Infof("contains user %v token %v", userName, authToken)
 	key := createKey(userName)
-	return d.ledis.SetContains(key, string(authToken))
+	return d.redis.SetContains(key, string(authToken))
 }
 
 func (d *directory) Remove(userName model.UserName, authToken model.AuthToken) error {
 	glog.V(2).Infof("remove token %v from user %v", authToken, userName)
 	key := createKey(userName)
-	return d.ledis.SetRemove(key, string(authToken))
+	return d.redis.SetRemove(key, string(authToken))
 }
 
 func (d *directory) Delete(userName model.UserName) error {
 	glog.V(2).Infof("delete user %v", userName)
 	key := createKey(userName)
-	return d.ledis.SetClear(key)
+	return d.redis.SetClear(key)
 }
 
 func (d *directory) List() ([]model.UserName, error) {
 	prefix := fmt.Sprintf("%s:", PREFIX)
-	list, err := d.ledis.SetList(prefix)
+	list, err := d.redis.SetList(prefix)
 	if err != nil {
 		return nil, err
 	}

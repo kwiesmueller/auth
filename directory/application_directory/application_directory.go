@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/ledis"
+	redis "github.com/bborbe/redis_client"
 	"github.com/golang/glog"
 )
 
 const PREFIX = "application"
 
 type directory struct {
-	ledis ledis.Kv
+	redis redis.Kv
 }
 
 type ApplicationDirectory interface {
@@ -21,9 +21,9 @@ type ApplicationDirectory interface {
 	Exists(applicationName model.ApplicationName) (bool, error)
 }
 
-func New(ledisClient ledis.Kv) *directory {
+func New(redisClient redis.Kv) *directory {
 	a := new(directory)
-	a.ledis = ledisClient
+	a.redis = redisClient
 	return a
 }
 
@@ -34,23 +34,23 @@ func createKey(applicationName model.ApplicationName) string {
 func (d *directory) Create(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) error {
 	glog.V(2).Infof("create application: %s", applicationName)
 	key := createKey(applicationName)
-	return d.ledis.Set(key, string(applicationPassword))
+	return d.redis.Set(key, string(applicationPassword))
 }
 
 func (d *directory) Delete(applicationName model.ApplicationName) error {
 	glog.V(2).Infof("delete application: %s", applicationName)
-	return d.ledis.Del(createKey(applicationName))
+	return d.redis.Del(createKey(applicationName))
 }
 
 func (d *directory) Exists(applicationName model.ApplicationName) (bool, error) {
 	glog.V(2).Infof("exists application: %s", applicationName)
-	return d.ledis.Exists(createKey(applicationName))
+	return d.redis.Exists(createKey(applicationName))
 }
 
 func (d *directory) Get(applicationName model.ApplicationName) (*model.ApplicationPassword, error) {
 	glog.V(2).Infof("get application: %s", applicationName)
 	key := createKey(applicationName)
-	value, err := d.ledis.Get(key)
+	value, err := d.redis.Get(key)
 	if err != nil {
 		return nil, err
 	}

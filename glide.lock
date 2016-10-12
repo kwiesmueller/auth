@@ -1,5 +1,5 @@
-hash: 208e11518e71198c2c12a9af6e8f241536270898dee327b548c9310aa942322c
-updated: 2016-10-05T13:33:53.778637205+02:00
+hash: 6609223af5b3871e0e9851487bb727e450298c4233c0808a41e4170e947daf57
+updated: 2016-10-12T13:38:55.972975316+02:00
 imports:
 - name: github.com/bborbe/flagenv
   version: 96aab95bb1341e7a7ccf9160e49792e2ad3b0e08
@@ -10,7 +10,7 @@ imports:
   - mock
   - requestbuilder
 - name: github.com/bborbe/http_handler
-  version: d93b87c7bc033a90a3893aae44e0925092c984f1
+  version: e2ac3d85129420f19725ac9918b1130eb93be7f2
   subpackages:
   - adapter
   - check
@@ -18,14 +18,15 @@ imports:
   - error
   - filter
   - not_found
-- name: github.com/bborbe/ledis
-  version: b510d0554dcff86441a1d7fb16f52ad60b434f13
-  subpackages:
-  - mock
 - name: github.com/bborbe/password
   version: 06dc0e1a989ebd79f383f5d05b8fc067c9b5d50f
   subpackages:
   - generator
+- name: github.com/bborbe/redis_client
+  version: e72634819d47deb35085f5f97189e81f6f7319e2
+  subpackages:
+  - ledis
+  - mock
 - name: github.com/facebookgo/clock
   version: 600d898af40aa09a7a93ecb9265d87b0504b6f03
 - name: github.com/facebookgo/grace
@@ -49,6 +50,6 @@ testImports:
 - name: github.com/bborbe/assert
   version: d2b3a7c4c731ac8cc63c6f5a1ea7d401e7547d42
 - name: github.com/bborbe/io
-  version: c2c48bf5bd136037d775f6fabe5caaba93b341b5
+  version: a11fbd04dece7d16d80e69884526dafdea697648
   subpackages:
   - reader_nop_close

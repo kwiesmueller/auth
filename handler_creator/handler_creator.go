@@ -20,7 +20,7 @@ import (
 	"github.com/bborbe/auth/v1/handler_creator"
 	"github.com/bborbe/http_handler/check"
 	"github.com/bborbe/http_handler/not_found"
-	"github.com/bborbe/ledis"
+	"github.com/bborbe/redis_client/ledis"
 	"github.com/bborbe/password/generator"
 	"github.com/golang/glog"
 )
