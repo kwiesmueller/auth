@@ -1,5 +1,5 @@
 hash: 6609223af5b3871e0e9851487bb727e450298c4233c0808a41e4170e947daf57
-updated: 2016-10-12T13:38:55.972975316+02:00
+updated: 2016-10-13T14:15:19.613213641+02:00
 imports:
 - name: github.com/bborbe/flagenv
   version: 96aab95bb1341e7a7ccf9160e49792e2ad3b0e08
@@ -23,7 +23,7 @@ imports:
   subpackages:
   - generator
 - name: github.com/bborbe/redis_client
-  version: e72634819d47deb35085f5f97189e81f6f7319e2
+  version: 900635aba7688804bd7efaae8efeb56a855f00db
   subpackages:
   - ledis
   - mock

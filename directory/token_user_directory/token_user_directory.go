@@ -34,25 +34,25 @@ func createKey(authToken model.AuthToken) string {
 func (d *directory) Add(authToken model.AuthToken, userName model.UserName) error {
 	glog.V(2).Infof("add token %v to user %v", authToken, userName)
 	key := createKey(authToken)
-	return d.redis.Set(key, string(userName))
+	return d.redis.KvSet(key, string(userName))
 }
 
 func (d *directory) Exists(authToken model.AuthToken) (bool, error) {
 	glog.V(2).Infof("exists token %v", authToken)
 	key := createKey(authToken)
-	return d.redis.Exists(key)
+	return d.redis.KvExists(key)
 }
 
 func (d *directory) Remove(authToken model.AuthToken) error {
 	glog.V(2).Infof("remove token %v", authToken)
 	key := createKey(authToken)
-	return d.redis.Del(key)
+	return d.redis.KvDel(key)
 }
 
 func (d *directory) FindUserByAuthToken(authToken model.AuthToken) (*model.UserName, error) {
 	glog.V(2).Infof("find user for token %v", authToken)
 	key := createKey(authToken)
-	value, err := d.redis.Get(key)
+	value, err := d.redis.KvGet(key)
 	if err != nil {
 		return nil, err
 	}

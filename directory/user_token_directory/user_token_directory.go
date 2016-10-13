@@ -79,14 +79,14 @@ func (d *directory) Delete(userName model.UserName) error {
 }
 
 func (d *directory) List() ([]model.UserName, error) {
-	prefix := fmt.Sprintf("%s:", PREFIX)
+	prefix := fmt.Sprintf("%s:*", PREFIX)
 	list, err := d.redis.SetList(prefix)
 	if err != nil {
 		return nil, err
 	}
 	var result []model.UserName
 	for key := range list {
-		name := key[len(prefix):]
+		name := key[len(prefix)-1:]
 		result = append(result, model.UserName(name))
 	}
 	return result, nil

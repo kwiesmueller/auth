@@ -34,23 +34,23 @@ func createKey(applicationName model.ApplicationName) string {
 func (d *directory) Create(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) error {
 	glog.V(2).Infof("create application: %s", applicationName)
 	key := createKey(applicationName)
-	return d.redis.Set(key, string(applicationPassword))
+	return d.redis.KvSet(key, string(applicationPassword))
 }
 
 func (d *directory) Delete(applicationName model.ApplicationName) error {
 	glog.V(2).Infof("delete application: %s", applicationName)
-	return d.redis.Del(createKey(applicationName))
+	return d.redis.KvDel(createKey(applicationName))
 }
 
 func (d *directory) Exists(applicationName model.ApplicationName) (bool, error) {
 	glog.V(2).Infof("exists application: %s", applicationName)
-	return d.redis.Exists(createKey(applicationName))
+	return d.redis.KvExists(createKey(applicationName))
 }
 
 func (d *directory) Get(applicationName model.ApplicationName) (*model.ApplicationPassword, error) {
 	glog.V(2).Infof("get application: %s", applicationName)
 	key := createKey(applicationName)
-	value, err := d.redis.Get(key)
+	value, err := d.redis.KvGet(key)
 	if err != nil {
 		return nil, err
 	}
