@@ -10,23 +10,24 @@ import (
 	debug_handler "github.com/bborbe/http_handler/debug"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/golang/glog"
+	"github.com/bborbe/auth/model"
 )
 
 const (
-	DEFAULT_PORT                        = 8080
-	PARAMETER_PORT                      = "port"
+	DEFAULT_PORT = 8080
+	PARAMETER_PORT = "port"
 	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
-	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
-	PARAMETER_PREFIX                    = "prefix"
+	PARAMETER_LEDISDB_ADDRESS = "ledisdb-address"
+	PARAMETER_LEDISDB_PASSWORD = "ledisdb-password"
+	PARAMETER_PREFIX = "prefix"
 )
 
 var (
-	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
+	portPtr = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
 	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
-	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
-	prefixPtr                  = flag.String(PARAMETER_PREFIX, "", "prefix")
+	ledisdbAddressPtr = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
+	ledisdbPasswordPtr = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
+	prefixPtr = flag.String(PARAMETER_PREFIX, "", "prefix")
 )
 
 func main() {
@@ -36,7 +37,7 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	err := do(
-		*portPtr,
+		model.Port(*portPtr),
 		*prefixPtr,
 		*authApplicationPasswordPtr,
 		*ledisdbAddressPtr,
@@ -48,11 +49,11 @@ func main() {
 }
 
 func do(
-	port int,
-	prefix string,
-	authApplicationPassword string,
-	ledisdbAddress string,
-	ledisdbPassword string,
+port model.Port,
+prefix string,
+authApplicationPassword string,
+ledisdbAddress string,
+ledisdbPassword string,
 ) error {
 	server, err := createServer(
 		port,
@@ -69,11 +70,11 @@ func do(
 }
 
 func createServer(
-	port int,
-	prefix string,
-	authApplicationPassword string,
-	ledisdbAddress string,
-	ledisdbPassword string,
+port model.Port,
+prefix string,
+authApplicationPassword string,
+ledisdbAddress string,
+ledisdbPassword string,
 ) (*http.Server, error) {
 	glog.V(2).Infof("create server with port: %d", port)
 	if port <= 0 {
@@ -97,5 +98,6 @@ func createServer(
 		handler = debug_handler.New(handler)
 	}
 
-	return &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: handler}, nil
+	glog.V(2).Infof("create http server on %s", port.Address())
+	return &http.Server{Addr: port.Address(), Handler: handler}, nil
 }

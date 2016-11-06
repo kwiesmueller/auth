@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/golang/glog"
+	"fmt"
 )
 
 const (
@@ -43,4 +44,12 @@ type Url string
 type Application struct {
 	ApplicationName     ApplicationName
 	ApplicationPassword ApplicationPassword
+}
+
+
+
+type Port int
+
+func (p Port) Address() string {
+	return fmt.Sprintf(":%d", p)
 }
