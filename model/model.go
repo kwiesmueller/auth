@@ -3,8 +3,9 @@ package model
 import (
 	"strings"
 
-	"github.com/golang/glog"
 	"fmt"
+
+	"github.com/golang/glog"
 )
 
 const (
@@ -45,8 +46,6 @@ type Application struct {
 	ApplicationName     ApplicationName
 	ApplicationPassword ApplicationPassword
 }
-
-
 
 type Port int
 
