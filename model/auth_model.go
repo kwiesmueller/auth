@@ -1,12 +1,46 @@
 package model
 
 import (
-	"strings"
-
 	"fmt"
+	"strings"
 
 	"github.com/golang/glog"
 )
+
+// Port to listen on
+type Port int
+
+// Address representation of the port
+func (p Port) Address() string {
+	return fmt.Sprintf(":%d", p)
+}
+
+// Int value of the port
+func (p Port) Int() int {
+	return int(p)
+}
+
+// Prefix of the application
+type Prefix string
+
+// String represenation of the prefix
+func (p Prefix) String() string {
+	return string(p)
+}
+
+// LedisdbAddress is used to connect to ledis (localhost:5555)
+type LedisdbAddress string
+
+func (l LedisdbAddress) String() string {
+	return string(l)
+}
+
+// LedisdbPassword used to access ledis
+type LedisdbPassword string
+
+func (l LedisdbPassword) String() string {
+	return string(l)
+}
 
 const (
 	Seperator             = ":"
@@ -45,10 +79,4 @@ type Url string
 type Application struct {
 	ApplicationName     ApplicationName
 	ApplicationPassword ApplicationPassword
-}
-
-type Port int
-
-func (p Port) Address() string {
-	return fmt.Sprintf(":%d", p)
 }

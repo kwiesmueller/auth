@@ -1,14 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"runtime"
 
-	"github.com/bborbe/auth/handler_creator"
+	"github.com/bborbe/auth/factory"
 	"github.com/bborbe/auth/model"
 	flag "github.com/bborbe/flagenv"
-	debug_handler "github.com/bborbe/http_handler/debug"
+	"github.com/bborbe/redis_client/ledis"
 	"github.com/facebookgo/grace/gracehttp"
 	"github.com/golang/glog"
 )
@@ -36,68 +34,37 @@ func main() {
 	flag.Parse()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	err := do(
-		model.Port(*portPtr),
-		*prefixPtr,
-		*authApplicationPasswordPtr,
-		*ledisdbAddressPtr,
-		*ledisdbPasswordPtr,
-	)
-	if err != nil {
+	if err := do(); err != nil {
 		glog.Exit(err)
 	}
 }
 
-func do(
-	port model.Port,
-	prefix string,
-	authApplicationPassword string,
-	ledisdbAddress string,
-	ledisdbPassword string,
-) error {
-	server, err := createServer(
-		port,
-		prefix,
-		authApplicationPassword,
-		ledisdbAddress,
-		ledisdbPassword,
-	)
-	if err != nil {
+func do() error {
+
+	config := createConfig()
+	if err := config.Validate(); err != nil {
 		return err
 	}
+
+	factory := factory.New(config, ledis.New(config.LedisdbAddress.String(), config.LedisdbPassword.String()))
+
+	go func() {
+		if _, err := factory.ApplicationService().CreateApplicationWithPassword(model.AUTH_APPLICATION_NAME, config.ApplicationPassword); err != nil {
+			glog.Warningf("create auth application failed: %v", err)
+			return
+		}
+	}()
+
 	glog.V(2).Infof("start server")
-	return gracehttp.Serve(server)
+	return gracehttp.Serve(factory.HttpServer())
 }
 
-func createServer(
-	port model.Port,
-	prefix string,
-	authApplicationPassword string,
-	ledisdbAddress string,
-	ledisdbPassword string,
-) (*http.Server, error) {
-	glog.V(2).Infof("create server with port: %d", port)
-	if port <= 0 {
-		return nil, fmt.Errorf("parameter %s invalid", PARAMETER_PORT)
+func createConfig() model.Config {
+	return model.Config{
+		Port:                model.Port(*portPtr),
+		Prefix:              model.Prefix(*prefixPtr),
+		ApplicationPassword: model.ApplicationPassword(*authApplicationPasswordPtr),
+		LedisdbAddress:      model.LedisdbAddress(*ledisdbAddressPtr),
+		LedisdbPassword:     model.LedisdbPassword(*ledisdbPasswordPtr),
 	}
-	if len(ledisdbAddress) == 0 {
-		return nil, fmt.Errorf("parameter %s missing", PARAMETER_LEDISDB_ADDRESS)
-	}
-	handlerCreator := handler_creator.New()
-	handler, err := handlerCreator.CreateHandler(
-		prefix,
-		authApplicationPassword,
-		ledisdbAddress,
-		ledisdbPassword,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	if glog.V(4) {
-		handler = debug_handler.New(handler)
-	}
-
-	glog.V(2).Infof("create http server on %s", port.Address())
-	return &http.Server{Addr: port.Address(), Handler: handler}, nil
 }
