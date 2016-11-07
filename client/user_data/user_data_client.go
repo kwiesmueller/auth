@@ -4,11 +4,17 @@ import (
 	"github.com/bborbe/auth/model"
 )
 
+type callRest func(path string, method string, request interface{}, response interface{}) error
+
 type userDataService struct {
+	callRest callRest
 }
 
-func New() *userDataService {
+func New(
+	callRest callRest,
+) *userDataService {
 	s := new(userDataService)
+	s.callRest = callRest
 	return s
 }
 

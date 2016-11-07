@@ -8,7 +8,7 @@ import (
 )
 
 func TestImplementsService(t *testing.T) {
-	object := New()
+	object := New(nil)
 	var expected *service.UserGroupService
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
