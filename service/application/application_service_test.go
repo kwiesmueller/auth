@@ -6,12 +6,13 @@ import (
 	. "github.com/bborbe/assert"
 	"github.com/bborbe/auth/directory/application_directory"
 	"github.com/bborbe/auth/model"
+	"github.com/bborbe/auth/service"
 	ledis "github.com/bborbe/redis_client/mock"
 )
 
 func TestImplementsService(t *testing.T) {
 	object := New(nil, nil)
-	var expected *Service
+	var expected *service.ApplicationService
 	if err := AssertThat(object, Implements(expected)); err != nil {
 		t.Fatal(err)
 	}

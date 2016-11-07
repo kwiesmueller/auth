@@ -7,24 +7,19 @@ import (
 	"github.com/golang/glog"
 )
 
-type service struct {
+type userGroupService struct {
 	userGroupDirectory user_group_directory.UserGroupDirectory
 	groupUserDirectory group_user_directory.GroupUserDirectory
 }
 
-type Service interface {
-	AddUserToGroup(userName model.UserName, groupName model.GroupName) error
-	RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error
-}
-
-func New(userGroupDirectory user_group_directory.UserGroupDirectory, groupUserDirectory group_user_directory.GroupUserDirectory) *service {
-	s := new(service)
+func New(userGroupDirectory user_group_directory.UserGroupDirectory, groupUserDirectory group_user_directory.GroupUserDirectory) *userGroupService {
+	s := new(userGroupService)
 	s.userGroupDirectory = userGroupDirectory
 	s.groupUserDirectory = groupUserDirectory
 	return s
 }
 
-func (s *service) AddUserToGroup(userName model.UserName, groupName model.GroupName) error {
+func (s *userGroupService) AddUserToGroup(userName model.UserName, groupName model.GroupName) error {
 	glog.V(2).Infof("add user %v to group %v", userName, groupName)
 	if err := s.userGroupDirectory.Add(userName, groupName); err != nil {
 		glog.V(2).Infof("add user %v to group %v failed: %v", userName, groupName, err)
@@ -38,7 +33,7 @@ func (s *service) AddUserToGroup(userName model.UserName, groupName model.GroupN
 	return nil
 }
 
-func (s *service) RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error {
+func (s *userGroupService) RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error {
 	glog.V(2).Infof("remove user %v from group %v", userName, groupName)
 	if err := s.userGroupDirectory.Remove(userName, groupName); err != nil {
 		glog.V(2).Infof("remove user %v from group %v failed: %v", userName, groupName, err)

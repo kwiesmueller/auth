@@ -11,21 +11,11 @@ import (
 	"github.com/golang/glog"
 )
 
-type service struct {
+type userService struct {
 	userTokenDirectory user_token_directory.UserTokenDirectory
 	userGroupDirectory user_group_directory.UserGroupDirectory
 	tokenUserDirectory token_user_directory.TokenUserDirectory
 	userDataDirectory  user_data_directory.UserDataDirectory
-}
-
-type Service interface {
-	DeleteUser(userName model.UserName) error
-	DeleteUserWithToken(authToken model.AuthToken) error
-	CreateUserWithToken(userName model.UserName, authToken model.AuthToken) error
-	AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
-	RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
-	VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
-	List() ([]model.UserName, error)
 }
 
 func New(
@@ -33,8 +23,8 @@ func New(
 	userGroupDirectory user_group_directory.UserGroupDirectory,
 	tokenUserDirectory token_user_directory.TokenUserDirectory,
 	userDataDirectory user_data_directory.UserDataDirectory,
-) *service {
-	s := new(service)
+) *userService {
+	s := new(userService)
 	s.userTokenDirectory = userTokenDirectory
 	s.userGroupDirectory = userGroupDirectory
 	s.tokenUserDirectory = tokenUserDirectory
@@ -42,7 +32,7 @@ func New(
 	return s
 }
 
-func (s *service) DeleteUserWithToken(authToken model.AuthToken) error {
+func (s *userService) DeleteUserWithToken(authToken model.AuthToken) error {
 	glog.V(2).Infof("delete user with token %v", authToken)
 	userName, err := s.tokenUserDirectory.FindUserByAuthToken(authToken)
 	if err != nil {
@@ -52,7 +42,7 @@ func (s *service) DeleteUserWithToken(authToken model.AuthToken) error {
 	return s.DeleteUser(*userName)
 }
 
-func (s *service) DeleteUser(userName model.UserName) error {
+func (s *userService) DeleteUser(userName model.UserName) error {
 	glog.V(2).Infof("delete user %v", userName)
 	tokens, err := s.userTokenDirectory.Get(userName)
 	if err != nil {
@@ -76,7 +66,7 @@ func (s *service) DeleteUser(userName model.UserName) error {
 	return nil
 }
 
-func (h *service) CreateUserWithToken(userName model.UserName, authToken model.AuthToken) error {
+func (h *userService) CreateUserWithToken(userName model.UserName, authToken model.AuthToken) error {
 	glog.V(2).Infof("add token user %v with token %v", userName, authToken)
 	if err := h.assertTokenNotUsed(authToken); err != nil {
 		glog.V(2).Infof("token %v already used", authToken)
@@ -98,7 +88,7 @@ func (h *service) CreateUserWithToken(userName model.UserName, authToken model.A
 	return nil
 }
 
-func (h *service) assertTokenNotUsed(authToken model.AuthToken) error {
+func (h *userService) assertTokenNotUsed(authToken model.AuthToken) error {
 	glog.V(2).Infof("assert token %s not used", authToken)
 	exists, err := h.tokenUserDirectory.Exists(authToken)
 	if err != nil {
@@ -112,7 +102,7 @@ func (h *service) assertTokenNotUsed(authToken model.AuthToken) error {
 	return nil
 }
 
-func (h *service) assertUserNameNotUser(userName model.UserName) error {
+func (h *userService) assertUserNameNotUser(userName model.UserName) error {
 	glog.V(2).Infof("assert user %s not existing", userName)
 	exists, err := h.userTokenDirectory.Exists(userName)
 	if err != nil {
@@ -126,7 +116,7 @@ func (h *service) assertUserNameNotUser(userName model.UserName) error {
 	return nil
 }
 
-func (h *service) AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
+func (h *userService) AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
 	glog.V(2).Infof("add token %v to user with token %v", newToken, userToken)
 	if err := h.assertTokenNotUsed(newToken); err != nil {
 		return err
@@ -148,7 +138,7 @@ func (h *service) AddTokenToUserWithToken(newToken model.AuthToken, userToken mo
 	return nil
 }
 
-func (h *service) RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
+func (h *userService) RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
 	glog.V(2).Infof("remove token %v from user with token %v", newToken, userToken)
 	userName, err := h.tokenUserDirectory.FindUserByAuthToken(userToken)
 	if err != nil {
@@ -167,7 +157,7 @@ func (h *service) RemoveTokenFromUserWithToken(newToken model.AuthToken, userTok
 	return nil
 }
 
-func (s *service) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error) {
+func (s *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error) {
 	glog.V(2).Infof("verify token %v has groups %v", authToken, requiredGroupNames)
 	userName, err := s.tokenUserDirectory.FindUserByAuthToken(authToken)
 	if err != nil {
@@ -188,6 +178,6 @@ func (s *service) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupN
 	return userName, nil
 }
 
-func (s *service) List() ([]model.UserName, error) {
+func (s *userService) List() ([]model.UserName, error) {
 	return s.userTokenDirectory.List()
 }

@@ -1,4 +1,4 @@
-package user_data
+package user_group
 
 import (
 	"testing"
@@ -8,8 +8,8 @@ import (
 )
 
 func TestImplementsService(t *testing.T) {
-	object := New(nil)
-	var expected *service.UserDataService
+	object := New()
+	var expected *service.UserGroupService
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)

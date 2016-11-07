@@ -4,10 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bborbe/auth/application_check"
-	"github.com/bborbe/auth/service/application"
-	"github.com/bborbe/auth/service/user"
-	"github.com/bborbe/auth/service/user_data"
-	"github.com/bborbe/auth/service/user_group"
+	"github.com/bborbe/auth/service"
 	"github.com/bborbe/auth/v1/handler/access_denied"
 	"github.com/bborbe/auth/v1/handler/application_creator"
 	"github.com/bborbe/auth/v1/handler/application_deletor"
@@ -37,10 +34,10 @@ import (
 type HandlerCreator interface {
 	CreateHandler(
 		prefix string,
-		applicationService application.Service,
-		userService user.Service,
-		userGroupService user_group.Service,
-		userDataService user_data.UserDataService,
+		applicationService service.ApplicationService,
+		userService service.UserService,
+		userGroupService service.UserGroupService,
+		userDataService service.UserDataService,
 	) (http.Handler, error)
 }
 
@@ -54,10 +51,10 @@ func New() *handlerCreator {
 
 func (h *handlerCreator) CreateHandler(
 	prefix string,
-	applicationService application.Service,
-	userService user.Service,
-	userGroupService user_group.Service,
-	userDataService user_data.UserDataService,
+	applicationService service.ApplicationService,
+	userService service.UserService,
+	userGroupService service.UserGroupService,
+	userDataService service.UserDataService,
 ) (http.Handler, error) {
 	glog.V(2).Infof("create handler with prefix: %v", prefix)
 

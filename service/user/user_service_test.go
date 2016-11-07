@@ -9,12 +9,13 @@ import (
 	"github.com/bborbe/auth/directory/user_group_directory"
 	"github.com/bborbe/auth/directory/user_token_directory"
 	"github.com/bborbe/auth/model"
+	"github.com/bborbe/auth/service"
 	ledis "github.com/bborbe/redis_client/mock"
 )
 
 func TestImplementsService(t *testing.T) {
 	object := New(nil, nil, nil, nil)
-	var expected *Service
+	var expected *service.UserService
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)
