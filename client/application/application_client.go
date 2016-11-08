@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	"github.com/golang/glog"

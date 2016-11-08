@@ -1,5 +1,5 @@
 hash: 6609223af5b3871e0e9851487bb727e450298c4233c0808a41e4170e947daf57
-updated: 2016-11-08T23:03:11.828576631+01:00
+updated: 2016-11-09T00:25:42.929505878+01:00
 imports:
 - name: github.com/bborbe/flagenv
   version: 96aab95bb1341e7a7ccf9160e49792e2ad3b0e08
@@ -9,6 +9,7 @@ imports:
   - header
   - mock
   - requestbuilder
+  - rest
 - name: github.com/bborbe/http_handler
   version: ecdbdfd8e55d56b81b1027e62eb290a9bcdcae84
   subpackages:
