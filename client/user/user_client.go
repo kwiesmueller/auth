@@ -21,6 +21,10 @@ func New(
 	return s
 }
 
+func (s *userService) HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error) {
+	panic("not implemented")
+}
+
 func (s *userService) DeleteUserWithToken(authToken model.AuthToken) error {
 	panic("not implemented")
 }

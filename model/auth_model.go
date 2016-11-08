@@ -70,6 +70,16 @@ func (a AuthToken) String() string {
 	return string(a)
 }
 
+func ParseTokens(tokens string) []AuthToken {
+	var result []AuthToken
+	for _, token := range strings.Split(tokens, ",") {
+		if len(token) > 0 {
+			result = append(result, AuthToken(token))
+		}
+	}
+	return result
+}
+
 type ApplicationName string
 
 func (a ApplicationName) String() string {
@@ -83,6 +93,10 @@ func (a ApplicationPassword) String() string {
 }
 
 type Url string
+
+func (u Url) String() string {
+	return string(u)
+}
 
 type Application struct {
 	ApplicationName     ApplicationName

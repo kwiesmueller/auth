@@ -181,3 +181,11 @@ func (s *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGr
 func (s *userService) List() ([]model.UserName, error) {
 	return s.userTokenDirectory.List()
 }
+
+func (s *userService) HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error) {
+	userName, err := s.VerifyTokenHasGroups(authToken, requiredGroups)
+	if err != nil {
+		return false, err
+	}
+	return userName != nil && len(*userName) > 0, nil
+}
