@@ -2,6 +2,8 @@ package user_group
 
 import (
 	"github.com/bborbe/auth/model"
+	"github.com/bborbe/auth/v1"
+	"github.com/golang/glog"
 )
 
 type callRest func(path string, method string, request interface{}, response interface{}) error
@@ -13,15 +15,37 @@ type userGroupService struct {
 func New(
 	callRest callRest,
 ) *userGroupService {
-	s := new(userGroupService)
-	s.callRest = callRest
-	return s
+	u := new(userGroupService)
+	u.callRest = callRest
+	return u
 }
 
-func (s *userGroupService) AddUserToGroup(userName model.UserName, groupName model.GroupName) error {
-	panic("not implemented")
+func (u *userGroupService) AddUserToGroup(userName model.UserName, groupName model.GroupName) error {
+	glog.V(2).Infof("add user %s to group %s", userName, groupName)
+	request := v1.AddUserToGroupRequest{
+		UserName:  model.UserName(userName),
+		GroupName: model.GroupName(groupName),
+	}
+	var response v1.AddUserToGroupResponse
+	if err := u.callRest("/api/1.0/user_group", "POST", &request, &response); err != nil {
+		glog.V(2).Infof("add user %v to group %v failed: %v", userName, groupName, err)
+		return err
+	}
+	glog.V(2).Infof("add user user %v to group %v successful", userName, groupName)
+	return nil
 }
 
-func (s *userGroupService) RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error {
-	panic("not implemented")
+func (u *userGroupService) RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error {
+	glog.V(2).Infof("remove user %s from group %s", userName, groupName)
+	request := v1.AddUserToGroupRequest{
+		UserName:  model.UserName(userName),
+		GroupName: model.GroupName(groupName),
+	}
+	var response v1.AddUserToGroupResponse
+	if err := u.callRest("/api/1.0/user_group", "DELETE", &request, &response); err != nil {
+		glog.V(2).Infof("remove user %v from group %v failed: %v", userName, groupName, err)
+		return err
+	}
+	glog.V(2).Infof("remove user user %v from group %v successful", userName, groupName)
+	return nil
 }
