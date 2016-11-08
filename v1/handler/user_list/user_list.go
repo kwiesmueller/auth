@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
 	"github.com/golang/glog"
 )
@@ -34,14 +33,10 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
-	var response v1.UserListResponse
 	var err error
 	var userNames []model.UserName
 	if userNames, err = h.listUsers(); err != nil {
 		return err
 	}
-	for _, userName := range userNames {
-		response = append(response, v1.User{UserName: userName})
-	}
-	return json.NewEncoder(resp).Encode(&response)
+	return json.NewEncoder(resp).Encode(&userNames)
 }

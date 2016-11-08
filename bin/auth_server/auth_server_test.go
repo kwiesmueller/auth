@@ -126,5 +126,24 @@ func TestUserServiceList(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "testtoken")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			list, err := services.UserService().List()
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(len(list), Is(1)); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(list[0].String(), Is("testuser")); err != nil {
+				t.Fatal(err)
+			}
+
+		}
 	})
 }
