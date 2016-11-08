@@ -52,7 +52,7 @@ type UserName string
 
 type GroupName string
 
-func CreateGroupsFromString(groupNames string) []GroupName {
+func ParseGroupNames(groupNames string) []GroupName {
 	parts := strings.Split(groupNames, ",")
 	groups := make([]GroupName, 0)
 	for _, groupName := range parts {
