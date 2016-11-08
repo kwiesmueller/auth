@@ -51,7 +51,7 @@ func TestResponseSuccess(t *testing.T) {
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err := AssertThat(string(resp.Bytes()), Is("[{\"username\":\"foo\"}]\n")); err != nil {
+	if err := AssertThat(string(resp.Bytes()), Is("[\"foo\"]\n")); err != nil {
 		t.Fatal(err)
 	}
 }
