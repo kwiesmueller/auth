@@ -34,6 +34,7 @@ type HandlerCreator interface {
 	TokenRemoveHandler() http.Handler
 	UserGroupAddHandler() http.Handler
 	UserGroupRemoveHandler() http.Handler
+	TokenListHandler() http.Handler
 }
 
 func Create(h HandlerCreator) http.Handler {
@@ -58,6 +59,7 @@ func Create(h HandlerCreator) http.Handler {
 	router.PathPrefix(fmt.Sprintf("%s/api/%s/application/", h.Prefix(), v1.VERSION)).Methods("GET").Handler(h.ApplicationGetHandler())
 
 	router.Path(fmt.Sprintf("%s/api/%s/token/{token}", h.Prefix(), v1.VERSION)).Methods("DELETE").Handler(h.UserUnregisterHandler())
+	router.Path(fmt.Sprintf("%s/api/%s/token", h.Prefix(), v1.VERSION)).Methods("GET").Queries("username", "{username}").Handler(h.TokenListHandler())
 	router.Path(fmt.Sprintf("%s/api/%s/token", h.Prefix(), v1.VERSION)).Methods("POST").Handler(h.TokenAddHandler())
 	router.Path(fmt.Sprintf("%s/api/%s/token", h.Prefix(), v1.VERSION)).Methods("DELETE").Handler(h.TokenRemoveHandler())
 

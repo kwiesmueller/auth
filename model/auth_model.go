@@ -43,14 +43,22 @@ func (l LedisdbPassword) String() string {
 }
 
 const (
-	Seperator             = ":"
+	Seperator = ":"
 	AUTH_APPLICATION_NAME = ApplicationName("auth")
-	AUTH_ADMIN_GROUP      = GroupName("auth")
+	AUTH_ADMIN_GROUP = GroupName("auth")
 )
 
 type UserName string
 
+func (u UserName) String() string {
+	return string(u)
+}
+
 type GroupName string
+
+func (g GroupName) String() string {
+	return string(g)
+}
 
 func ParseGroupNames(groupNames string) []GroupName {
 	parts := strings.Split(groupNames, ",")

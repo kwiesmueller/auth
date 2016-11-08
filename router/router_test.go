@@ -36,6 +36,7 @@ type counter struct {
 	userDataDeleteValue int
 	version             int
 	userList            int
+	tokenList           int
 }
 
 func createCounterHandler(counter *int) http.Handler {
@@ -46,6 +47,10 @@ func createCounterHandler(counter *int) http.Handler {
 
 func (c *counter) Prefix() model.Prefix {
 	return "/prefix"
+}
+
+func (c *counter) TokenListHandler() http.Handler {
+	return createCounterHandler(&c.tokenList)
 }
 
 func (c *counter) NotFoundHandler() http.Handler {
@@ -557,6 +562,26 @@ func TestUserList(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err := AssertThat(c.userList, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTokenList(t *testing.T) {
+	c := new(counter)
+	r := Create(c)
+	resp := mock.NewHttpResponseWriterMock()
+
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/api/1.0/token?username=test123")
+	rb.SetMethod("GET")
+	req, err := rb.Build()
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(c.tokenList, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err := AssertThat(c.tokenList, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

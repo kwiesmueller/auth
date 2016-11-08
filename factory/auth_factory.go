@@ -44,6 +44,7 @@ import (
 	"github.com/bborbe/password/generator"
 	"github.com/bborbe/redis_client"
 	"github.com/golang/glog"
+	"github.com/bborbe/auth/v1/handler/token_by_username"
 )
 
 type factory struct {
@@ -52,8 +53,8 @@ type factory struct {
 }
 
 func New(
-	config model.Config,
-	ledisClient redis_client.Client,
+config model.Config,
+ledisClient redis_client.Client,
 ) *factory {
 	h := new(factory)
 	h.config = config
@@ -61,7 +62,9 @@ func New(
 	return h
 }
 
-func (f *factory) Prefix() model.Prefix { return f.config.Prefix }
+func (f *factory) Prefix() model.Prefix {
+	return f.config.Prefix
+}
 func (f *factory) passwordGenerator() generator.PasswordGenerator {
 	return generator.New()
 }
@@ -144,87 +147,81 @@ func (f *factory) VersionHandler() http.Handler {
 }
 
 func (f *factory) UserListHandler() http.Handler {
-	userList := user_list.New(f.userService().List)
-	return filter.New(f.applicationCheck(), userList.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_list.New(f.userService().List))
 }
 
 func (f *factory) UserRegisterHandler() http.Handler {
-	userRegister := user_register.New(f.userService().CreateUserWithToken)
-	return filter.New(f.applicationCheck(), userRegister.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_register.New(f.userService().CreateUserWithToken))
 }
 
 func (f *factory) UserDeleteHandler() http.Handler {
-	userDelete := user_delete.New(f.userService().DeleteUser)
-	return filter.New(f.applicationCheck(), userDelete.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_delete.New(f.userService().DeleteUser))
 }
 
 func (f *factory) UserDataSetHandler() http.Handler {
-	userDataSet := user_data_set.New(f.userDataService().Set)
-	return filter.New(f.applicationCheck(), userDataSet.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_data_set.New(f.userDataService().Set))
 }
 
 func (f *factory) UserDataSetValueHandler() http.Handler {
-	userDataSetValue := user_data_set_value.New(f.userDataService().SetValue)
-	return filter.New(f.applicationCheck(), userDataSetValue.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_data_set_value.New(f.userDataService().SetValue))
 }
 
 func (f *factory) UserDataGetHandler() http.Handler {
-	userDataGet := user_data_get.New(f.userDataService().Get)
-	return filter.New(f.applicationCheck(), userDataGet.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_data_get.New(f.userDataService().Get))
 }
 
 func (f *factory) UserDataGetValueHandler() http.Handler {
-	userDataGetValue := user_data_get_value.New(f.userDataService().GetValue)
-	return filter.New(f.applicationCheck(), userDataGetValue.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_data_get_value.New(f.userDataService().GetValue))
 }
 
 func (f *factory) UserDataDeleteHandler() http.Handler {
-	userDataDelete := user_data_delete.New(f.userDataService().Delete)
-	return filter.New(f.applicationCheck(), userDataDelete.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_data_delete.New(f.userDataService().Delete))
 }
 
 func (f *factory) UserDataDeleteValueHandler() http.Handler {
-	userDataDeleteValue := user_data_delete_value.New(f.userDataService().DeleteValue)
-	return filter.New(f.applicationCheck(), userDataDeleteValue.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_data_delete_value.New(f.userDataService().DeleteValue))
 }
 
 func (f *factory) LoginHandler() http.Handler {
-	return filter.New(f.applicationCheck(), login.New(f.userService().VerifyTokenHasGroups).ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(login.New(f.userService().VerifyTokenHasGroups))
 }
 
 func (f *factory) ApplicationCreateHandler() http.Handler {
-	return filter.New(f.applicationCheck(), application_creator.New(f.ApplicationService().CreateApplication).ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(application_creator.New(f.ApplicationService().CreateApplication))
 }
 
 func (f *factory) ApplicationDeleteHandler() http.Handler {
-	return filter.New(f.applicationCheck(), application_deletor.New(f.ApplicationService().DeleteApplication).ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(application_deletor.New(f.ApplicationService().DeleteApplication))
 }
 
 func (f *factory) ApplicationGetHandler() http.Handler {
-	return filter.New(f.applicationCheck(), application_getter.New(f.ApplicationService().GetApplication).ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(application_getter.New(f.ApplicationService().GetApplication))
 }
 
 func (f *factory) UserUnregisterHandler() http.Handler {
-	userUnregister := user_unregister.New(f.userService().DeleteUserWithToken)
-	return filter.New(f.applicationCheck(), userUnregister.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_unregister.New(f.userService().DeleteUserWithToken))
 }
 
 func (f *factory) TokenAddHandler() http.Handler {
-	tokenAdder := token_adder.New(f.userService().AddTokenToUserWithToken)
-	return filter.New(f.applicationCheck(), tokenAdder.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(token_adder.New(f.userService().AddTokenToUserWithToken))
 }
 
 func (f *factory) TokenRemoveHandler() http.Handler {
-	tokenRemover := token_remover.New(f.userService().RemoveTokenFromUserWithToken)
-	return filter.New(f.applicationCheck(), tokenRemover.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(token_remover.New(f.userService().RemoveTokenFromUserWithToken))
 }
 
 func (f *factory) UserGroupAddHandler() http.Handler {
-	userGroupAdder := user_group_adder.New(f.userGroupService().AddUserToGroup)
-	return filter.New(f.applicationCheck(), userGroupAdder.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_group_adder.New(f.userGroupService().AddUserToGroup))
 }
 
 func (f *factory) UserGroupRemoveHandler() http.Handler {
-	userGroupRemover := user_group_remover.New(f.userGroupService().RemoveUserFromGroup)
-	return filter.New(f.applicationCheck(), userGroupRemover.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+	return f.addRequireAuth(user_group_remover.New(f.userGroupService().RemoveUserFromGroup))
+}
+
+func (f *factory) TokenListHandler() http.Handler {
+	return f.addRequireAuth(token_by_username.New(f.userService().ListTokenOfUser))
+}
+
+func (f *factory) addRequireAuth(handler http.Handler) http.Handler {
+	return filter.New(f.applicationCheck(), handler.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
 }

@@ -189,3 +189,7 @@ func (s *userService) HasGroups(authToken model.AuthToken, requiredGroups []mode
 	}
 	return userName != nil && len(*userName) > 0, nil
 }
+
+func (s *userService)  ListTokenOfUser(username model.UserName) ([]model.AuthToken, error) {
+	return s.userTokenDirectory.Get(username)
+}
