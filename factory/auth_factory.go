@@ -23,6 +23,7 @@ import (
 	"github.com/bborbe/auth/v1/handler/application_getter"
 	"github.com/bborbe/auth/v1/handler/login"
 	"github.com/bborbe/auth/v1/handler/token_adder"
+	"github.com/bborbe/auth/v1/handler/token_by_username"
 	"github.com/bborbe/auth/v1/handler/token_remover"
 	"github.com/bborbe/auth/v1/handler/user_data_delete"
 	"github.com/bborbe/auth/v1/handler/user_data_delete_value"
@@ -44,7 +45,6 @@ import (
 	"github.com/bborbe/password/generator"
 	"github.com/bborbe/redis_client"
 	"github.com/golang/glog"
-	"github.com/bborbe/auth/v1/handler/token_by_username"
 )
 
 type factory struct {
@@ -53,17 +53,32 @@ type factory struct {
 }
 
 func New(
-config model.Config,
-ledisClient redis_client.Client,
+	config model.Config,
+	ledisClient redis_client.Client,
 ) *factory {
 	h := new(factory)
 	h.config = config
 	h.ledisClient = ledisClient
 	return h
 }
+func (f *factory) ApplicationService() service.ApplicationService {
+	return application.New(f.passwordGenerator().GeneratePassword, f.applicationDirectory())
+}
+
+func (f *factory) UserService() service.UserService {
+	return user.New(f.userTokenDirectory(), f.userGroupDirectory(), f.tokenUserDirectory(), f.userDataDirectory())
+}
+
+func (f *factory) UserGroupService() service.UserGroupService {
+	return user_group.New(f.userGroupDirectory(), f.groupUserDirectory())
+}
+
+func (f *factory) UserDataService() service.UserDataService {
+	return user_data.New(f.userDataDirectory())
+}
 
 func (f *factory) Prefix() model.Prefix {
-	return f.config.Prefix
+	return f.config.HttpPrefix
 }
 func (f *factory) passwordGenerator() generator.PasswordGenerator {
 	return generator.New()
@@ -93,22 +108,6 @@ func (f *factory) userDataDirectory() user_data_directory.UserDataDirectory {
 	return user_data_directory.New(f.ledisClient)
 }
 
-func (f *factory) ApplicationService() service.ApplicationService {
-	return application.New(f.passwordGenerator().GeneratePassword, f.applicationDirectory())
-}
-
-func (f *factory) userService() service.UserService {
-	return user.New(f.userTokenDirectory(), f.userGroupDirectory(), f.tokenUserDirectory(), f.userDataDirectory())
-}
-
-func (f *factory) userGroupService() service.UserGroupService {
-	return user_group.New(f.userGroupDirectory(), f.groupUserDirectory())
-}
-
-func (f *factory) userDataService() service.UserDataService {
-	return user_data.New(f.userDataDirectory())
-}
-
 func (f *factory) HealthzHandler() http.Handler {
 	return check.New(f.ledisClient.Ping)
 }
@@ -130,8 +129,8 @@ func (f *factory) Handler() http.Handler {
 }
 
 func (f *factory) HttpServer() *http.Server {
-	glog.V(2).Infof("create http server on %s", f.config.Port.Address())
-	return &http.Server{Addr: f.config.Port.Address(), Handler: f.Handler()}
+	glog.V(2).Infof("create http server on %s", f.config.HttpPort.Address())
+	return &http.Server{Addr: f.config.HttpPort.Address(), Handler: f.Handler()}
 }
 
 func (f *factory) applicationCheck() filter.Check {
@@ -147,43 +146,43 @@ func (f *factory) VersionHandler() http.Handler {
 }
 
 func (f *factory) UserListHandler() http.Handler {
-	return f.addRequireAuth(user_list.New(f.userService().List))
+	return f.addRequireAuth(user_list.New(f.UserService().List))
 }
 
 func (f *factory) UserRegisterHandler() http.Handler {
-	return f.addRequireAuth(user_register.New(f.userService().CreateUserWithToken))
+	return f.addRequireAuth(user_register.New(f.UserService().CreateUserWithToken))
 }
 
 func (f *factory) UserDeleteHandler() http.Handler {
-	return f.addRequireAuth(user_delete.New(f.userService().DeleteUser))
+	return f.addRequireAuth(user_delete.New(f.UserService().DeleteUser))
 }
 
 func (f *factory) UserDataSetHandler() http.Handler {
-	return f.addRequireAuth(user_data_set.New(f.userDataService().Set))
+	return f.addRequireAuth(user_data_set.New(f.UserDataService().Set))
 }
 
 func (f *factory) UserDataSetValueHandler() http.Handler {
-	return f.addRequireAuth(user_data_set_value.New(f.userDataService().SetValue))
+	return f.addRequireAuth(user_data_set_value.New(f.UserDataService().SetValue))
 }
 
 func (f *factory) UserDataGetHandler() http.Handler {
-	return f.addRequireAuth(user_data_get.New(f.userDataService().Get))
+	return f.addRequireAuth(user_data_get.New(f.UserDataService().Get))
 }
 
 func (f *factory) UserDataGetValueHandler() http.Handler {
-	return f.addRequireAuth(user_data_get_value.New(f.userDataService().GetValue))
+	return f.addRequireAuth(user_data_get_value.New(f.UserDataService().GetValue))
 }
 
 func (f *factory) UserDataDeleteHandler() http.Handler {
-	return f.addRequireAuth(user_data_delete.New(f.userDataService().Delete))
+	return f.addRequireAuth(user_data_delete.New(f.UserDataService().Delete))
 }
 
 func (f *factory) UserDataDeleteValueHandler() http.Handler {
-	return f.addRequireAuth(user_data_delete_value.New(f.userDataService().DeleteValue))
+	return f.addRequireAuth(user_data_delete_value.New(f.UserDataService().DeleteValue))
 }
 
 func (f *factory) LoginHandler() http.Handler {
-	return f.addRequireAuth(login.New(f.userService().VerifyTokenHasGroups))
+	return f.addRequireAuth(login.New(f.UserService().VerifyTokenHasGroups))
 }
 
 func (f *factory) ApplicationCreateHandler() http.Handler {
@@ -199,27 +198,27 @@ func (f *factory) ApplicationGetHandler() http.Handler {
 }
 
 func (f *factory) UserUnregisterHandler() http.Handler {
-	return f.addRequireAuth(user_unregister.New(f.userService().DeleteUserWithToken))
+	return f.addRequireAuth(user_unregister.New(f.UserService().DeleteUserWithToken))
 }
 
 func (f *factory) TokenAddHandler() http.Handler {
-	return f.addRequireAuth(token_adder.New(f.userService().AddTokenToUserWithToken))
+	return f.addRequireAuth(token_adder.New(f.UserService().AddTokenToUserWithToken))
 }
 
 func (f *factory) TokenRemoveHandler() http.Handler {
-	return f.addRequireAuth(token_remover.New(f.userService().RemoveTokenFromUserWithToken))
+	return f.addRequireAuth(token_remover.New(f.UserService().RemoveTokenFromUserWithToken))
 }
 
 func (f *factory) UserGroupAddHandler() http.Handler {
-	return f.addRequireAuth(user_group_adder.New(f.userGroupService().AddUserToGroup))
+	return f.addRequireAuth(user_group_adder.New(f.UserGroupService().AddUserToGroup))
 }
 
 func (f *factory) UserGroupRemoveHandler() http.Handler {
-	return f.addRequireAuth(user_group_remover.New(f.userGroupService().RemoveUserFromGroup))
+	return f.addRequireAuth(user_group_remover.New(f.UserGroupService().RemoveUserFromGroup))
 }
 
 func (f *factory) TokenListHandler() http.Handler {
-	return f.addRequireAuth(token_by_username.New(f.userService().ListTokenOfUser))
+	return f.addRequireAuth(token_by_username.New(f.UserService().ListTokenOfUser))
 }
 
 func (f *factory) addRequireAuth(handler http.Handler) http.Handler {

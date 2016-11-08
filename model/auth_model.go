@@ -42,11 +42,7 @@ func (l LedisdbPassword) String() string {
 	return string(l)
 }
 
-const (
-	Seperator = ":"
-	AUTH_APPLICATION_NAME = ApplicationName("auth")
-	AUTH_ADMIN_GROUP = GroupName("auth")
-)
+const Seperator = ":"
 
 type UserName string
 

@@ -12,20 +12,21 @@ import (
 )
 
 const (
-	DEFAULT_PORT                        = 8080
-	PARAMETER_PORT                      = "port"
-	PARAMETER_AUTH_APPLICATION_PASSWORD = "auth-application-password"
-	PARAMETER_LEDISDB_ADDRESS           = "ledisdb-address"
-	PARAMETER_LEDISDB_PASSWORD          = "ledisdb-password"
-	PARAMETER_PREFIX                    = "prefix"
+	parameterPort                    = "port"
+	parameterAuthApplicationName     = "auth-application-name"
+	parameterAuthApplicationPassword = "auth-application-password"
+	parameterLedisdbAddress          = "ledisdb-address"
+	parameterLedisdbPassword         = "ledisdb-password"
+	parameterPrefix                  = "prefix"
 )
 
 var (
-	portPtr                    = flag.Int(PARAMETER_PORT, DEFAULT_PORT, "port")
-	authApplicationPasswordPtr = flag.String(PARAMETER_AUTH_APPLICATION_PASSWORD, "", "auth application password")
-	ledisdbAddressPtr          = flag.String(PARAMETER_LEDISDB_ADDRESS, "", "ledisdb address")
-	ledisdbPasswordPtr         = flag.String(PARAMETER_LEDISDB_PASSWORD, "", "ledisdb password")
-	prefixPtr                  = flag.String(PARAMETER_PREFIX, "", "prefix")
+	portPtr                    = flag.Int(parameterPort, 8080, "port")
+	authApplicationNamePtr     = flag.String(parameterAuthApplicationName, "auth", "auth application name")
+	authApplicationPasswordPtr = flag.String(parameterAuthApplicationPassword, "", "auth application password")
+	ledisdbAddressPtr          = flag.String(parameterLedisdbAddress, "", "ledisdb address")
+	ledisdbPasswordPtr         = flag.String(parameterLedisdbPassword, "", "ledisdb password")
+	prefixPtr                  = flag.String(parameterPrefix, "", "prefix")
 )
 
 func main() {
@@ -49,7 +50,7 @@ func do() error {
 	factory := factory.New(config, ledis.New(config.LedisdbAddress.String(), config.LedisdbPassword.String()))
 
 	go func() {
-		if _, err := factory.ApplicationService().CreateApplicationWithPassword(model.AUTH_APPLICATION_NAME, config.ApplicationPassword); err != nil {
+		if _, err := factory.ApplicationService().CreateApplicationWithPassword(config.ApplicationName, config.ApplicationPassword); err != nil {
 			glog.Warningf("create auth application failed: %v", err)
 			return
 		}
@@ -61,8 +62,9 @@ func do() error {
 
 func createConfig() model.Config {
 	return model.Config{
-		Port:                model.Port(*portPtr),
-		Prefix:              model.Prefix(*prefixPtr),
+		HttpPort:            model.Port(*portPtr),
+		HttpPrefix:          model.Prefix(*prefixPtr),
+		ApplicationName:     model.ApplicationName(*authApplicationNamePtr),
 		ApplicationPassword: model.ApplicationPassword(*authApplicationPasswordPtr),
 		LedisdbAddress:      model.LedisdbAddress(*ledisdbAddressPtr),
 		LedisdbPassword:     model.LedisdbPassword(*ledisdbPasswordPtr),

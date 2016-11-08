@@ -3,9 +3,10 @@ package user
 import (
 	"net/http"
 
+	"fmt"
+
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
-	"fmt"
 )
 
 type callRest func(path string, method string, request interface{}, response interface{}) error
@@ -15,7 +16,7 @@ type userService struct {
 }
 
 func New(
-callRest callRest,
+	callRest callRest,
 ) *userService {
 	s := new(userService)
 	s.callRest = callRest
@@ -51,7 +52,11 @@ func (s *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGr
 }
 
 func (s *userService) List() ([]model.UserName, error) {
-	panic("not implemented")
+	var response []model.UserName
+	if err := s.callRest("/api/1.0/user", http.MethodGet, nil, &response); err != nil {
+		return nil, err
+	}
+	return response, nil
 }
 
 func (s *userService) DeleteUserWithToken(authToken model.AuthToken) error {
