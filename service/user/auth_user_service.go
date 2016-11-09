@@ -118,10 +118,10 @@ func (h *userService) assertUserNameNotUser(userName model.UserName) error {
 
 func (h *userService) AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
 	glog.V(2).Infof("add token %v to user with token %v", newToken, userToken)
-	if err := h.assertTokenNotUsed(newToken); err != nil {
-		glog.V(2).Infof("token %v already used, can't add token", err)
-		return err
-	}
+	//if err := h.assertTokenNotUsed(newToken); err != nil {
+	//	glog.V(2).Infof("token %v already used, can't add token", err)
+	//	return err
+	//}
 	return h.AddTokenToUserWithTokenForce(newToken, userToken)
 }
 
