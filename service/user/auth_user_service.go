@@ -161,7 +161,8 @@ func (s *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGr
 	glog.V(2).Infof("verify token %v has groups %v", authToken, requiredGroupNames)
 	userName, err := s.tokenUserDirectory.FindUserByAuthToken(authToken)
 	if err != nil {
-		return userName, err
+		glog.V(2).Infof("find user by token failed: %v", err)
+		return nil, err
 	}
 	glog.V(2).Infof("verify user %v has groups %v", *userName, requiredGroupNames)
 	for _, groupName := range requiredGroupNames {
