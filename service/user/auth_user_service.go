@@ -19,10 +19,10 @@ type userService struct {
 }
 
 func New(
-userTokenDirectory user_token_directory.UserTokenDirectory,
-userGroupDirectory user_group_directory.UserGroupDirectory,
-tokenUserDirectory token_user_directory.TokenUserDirectory,
-userDataDirectory user_data_directory.UserDataDirectory,
+	userTokenDirectory user_token_directory.UserTokenDirectory,
+	userGroupDirectory user_group_directory.UserGroupDirectory,
+	tokenUserDirectory token_user_directory.TokenUserDirectory,
+	userDataDirectory user_data_directory.UserDataDirectory,
 ) *userService {
 	s := new(userService)
 	s.userTokenDirectory = userTokenDirectory
@@ -120,7 +120,7 @@ func (h *userService) AddTokenToUserWithToken(newToken model.AuthToken, userToke
 	glog.V(2).Infof("add token %v to user with token %v", newToken, userToken)
 	if err := h.assertTokenNotUsed(newToken); err != nil {
 		glog.V(2).Infof("token %v already used, can't add token", err)
-		//return err
+		return err
 	}
 	return h.AddTokenToUserWithTokenForce(newToken, userToken)
 }
@@ -129,6 +129,7 @@ func (h *userService) AddTokenToUserWithTokenForce(newToken model.AuthToken, use
 	glog.V(2).Infof("add token %v to user with token %v", newToken, userToken)
 	userName, err := h.tokenUserDirectory.FindUserByAuthToken(userToken)
 	if err != nil {
+		glog.V(2).Infof("find user with token %v failed: %v", userToken, err)
 		return err
 	}
 	glog.V(2).Infof("add token %v to user %v", newToken, *userName)
@@ -148,6 +149,7 @@ func (h *userService) RemoveTokenFromUserWithToken(newToken model.AuthToken, use
 	glog.V(2).Infof("remove token %v from user with token %v", newToken, userToken)
 	userName, err := h.tokenUserDirectory.FindUserByAuthToken(userToken)
 	if err != nil {
+		glog.V(2).Infof("find user with token %v failed: %v", userToken, err)
 		return err
 	}
 	glog.V(2).Infof("remove token %v from user %v", newToken, *userName)
