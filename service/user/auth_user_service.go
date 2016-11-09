@@ -33,7 +33,7 @@ func New(
 }
 
 func (s *userService) DeleteUserWithToken(authToken model.AuthToken) error {
-	glog.V(2).Infof("delete user with token %v", authToken)
+	glog.V(4).Infof("delete user with token %v", authToken)
 	userName, err := s.tokenUserDirectory.FindUserByAuthToken(authToken)
 	if err != nil {
 		glog.V(2).Infof("find user with token %v failed", authToken)
@@ -43,7 +43,7 @@ func (s *userService) DeleteUserWithToken(authToken model.AuthToken) error {
 }
 
 func (s *userService) DeleteUser(userName model.UserName) error {
-	glog.V(2).Infof("delete user %v", userName)
+	glog.V(4).Infof("delete user %v", userName)
 	tokens, err := s.userTokenDirectory.Get(userName)
 	if err != nil {
 		glog.V(2).Infof("find tokens for user %v failed", userName)
@@ -62,12 +62,12 @@ func (s *userService) DeleteUser(userName model.UserName) error {
 		glog.V(2).Infof("remove user %v failed", userName)
 		return err
 	}
-	glog.V(2).Infof("delete user %v successful", userName)
+	glog.V(4).Infof("delete user %v successful", userName)
 	return nil
 }
 
 func (h *userService) CreateUserWithToken(userName model.UserName, authToken model.AuthToken) error {
-	glog.V(2).Infof("add token user %v with token %v", userName, authToken)
+	glog.V(4).Infof("add token user %v with token %v", userName, authToken)
 	if err := h.assertTokenNotUsed(authToken); err != nil {
 		glog.V(2).Infof("token %v already used", authToken)
 		return err
@@ -84,7 +84,7 @@ func (h *userService) CreateUserWithToken(userName model.UserName, authToken mod
 		glog.V(2).Infof("add token %v to user %v failed", authToken, userName)
 		return err
 	}
-	glog.V(2).Infof("add token %v to user %v successful", authToken, userName)
+	glog.V(4).Infof("add token %v to user %v successful", authToken, userName)
 	return nil
 }
 
@@ -98,7 +98,7 @@ func (h *userService) assertTokenNotUsed(authToken model.AuthToken) error {
 	if exists {
 		return fmt.Errorf("token %s already used", authToken)
 	}
-	glog.V(2).Infof("token not used")
+	glog.V(4).Infof("token not used")
 	return nil
 }
 
@@ -112,7 +112,7 @@ func (h *userService) assertUserNameNotUser(userName model.UserName) error {
 	if exists {
 		return fmt.Errorf("create user failed, user %s already exists", userName)
 	}
-	glog.V(2).Infof("user not existing")
+	glog.V(4).Infof("user not existing")
 	return nil
 }
 
@@ -161,7 +161,7 @@ func (h *userService) RemoveTokenFromUserWithToken(newToken model.AuthToken, use
 		glog.V(2).Infof("remove token %v from user %v failed: %v", newToken, *userName, err)
 		return err
 	}
-	glog.V(2).Infof("token removed successful")
+	glog.V(4).Infof("token removed successful")
 	return nil
 }
 
