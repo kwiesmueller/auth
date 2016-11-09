@@ -143,7 +143,37 @@ func TestUserServiceList(t *testing.T) {
 			if err := AssertThat(list[0].String(), Is("testuser")); err != nil {
 				t.Fatal(err)
 			}
+		}
+	})
+}
 
+func TestVerifyTokenHasGroups(t *testing.T) {
+	run(t, func(services Services) {
+		{
+
+			username, err := services.UserService().VerifyTokenHasGroups("testtoken", nil)
+			if err := AssertThat(err, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "testtoken")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+
+			username, err := services.UserService().VerifyTokenHasGroups("testtoken", nil)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username.String(), Is("testuser")); err != nil {
+				t.Fatal(err)
+			}
 		}
 	})
 }
