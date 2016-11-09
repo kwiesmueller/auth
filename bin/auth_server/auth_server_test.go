@@ -87,7 +87,7 @@ func createRestServices(t *testing.T, config model.Config) Services {
 		handler.ServeHTTP(resp, req)
 		return resp.Result(), nil
 	})
-	rest := rest.New(httpRest.Call, model.Url("http://example.com" + config.HttpPrefix.String()), config.ApplicationName, config.ApplicationPassword)
+	rest := rest.New(httpRest.Call, model.Url("http://example.com"+config.HttpPrefix.String()), config.ApplicationName, config.ApplicationPassword)
 	return &restServices{
 		applicationService: application.New(rest.Call),
 		userService:        user.New(rest.Call),
@@ -242,7 +242,117 @@ func TestHasGroupsWithGroup(t *testing.T) {
 			if err := AssertThat(result, Is(true)); err != nil {
 				t.Fatal(err)
 			}
+		}
+	})
+}
 
+func TestAddTokenToUserWithToken(t *testing.T) {
+	run(t, func(services Services) {
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "token1")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().AddTokenToUserWithToken("token2", "token1")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			username, err := services.UserService().VerifyTokenHasGroups("token1", nil)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username.String(), Is("testuser")); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			username, err := services.UserService().VerifyTokenHasGroups("token2", nil)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username.String(), Is("testuser")); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			username, err := services.UserService().VerifyTokenHasGroups("token3", nil)
+			if err := AssertThat(err, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+	})
+}
+
+func TestDeleteUserWithToken(t *testing.T) {
+	run(t, func(services Services) {
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "token1")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().AddTokenToUserWithToken("token2", "token1")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().DeleteUserWithToken("token2")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			username, err := services.UserService().VerifyTokenHasGroups("token1", nil)
+			if err := AssertThat(err, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			username, err := services.UserService().VerifyTokenHasGroups("token2", nil)
+			if err := AssertThat(err, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+	})
+}
+
+func TestDeleteUserWithTokenSecond(t *testing.T) {
+	run(t, func(services Services) {
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "token1")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().DeleteUserWithToken("token1")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			username, err := services.UserService().VerifyTokenHasGroups("token1", nil)
+			if err := AssertThat(err, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(username, NilValue()); err != nil {
+				t.Fatal(err)
+			}
 		}
 	})
 }

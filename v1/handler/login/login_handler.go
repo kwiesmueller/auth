@@ -17,7 +17,7 @@ type handler struct {
 }
 
 func New(
-verifyTokenHasGroups verifyTokenHasGroups,
+	verifyTokenHasGroups verifyTokenHasGroups,
 ) *handler {
 	h := new(handler)
 	h.verifyTokenHasGroups = verifyTokenHasGroups

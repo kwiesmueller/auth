@@ -17,7 +17,7 @@ type userService struct {
 }
 
 func New(
-callRest callRest,
+	callRest callRest,
 ) *userService {
 	u := new(userService)
 	u.callRest = callRest
@@ -25,8 +25,10 @@ callRest callRest,
 }
 
 func (u *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToken, error) {
+	glog.V(2).Infof("list tokens of user %v", username)
 	var response []model.AuthToken
 	if err := u.callRest(fmt.Sprintf("/api/1.0/token?username=%v", username), http.MethodGet, nil, &response); err != nil {
+		glog.V(2).Infof("list tokens of user %v failed: %v", username, err)
 		return nil, err
 	}
 	return response, nil
@@ -36,26 +38,31 @@ func (u *userService) HasGroups(authToken model.AuthToken, requiredGroups []mode
 	glog.V(2).Infof("check user %v has groups %v", authToken, requiredGroups)
 	userName, err := u.VerifyTokenHasGroups(authToken, requiredGroups)
 	if err != nil {
+		glog.V(2).Infof("check user %v has groups %v failed: %v", authToken, requiredGroups, err)
 		return false, err
 	}
 	return userName != nil && len(*userName) > 0, nil
 }
 
 func (u *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error) {
+	glog.V(2).Infof("verify user with token %v has groups %v", authToken, requiredGroupNames)
 	request := v1.LoginRequest{
 		AuthToken:      authToken,
 		RequiredGroups: requiredGroupNames,
 	}
 	var response v1.LoginResponse
 	if err := u.callRest("/api/1.0/login", http.MethodPost, &request, &response); err != nil {
+		glog.V(2).Infof("verify user with token %v has groups %v failed: %v", authToken, requiredGroupNames, err)
 		return nil, err
 	}
 	return response.UserName, nil
 }
 
 func (u *userService) List() ([]model.UserName, error) {
+	glog.V(2).Infof("list usernames")
 	var response []model.UserName
 	if err := u.callRest("/api/1.0/user", http.MethodGet, nil, &response); err != nil {
+		glog.V(2).Infof("list usernames failed: %v", err)
 		return nil, err
 	}
 	return response, nil
@@ -96,11 +103,9 @@ func (h *userService) AddTokenToUserWithToken(token model.AuthToken, authToken m
 
 func (u *userService) RemoveTokenFromUserWithToken(token model.AuthToken, authToken model.AuthToken) error {
 	glog.V(2).Infof("remove token %s to user with token %s", token, authToken)
-
 	if authToken == token {
 		return fmt.Errorf("token equals authToken")
 	}
-
 	request := v1.AddTokenRequest{
 		AuthToken: model.AuthToken(authToken),
 		Token:     model.AuthToken(token),
@@ -125,5 +130,11 @@ func (u *userService) DeleteUser(username model.UserName) error {
 }
 
 func (u *userService) DeleteUserWithToken(authToken model.AuthToken) error {
-	panic("not implemented")
+	glog.V(2).Infof("delete user with token %v", authToken)
+	if err := u.callRest(fmt.Sprintf("/api/1.0/token/%v", authToken), "DELETE", nil, nil); err != nil {
+		glog.V(2).Infof("delete user with token %s failed: %v", authToken, err)
+		return err
+	}
+	glog.V(2).Infof("delete user with token %s successful", authToken)
+	return nil
 }
