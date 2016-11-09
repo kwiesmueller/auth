@@ -87,7 +87,7 @@ func createRestServices(t *testing.T, config model.Config) Services {
 		handler.ServeHTTP(resp, req)
 		return resp.Result(), nil
 	})
-	rest := rest.New(httpRest.Call, model.Url("http://example.com"+config.HttpPrefix.String()), config.ApplicationName, config.ApplicationPassword)
+	rest := rest.New(httpRest.Call, model.Url("http://example.com" + config.HttpPrefix.String()), config.ApplicationName, config.ApplicationPassword)
 	return &restServices{
 		applicationService: application.New(rest.Call),
 		userService:        user.New(rest.Call),
@@ -174,6 +174,75 @@ func TestVerifyTokenHasGroups(t *testing.T) {
 			if err := AssertThat(username.String(), Is("testuser")); err != nil {
 				t.Fatal(err)
 			}
+		}
+	})
+}
+
+func TestHasGroups(t *testing.T) {
+	run(t, func(services Services) {
+		{
+
+			result, err := services.UserService().HasGroups("testtoken", nil)
+			if err := AssertThat(err, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(result, Is(false)); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "testtoken")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+
+			result, err := services.UserService().HasGroups("testtoken", nil)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(result, Is(true)); err != nil {
+				t.Fatal(err)
+			}
+
+		}
+	})
+}
+
+func TestHasGroupsWithGroup(t *testing.T) {
+	run(t, func(services Services) {
+		{
+			result, err := services.UserService().HasGroups("testtoken", []model.GroupName{"testgroup"})
+			if err := AssertThat(err, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(result, Is(false)); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "testtoken")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserGroupService().AddUserToGroup("testuser", "testgroup")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+
+			result, err := services.UserService().HasGroups("testtoken", []model.GroupName{"testgroup"})
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(result, Is(true)); err != nil {
+				t.Fatal(err)
+			}
+
 		}
 	})
 }

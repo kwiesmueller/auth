@@ -17,7 +17,7 @@ type handler struct {
 }
 
 func New(
-	verifyTokenHasGroups verifyTokenHasGroups,
+verifyTokenHasGroups verifyTokenHasGroups,
 ) *handler {
 	h := new(handler)
 	h.verifyTokenHasGroups = verifyTokenHasGroups
@@ -40,6 +40,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
+	glog.V(2).Infof("verify user with token %v has groups %v", request.AuthToken, request.RequiredGroups)
 	userName, err := h.verifyTokenHasGroups(request.AuthToken, request.RequiredGroups)
 	if err != nil {
 		glog.V(2).Infof("verify token has group failed: %v", err)
@@ -50,6 +51,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 		}
 		return err
 	}
+	glog.V(2).Infof("user with token %v has groups %v", request.AuthToken, request.RequiredGroups)
 	response.UserName = userName
 	return json.NewEncoder(resp).Encode(response)
 }

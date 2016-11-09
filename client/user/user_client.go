@@ -17,7 +17,7 @@ type userService struct {
 }
 
 func New(
-	callRest callRest,
+callRest callRest,
 ) *userService {
 	u := new(userService)
 	u.callRest = callRest
@@ -33,6 +33,7 @@ func (u *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToke
 }
 
 func (u *userService) HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error) {
+	glog.V(2).Infof("check user %v has groups %v", authToken, requiredGroups)
 	userName, err := u.VerifyTokenHasGroups(authToken, requiredGroups)
 	if err != nil {
 		return false, err
