@@ -89,8 +89,6 @@ func (h *userService) CreateUserWithToken(userName model.UserName, authToken mod
 }
 
 func (h *userService) assertTokenNotUsed(authToken model.AuthToken) error {
-	// TODO REMOVE ME
-	return nil
 	glog.V(4).Infof("assert token %s not used", authToken)
 	exists, err := h.tokenUserDirectory.Exists(authToken)
 	if err != nil {
