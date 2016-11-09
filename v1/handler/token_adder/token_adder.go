@@ -10,13 +10,13 @@ import (
 	"github.com/golang/glog"
 )
 
-type AddTokenToUserWithToken func(newToken model.AuthToken, userToken model.AuthToken) error
+type addTokenToUserWithToken func(newToken model.AuthToken, userToken model.AuthToken) error
 
 type handler struct {
-	addTokenToUserWithToken AddTokenToUserWithToken
+	addTokenToUserWithToken addTokenToUserWithToken
 }
 
-func New(addTokenToUserWithToken AddTokenToUserWithToken) *handler {
+func New(addTokenToUserWithToken addTokenToUserWithToken) *handler {
 	h := new(handler)
 	h.addTokenToUserWithToken = addTokenToUserWithToken
 	return h
@@ -39,13 +39,9 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
-	err := h.action(&request, &response)
-	if err != nil {
+	glog.V(2).Infof("add token %v to user with token %v", request.Token, request.AuthToken)
+	if err := h.addTokenToUserWithToken(request.Token, request.AuthToken); err != nil {
 		return err
 	}
 	return json.NewEncoder(resp).Encode(&response)
-}
-
-func (h *handler) action(request *v1.AddTokenRequest, response *v1.AddTokenResponse) error {
-	return h.addTokenToUserWithToken(request.Token, request.AuthToken)
 }
