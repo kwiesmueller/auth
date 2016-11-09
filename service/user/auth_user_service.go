@@ -89,7 +89,9 @@ func (h *userService) CreateUserWithToken(userName model.UserName, authToken mod
 }
 
 func (h *userService) assertTokenNotUsed(authToken model.AuthToken) error {
-	glog.V(2).Infof("assert token %s not used", authToken)
+	// TODO REMOVE ME
+	return nil
+	glog.V(4).Infof("assert token %s not used", authToken)
 	exists, err := h.tokenUserDirectory.Exists(authToken)
 	if err != nil {
 		glog.V(2).Infof("exists token failed: %v", err)
@@ -103,7 +105,7 @@ func (h *userService) assertTokenNotUsed(authToken model.AuthToken) error {
 }
 
 func (h *userService) assertUserNameNotUser(userName model.UserName) error {
-	glog.V(2).Infof("assert user %s not existing", userName)
+	glog.V(4).Infof("assert user %s not existing", userName)
 	exists, err := h.userTokenDirectory.Exists(userName)
 	if err != nil {
 		glog.V(2).Infof("exists user failed: %v", err)
@@ -117,7 +119,7 @@ func (h *userService) assertUserNameNotUser(userName model.UserName) error {
 }
 
 func (h *userService) AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
-	glog.V(2).Infof("add token %v to user with token %v", newToken, userToken)
+	glog.V(4).Infof("add token %v to user with token %v", newToken, userToken)
 	if err := h.assertTokenNotUsed(newToken); err != nil {
 		glog.V(2).Infof("token %v already used, can't add token", err)
 		return err
@@ -126,7 +128,7 @@ func (h *userService) AddTokenToUserWithToken(newToken model.AuthToken, userToke
 }
 
 func (h *userService) AddTokenToUserWithTokenForce(newToken model.AuthToken, userToken model.AuthToken) error {
-	glog.V(2).Infof("add token %v to user with token %v", newToken, userToken)
+	glog.V(4).Infof("add token %v to user with token %v", newToken, userToken)
 	userName, err := h.tokenUserDirectory.FindUserByAuthToken(userToken)
 	if err != nil {
 		glog.V(2).Infof("find user with token %v failed: %v", userToken, err)
@@ -141,18 +143,18 @@ func (h *userService) AddTokenToUserWithTokenForce(newToken model.AuthToken, use
 		glog.V(2).Infof("add user %v to token %v failed: %v", *userName, newToken, err)
 		return err
 	}
-	glog.V(2).Infof("token added successful")
+	glog.V(4).Infof("token added successful")
 	return nil
 }
 
 func (h *userService) RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error {
-	glog.V(2).Infof("remove token %v from user with token %v", newToken, userToken)
+	glog.V(4).Infof("remove token %v from user with token %v", newToken, userToken)
 	userName, err := h.tokenUserDirectory.FindUserByAuthToken(userToken)
 	if err != nil {
 		glog.V(2).Infof("find user with token %v failed: %v", userToken, err)
 		return err
 	}
-	glog.V(2).Infof("remove token %v from user %v", newToken, *userName)
+	glog.V(4).Infof("remove token %v from user %v", newToken, *userName)
 	if err := h.tokenUserDirectory.Remove(newToken); err != nil {
 		glog.V(2).Infof("remove token %v failed: %v", newToken, err)
 		return err
@@ -166,13 +168,13 @@ func (h *userService) RemoveTokenFromUserWithToken(newToken model.AuthToken, use
 }
 
 func (s *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error) {
-	glog.V(2).Infof("verify token %v has groups %v", authToken, requiredGroupNames)
+	glog.V(4).Infof("verify token %v has groups %v", authToken, requiredGroupNames)
 	userName, err := s.tokenUserDirectory.FindUserByAuthToken(authToken)
 	if err != nil {
 		glog.V(2).Infof("find user by token failed: %v", err)
 		return nil, err
 	}
-	glog.V(2).Infof("verify user %v has groups %v", *userName, requiredGroupNames)
+	glog.V(4).Infof("verify user %v has groups %v", *userName, requiredGroupNames)
 	for _, groupName := range requiredGroupNames {
 		containsGroup, err := s.userGroupDirectory.Contains(*userName, groupName)
 		if err != nil {
@@ -183,22 +185,38 @@ func (s *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGr
 			return userName, fmt.Errorf("user %v not in group %v", *userName, groupName)
 		}
 	}
-	glog.V(2).Infof("token %v has all required groups", authToken)
+	glog.V(4).Infof("token %v has all required groups", authToken)
 	return userName, nil
 }
 
 func (s *userService) List() ([]model.UserName, error) {
-	return s.userTokenDirectory.List()
+	glog.V(4).Infof("list users")
+	result, err := s.userTokenDirectory.List()
+	if err != nil {
+		glog.V(4).Infof("list users failed: %v", err)
+		return nil, err
+	}
+	glog.V(4).Infof("found %d users", len(result))
+	return result, nil
 }
 
 func (s *userService) HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error) {
+	glog.V(4).Infof("check user with token %v has groups %v", authToken, requiredGroups)
 	userName, err := s.VerifyTokenHasGroups(authToken, requiredGroups)
 	if err != nil {
+		glog.V(2).Infof("check user with token %v has groups %v failed: %v", authToken, requiredGroups, err)
 		return false, err
 	}
 	return userName != nil && len(*userName) > 0, nil
 }
 
 func (s *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToken, error) {
-	return s.userTokenDirectory.Get(username)
+	glog.V(4).Infof("list tokens of user %v", username)
+	result, err := s.userTokenDirectory.Get(username)
+	if err != nil {
+		glog.V(2).Infof("list tokens of user %v failed: %v", username, err)
+		return nil, err
+	}
+	glog.V(4).Infof("found %d tokens for user %v", len(result), username)
+	return result, nil
 }

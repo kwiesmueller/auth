@@ -32,31 +32,31 @@ func createKey(authToken model.AuthToken) string {
 }
 
 func (d *directory) Add(authToken model.AuthToken, userName model.UserName) error {
-	glog.V(2).Infof("add token %v to user %v", authToken, userName)
+	glog.V(4).Infof("add token %v to user %v", authToken, userName)
 	key := createKey(authToken)
 	return d.redis.KvSet(key, string(userName))
 }
 
 func (d *directory) Exists(authToken model.AuthToken) (bool, error) {
-	glog.V(2).Infof("exists token %v", authToken)
+	glog.V(4).Infof("exists token %v", authToken)
 	key := createKey(authToken)
 	return d.redis.KvExists(key)
 }
 
 func (d *directory) Remove(authToken model.AuthToken) error {
-	glog.V(2).Infof("remove token %v", authToken)
+	glog.V(4).Infof("remove token %v", authToken)
 	key := createKey(authToken)
 	return d.redis.KvDel(key)
 }
 
 func (d *directory) FindUserByAuthToken(authToken model.AuthToken) (*model.UserName, error) {
-	glog.V(2).Infof("find user for token %v", authToken)
+	glog.V(4).Infof("find user for token %v", authToken)
 	key := createKey(authToken)
 	value, err := d.redis.KvGet(key)
 	if err != nil {
 		return nil, err
 	}
 	userName := model.UserName(value)
-	glog.V(2).Infof("found user %v for token %v", userName, authToken)
+	glog.V(4).Infof("found user %v for token %v", userName, authToken)
 	return &userName, nil
 }
