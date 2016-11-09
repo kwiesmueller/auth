@@ -10,14 +10,14 @@ import (
 	"github.com/golang/glog"
 )
 
-type VerifyTokenHasGroups func(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
+type verifyTokenHasGroups func(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
 
 type handler struct {
-	verifyTokenHasGroups VerifyTokenHasGroups
+	verifyTokenHasGroups verifyTokenHasGroups
 }
 
 func New(
-	verifyTokenHasGroups VerifyTokenHasGroups,
+	verifyTokenHasGroups verifyTokenHasGroups,
 ) *handler {
 	h := new(handler)
 	h.verifyTokenHasGroups = verifyTokenHasGroups
@@ -42,6 +42,7 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	}
 	userName, err := h.verifyTokenHasGroups(request.AuthToken, request.RequiredGroups)
 	if err != nil {
+		glog.V(2).Infof("verify token has group failed: %v", err)
 		if userName == nil {
 			glog.V(1).Infof("user not found: %s", request.AuthToken)
 			resp.WriteHeader(http.StatusNotFound)
