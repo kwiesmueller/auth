@@ -14,29 +14,30 @@ import (
 )
 
 type counter struct {
-	notFound            int
-	healthz             int
-	readiness           int
-	login               int
-	applicationCreate   int
-	applicationDelete   int
-	applicationGet      int
-	userRegister        int
-	userUnregister      int
-	userDelete          int
-	tokenAdd            int
-	tokenRemove         int
-	userGroupAdd        int
-	userGroupRemove     int
-	userDataSet         int
-	userDataSetValue    int
-	userDataGet         int
-	userDataGetValue    int
-	userDataDelete      int
-	userDataDeleteValue int
-	version             int
-	userList            int
-	tokenList           int
+	notFound              int
+	healthz               int
+	readiness             int
+	login                 int
+	applicationCreate     int
+	applicationDelete     int
+	applicationGet        int
+	userRegister          int
+	userUnregister        int
+	userDelete            int
+	tokenAdd              int
+	tokenRemove           int
+	userGroupAdd          int
+	userGroupRemove       int
+	userDataSet           int
+	userDataSetValue      int
+	userDataGet           int
+	userDataGetValue      int
+	userDataDelete        int
+	userDataDeleteValue   int
+	version               int
+	userList              int
+	tokensForUsername     int
+	groupNamesForUsername int
 }
 
 func createCounterHandler(counter *int) http.Handler {
@@ -49,8 +50,8 @@ func (c *counter) Prefix() model.Prefix {
 	return "/prefix"
 }
 
-func (c *counter) TokenListHandler() http.Handler {
-	return createCounterHandler(&c.tokenList)
+func (c *counter) TokensForUsernameHandler() http.Handler {
+	return createCounterHandler(&c.tokensForUsername)
 }
 
 func (c *counter) NotFoundHandler() http.Handler {
@@ -95,6 +96,10 @@ func (c *counter) UserDataGetHandler() http.Handler {
 
 func (c *counter) UserDataGetValueHandler() http.Handler {
 	return createCounterHandler(&c.userDataGetValue)
+}
+
+func (c *counter) GroupNamesForUsernameHandler() http.Handler {
+	return createCounterHandler(&c.groupNamesForUsername)
 }
 
 func (c *counter) UserDataDeleteHandler() http.Handler {
@@ -392,6 +397,25 @@ func TestUserGroupAdd(t *testing.T) {
 	}
 }
 
+func TestGroupNamesForUsername(t *testing.T) {
+	c := new(counter)
+	r := Create(c)
+	resp := mock.NewHttpResponseWriterMock()
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/api/1.0/user_group?username=foo")
+	rb.SetMethod("GET")
+	req, err := rb.Build()
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(c.groupNamesForUsername, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err := AssertThat(c.groupNamesForUsername, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestUserGroupRemove(t *testing.T) {
 	c := new(counter)
 	r := Create(c)
@@ -566,7 +590,7 @@ func TestUserList(t *testing.T) {
 	}
 }
 
-func TestTokenList(t *testing.T) {
+func TestTokensForUsername(t *testing.T) {
 	c := new(counter)
 	r := Create(c)
 	resp := mock.NewHttpResponseWriterMock()
@@ -577,11 +601,11 @@ func TestTokenList(t *testing.T) {
 	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err := AssertThat(c.tokenList, Is(0)); err != nil {
+	if err := AssertThat(c.tokensForUsername, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 	r.ServeHTTP(resp, req)
-	if err := AssertThat(c.tokenList, Is(1)); err != nil {
+	if err := AssertThat(c.tokensForUsername, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

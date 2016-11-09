@@ -21,10 +21,11 @@ import (
 	"github.com/bborbe/auth/v1/handler/application_creator"
 	"github.com/bborbe/auth/v1/handler/application_deletor"
 	"github.com/bborbe/auth/v1/handler/application_getter"
+	"github.com/bborbe/auth/v1/handler/groupnames_by_username"
 	"github.com/bborbe/auth/v1/handler/login"
 	"github.com/bborbe/auth/v1/handler/token_adder"
-	"github.com/bborbe/auth/v1/handler/token_by_username"
 	"github.com/bborbe/auth/v1/handler/token_remover"
+	"github.com/bborbe/auth/v1/handler/tokens_by_username"
 	"github.com/bborbe/auth/v1/handler/user_data_delete"
 	"github.com/bborbe/auth/v1/handler/user_data_delete_value"
 	"github.com/bborbe/auth/v1/handler/user_data_get"
@@ -61,6 +62,11 @@ func New(
 	h.ledisClient = ledisClient
 	return h
 }
+
+func (f *factory) addRequireAuth(handler http.Handler) http.Handler {
+	return filter.New(f.applicationCheck(), handler.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+}
+
 func (f *factory) ApplicationService() service.ApplicationService {
 	return application.New(f.passwordGenerator().GeneratePassword, f.applicationDirectory())
 }
@@ -217,10 +223,10 @@ func (f *factory) UserGroupRemoveHandler() http.Handler {
 	return f.addRequireAuth(user_group_remover.New(f.UserGroupService().RemoveUserFromGroup))
 }
 
-func (f *factory) TokenListHandler() http.Handler {
-	return f.addRequireAuth(token_by_username.New(f.UserService().ListTokenOfUser))
+func (f *factory) TokensForUsernameHandler() http.Handler {
+	return f.addRequireAuth(tokens_by_username.New(f.UserService().ListTokenOfUser))
 }
 
-func (f *factory) addRequireAuth(handler http.Handler) http.Handler {
-	return filter.New(f.applicationCheck(), handler.ServeHTTP, f.accessDeniedHandler().ServeHTTP)
+func (f *factory) GroupNamesForUsernameHandler() http.Handler {
+	return f.addRequireAuth(groupnames_by_username.New(f.UserGroupService().ListGroupNamesForUsername))
 }

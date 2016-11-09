@@ -35,4 +35,5 @@ type UserDataService interface {
 type UserGroupService interface {
 	AddUserToGroup(userName model.UserName, groupName model.GroupName) error
 	RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error
+	ListGroupNamesForUsername(username model.UserName) ([]model.GroupName, error)
 }

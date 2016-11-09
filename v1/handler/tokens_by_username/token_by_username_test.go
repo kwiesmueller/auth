@@ -1,4 +1,4 @@
-package token_by_username
+package tokens_by_username
 
 import (
 	"net/http"

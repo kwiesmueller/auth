@@ -48,11 +48,15 @@ func run(t *testing.T, fn func(services Services)) {
 	}
 	// run normal service
 	{
+		glog.Infof("test normal started")
 		fn(createServices(t, config))
+		glog.Infof("test normal finished")
 	}
 	// run rest service
 	{
+		glog.Infof("test rest started")
 		fn(createRestServices(t, config))
+		glog.Infof("test rest finished")
 	}
 }
 
@@ -351,6 +355,44 @@ func TestDeleteUserWithTokenSecond(t *testing.T) {
 				t.Fatal(err)
 			}
 			if err := AssertThat(username, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+	})
+}
+
+func TestListGroupNamesForUsername(t *testing.T) {
+	run(t, func(services Services) {
+		{
+			err := services.UserService().CreateUserWithToken("testuser", "token1")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			groupNames, err := services.UserGroupService().ListGroupNamesForUsername("testuser")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(len(groupNames), Is(0)); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserGroupService().AddUserToGroup("testuser", "testgroup")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			groupNames, err := services.UserGroupService().ListGroupNamesForUsername("testuser")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(len(groupNames), Is(1)); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(groupNames[0].String(), Is("testgroup")); err != nil {
 				t.Fatal(err)
 			}
 		}

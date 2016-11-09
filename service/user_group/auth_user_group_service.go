@@ -20,7 +20,7 @@ func New(userGroupDirectory user_group_directory.UserGroupDirectory, groupUserDi
 }
 
 func (s *userGroupService) AddUserToGroup(userName model.UserName, groupName model.GroupName) error {
-	glog.V(2).Infof("add user %v to group %v", userName, groupName)
+	glog.V(4).Infof("add user %v to group %v", userName, groupName)
 	if err := s.userGroupDirectory.Add(userName, groupName); err != nil {
 		glog.V(2).Infof("add user %v to group %v failed: %v", userName, groupName, err)
 		return err
@@ -29,12 +29,12 @@ func (s *userGroupService) AddUserToGroup(userName model.UserName, groupName mod
 		glog.V(2).Infof("add user %v to group %v failed: %v", userName, groupName, err)
 		return err
 	}
-	glog.V(2).Infof("added user %v to group %v successful", userName, groupName)
+	glog.V(4).Infof("added user %v to group %v successful", userName, groupName)
 	return nil
 }
 
 func (s *userGroupService) RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error {
-	glog.V(2).Infof("remove user %v from group %v", userName, groupName)
+	glog.V(4).Infof("remove user %v from group %v", userName, groupName)
 	if err := s.userGroupDirectory.Remove(userName, groupName); err != nil {
 		glog.V(2).Infof("remove user %v from group %v failed: %v", userName, groupName, err)
 		return err
@@ -43,6 +43,17 @@ func (s *userGroupService) RemoveUserFromGroup(userName model.UserName, groupNam
 		glog.V(2).Infof("remove user %v from group %v failed: %v", userName, groupName, err)
 		return err
 	}
-	glog.V(2).Infof("removed user %v from group %v successful", userName, groupName)
+	glog.V(4).Infof("removed user %v from group %v successful", userName, groupName)
 	return nil
+}
+
+func (s *userGroupService) ListGroupNamesForUsername(username model.UserName) ([]model.GroupName, error) {
+	glog.V(4).Infof("get groupNames for user %v", username)
+	result, err := s.userGroupDirectory.Get(username)
+	if err != nil {
+		glog.V(2).Infof("get groupNames for user %v failed: %v", username, err)
+		return nil, err
+	}
+	glog.V(4).Infof("got %d groupNames for user %v", len(result), username)
+	return result, nil
 }
