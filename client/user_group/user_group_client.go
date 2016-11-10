@@ -24,7 +24,7 @@ func New(
 }
 
 func (u *userGroupService) AddUserToGroup(userName model.UserName, groupName model.GroupName) error {
-	glog.V(2).Infof("add user %s to group %s", userName, groupName)
+	glog.V(4).Infof("add user %s to group %s", userName, groupName)
 	request := v1.AddUserToGroupRequest{
 		UserName:  model.UserName(userName),
 		GroupName: model.GroupName(groupName),
@@ -34,12 +34,12 @@ func (u *userGroupService) AddUserToGroup(userName model.UserName, groupName mod
 		glog.V(2).Infof("add user %v to group %v failed: %v", userName, groupName, err)
 		return err
 	}
-	glog.V(2).Infof("add user user %v to group %v successful", userName, groupName)
+	glog.V(4).Infof("add user user %v to group %v successful", userName, groupName)
 	return nil
 }
 
 func (u *userGroupService) RemoveUserFromGroup(userName model.UserName, groupName model.GroupName) error {
-	glog.V(2).Infof("remove user %s from group %s", userName, groupName)
+	glog.V(4).Infof("remove user %s from group %s", userName, groupName)
 	request := v1.AddUserToGroupRequest{
 		UserName:  model.UserName(userName),
 		GroupName: model.GroupName(groupName),
@@ -49,7 +49,7 @@ func (u *userGroupService) RemoveUserFromGroup(userName model.UserName, groupNam
 		glog.V(2).Infof("remove user %v from group %v failed: %v", userName, groupName, err)
 		return err
 	}
-	glog.V(2).Infof("remove user user %v from group %v successful", userName, groupName)
+	glog.V(4).Infof("remove user user %v from group %v successful", userName, groupName)
 	return nil
 }
 

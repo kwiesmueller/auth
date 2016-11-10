@@ -23,28 +23,28 @@ func New(
 }
 
 func (s *applicationService) DeleteApplication(applicationName model.ApplicationName) error {
-	glog.V(2).Infof("delete application %s", applicationName)
+	glog.V(4).Infof("delete application %s", applicationName)
 	if err := s.callRest(fmt.Sprintf("/api/1.0/application/%s", applicationName), "DELETE", nil, nil); err != nil {
 		glog.V(2).Infof("delete application %s failed: %v", applicationName, err)
 		return err
 	}
-	glog.V(2).Infof("delete application %s successful", applicationName)
+	glog.V(4).Infof("delete application %s successful", applicationName)
 	return nil
 }
 
 func (s *applicationService) ExistsApplication(applicationName model.ApplicationName) (bool, error) {
-	glog.V(2).Infof("exists application %s", applicationName)
+	glog.V(4).Infof("exists application %s", applicationName)
 	var response v1.GetApplicationResponse
 	if err := s.callRest(fmt.Sprintf("/api/1.0/application/%s", applicationName), "GET", nil, &response); err != nil {
 		glog.V(2).Infof("exists application %s failed: %v", applicationName, err)
 		return false, err
 	}
-	glog.V(2).Infof("exists application %s successful", applicationName)
+	glog.V(4).Infof("exists application %s successful", applicationName)
 	return len(response.ApplicationPassword) > 0, nil
 }
 
 func (s *applicationService) CreateApplication(applicationName model.ApplicationName) (*model.Application, error) {
-	glog.V(2).Infof("create application %s", applicationName)
+	glog.V(4).Infof("create application %s", applicationName)
 	request := v1.CreateApplicationRequest{
 		ApplicationName: model.ApplicationName(applicationName),
 	}
@@ -53,7 +53,7 @@ func (s *applicationService) CreateApplication(applicationName model.Application
 		glog.V(2).Infof("create application %s failed: %v", applicationName, err)
 		return nil, err
 	}
-	glog.V(2).Infof("create application %s successful", applicationName)
+	glog.V(4).Infof("create application %s successful", applicationName)
 	return &response, nil
 }
 

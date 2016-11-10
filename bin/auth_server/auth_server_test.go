@@ -12,16 +12,11 @@ import (
 	"net/http/httptest"
 	"os"
 
-	"github.com/bborbe/auth/client/application"
-	"github.com/bborbe/auth/client/rest"
-	"github.com/bborbe/auth/client/user"
-	"github.com/bborbe/auth/client/user_data"
-	"github.com/bborbe/auth/client/user_group"
+	"github.com/bborbe/auth/client"
 	"github.com/bborbe/auth/factory"
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/router"
 	"github.com/bborbe/auth/service"
-	http_rest "github.com/bborbe/http/rest"
 	ledis_mock "github.com/bborbe/redis_client/mock"
 	"github.com/golang/glog"
 )
@@ -82,7 +77,7 @@ func createRestServices(t *testing.T, config model.Config) Services {
 	}
 
 	handler := router.Create(factory)
-	httpRest := http_rest.New(func(req *http.Request) (*http.Response, error) {
+	return client.New(func(req *http.Request) (*http.Response, error) {
 		if req.Body == nil {
 			req.Body = ioutil.NopCloser(bytes.NewBufferString(""))
 		}
@@ -90,27 +85,7 @@ func createRestServices(t *testing.T, config model.Config) Services {
 		resp := httptest.NewRecorder()
 		handler.ServeHTTP(resp, req)
 		return resp.Result(), nil
-	})
-	rest := rest.New(httpRest.Call, model.Url("http://example.com"+config.HttpPrefix.String()), config.ApplicationName, config.ApplicationPassword)
-	return &restServices{
-		applicationService: application.New(rest.Call),
-		userService:        user.New(rest.Call),
-		userDataService:    user_data.New(rest.Call),
-		userGroupService:   user_group.New(rest.Call),
-	}
-}
-
-func (r *restServices) ApplicationService() service.ApplicationService {
-	return r.applicationService
-}
-func (r *restServices) UserService() service.UserService {
-	return r.userService
-}
-func (r *restServices) UserDataService() service.UserDataService {
-	return r.userDataService
-}
-func (r *restServices) UserGroupService() service.UserGroupService {
-	return r.userGroupService
+	}, model.Url("http://example.com"+config.HttpPrefix.String()), config.ApplicationName, config.ApplicationPassword)
 }
 
 func TestMain(m *testing.M) {

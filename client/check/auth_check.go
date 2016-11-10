@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bborbe/auth/model"
+	"github.com/bborbe/auth/service"
 	"github.com/bborbe/http/header"
 	"github.com/golang/glog"
 )
@@ -15,16 +16,16 @@ type Check interface {
 }
 
 type handler struct {
-	hasGroups      hasGroups
+	userService    service.UserService
 	requiredGroups []model.GroupName
 }
 
 func New(
-	hasGroups hasGroups,
+	userService service.UserService,
 	requiredGroups ...model.GroupName,
 ) *handler {
 	h := new(handler)
-	h.hasGroups = hasGroups
+	h.userService = userService
 	h.requiredGroups = requiredGroups
 	return h
 }
@@ -35,7 +36,7 @@ func (h *handler) Check(req *http.Request) (bool, error) {
 		glog.V(2).Infof("parse authorization header failed: %v", err)
 		return false, err
 	}
-	return h.hasGroups(
+	return h.userService.HasGroups(
 		model.AuthToken(header.CreateAuthorizationToken(name, value)),
 		h.requiredGroups,
 	)

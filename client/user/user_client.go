@@ -25,7 +25,7 @@ func New(
 }
 
 func (u *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToken, error) {
-	glog.V(2).Infof("list tokens of user %v", username)
+	glog.V(4).Infof("list tokens of user %v", username)
 	var response []model.AuthToken
 	if err := u.callRest(fmt.Sprintf("/api/1.0/token?username=%v", username), http.MethodGet, nil, &response); err != nil {
 		glog.V(2).Infof("list tokens of user %v failed: %v", username, err)
@@ -35,7 +35,7 @@ func (u *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToke
 }
 
 func (u *userService) HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error) {
-	glog.V(2).Infof("check user %v has groups %v", authToken, requiredGroups)
+	glog.V(4).Infof("check user %v has groups %v", authToken, requiredGroups)
 	userName, err := u.VerifyTokenHasGroups(authToken, requiredGroups)
 	if err != nil {
 		glog.V(2).Infof("check user %v has groups %v failed: %v", authToken, requiredGroups, err)
@@ -45,7 +45,7 @@ func (u *userService) HasGroups(authToken model.AuthToken, requiredGroups []mode
 }
 
 func (u *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error) {
-	glog.V(2).Infof("verify user with token %v has groups %v", authToken, requiredGroupNames)
+	glog.V(4).Infof("verify user with token %v has groups %v", authToken, requiredGroupNames)
 	request := v1.LoginRequest{
 		AuthToken:      authToken,
 		RequiredGroups: requiredGroupNames,
@@ -69,7 +69,7 @@ func (u *userService) List() ([]model.UserName, error) {
 }
 
 func (u *userService) CreateUserWithToken(userName model.UserName, authToken model.AuthToken) error {
-	glog.V(2).Infof("create user %s with token %s", userName, authToken)
+	glog.V(4).Infof("create user %s with token %s", userName, authToken)
 	request := v1.RegisterRequest{
 		AuthToken: model.AuthToken(authToken),
 		UserName:  model.UserName(userName),
@@ -79,12 +79,12 @@ func (u *userService) CreateUserWithToken(userName model.UserName, authToken mod
 		glog.V(2).Infof("create user %s failed: %v", userName, err)
 		return err
 	}
-	glog.V(2).Infof("create user %s successful", userName)
+	glog.V(4).Infof("create user %s successful", userName)
 	return nil
 }
 
 func (h *userService) AddTokenToUserWithToken(token model.AuthToken, authToken model.AuthToken) error {
-	glog.V(2).Infof("add token %s to user with token %s", token, authToken)
+	glog.V(4).Infof("add token %s to user with token %s", token, authToken)
 	if authToken == token {
 		return fmt.Errorf("token equals authToken")
 	}
@@ -97,12 +97,12 @@ func (h *userService) AddTokenToUserWithToken(token model.AuthToken, authToken m
 		glog.V(2).Infof("add token failed: %v", err)
 		return err
 	}
-	glog.V(2).Infof("add token successful")
+	glog.V(4).Infof("add token successful")
 	return nil
 }
 
 func (u *userService) RemoveTokenFromUserWithToken(token model.AuthToken, authToken model.AuthToken) error {
-	glog.V(2).Infof("remove token %s to user with token %s", token, authToken)
+	glog.V(4).Infof("remove token %s to user with token %s", token, authToken)
 	if authToken == token {
 		return fmt.Errorf("token equals authToken")
 	}
@@ -115,7 +115,7 @@ func (u *userService) RemoveTokenFromUserWithToken(token model.AuthToken, authTo
 		glog.V(2).Infof("remove token failed: %v", err)
 		return err
 	}
-	glog.V(2).Infof("remove token successful")
+	glog.V(4).Infof("remove token successful")
 	return nil
 }
 
@@ -130,11 +130,11 @@ func (u *userService) DeleteUser(username model.UserName) error {
 }
 
 func (u *userService) DeleteUserWithToken(authToken model.AuthToken) error {
-	glog.V(2).Infof("delete user with token %v", authToken)
+	glog.V(4).Infof("delete user with token %v", authToken)
 	if err := u.callRest(fmt.Sprintf("/api/1.0/token/%v", authToken), "DELETE", nil, nil); err != nil {
 		glog.V(2).Infof("delete user with token %s failed: %v", authToken, err)
 		return err
 	}
-	glog.V(2).Infof("delete user with token %s successful", authToken)
+	glog.V(4).Infof("delete user with token %s successful", authToken)
 	return nil
 }
