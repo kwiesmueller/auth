@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/golang/glog"
+	"encoding/base64"
 )
 
 // Port to listen on
@@ -72,6 +73,10 @@ type AuthToken string
 
 func (a AuthToken) String() string {
 	return string(a)
+}
+
+func AuthTokenByUsernameAndPassword(username string, password string) AuthToken {
+	return AuthToken(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintln("%s:%s", username, password))))
 }
 
 func ParseTokens(tokens string) []AuthToken {
