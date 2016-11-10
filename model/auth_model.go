@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/golang/glog"
 	"encoding/base64"
+
+	"github.com/golang/glog"
 )
 
 // Port to listen on

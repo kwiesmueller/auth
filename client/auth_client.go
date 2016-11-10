@@ -2,6 +2,8 @@ package client
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/bborbe/auth/client/application"
 	"github.com/bborbe/auth/client/user"
 	"github.com/bborbe/auth/client/user_data"
@@ -10,7 +12,6 @@ import (
 	"github.com/bborbe/auth/service"
 	"github.com/bborbe/http/header"
 	"github.com/bborbe/http/rest"
-	"net/http"
 )
 
 type authClient struct {
