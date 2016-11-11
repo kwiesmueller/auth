@@ -1,4 +1,4 @@
-package user_group_directory
+package username_groupname_directory
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type directory struct {
 	redis redis.Set
 }
 
-type UserGroupDirectory interface {
+type UsernameGroupnameDirectory interface {
 	Add(userName model.UserName, groupName model.GroupName) error
 	Exists(userName model.UserName) (bool, error)
 	Get(userName model.UserName) ([]model.GroupName, error)

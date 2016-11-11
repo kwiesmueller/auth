@@ -1,4 +1,4 @@
-package user_group_directory
+package username_groupname_directory
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func TestImplementsGroupDirectory(t *testing.T) {
 	object := New(nil)
-	var expected *UserGroupDirectory
+	var expected *UsernameGroupnameDirectory
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)

@@ -1,4 +1,4 @@
-package token_user_directory
+package token_username_directory
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type directory struct {
 	redis redis.Kv
 }
 
-type TokenUserDirectory interface {
+type TokenUsernameDirectory interface {
 	Add(authToken model.AuthToken, userName model.UserName) error
 	Exists(authToken model.AuthToken) (bool, error)
 	Remove(authToken model.AuthToken) error

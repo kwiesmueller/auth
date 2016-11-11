@@ -6,10 +6,10 @@ import (
 	"github.com/bborbe/auth/application_check"
 	"github.com/bborbe/auth/directory/application_directory"
 	"github.com/bborbe/auth/directory/group_user_directory"
-	"github.com/bborbe/auth/directory/token_user_directory"
-	"github.com/bborbe/auth/directory/user_data_directory"
-	"github.com/bborbe/auth/directory/user_group_directory"
-	"github.com/bborbe/auth/directory/user_token_directory"
+	"github.com/bborbe/auth/directory/token_username_directory"
+	"github.com/bborbe/auth/directory/username_data_directory"
+	"github.com/bborbe/auth/directory/username_groupname_directory"
+	"github.com/bborbe/auth/directory/username_token_directory"
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/router"
 	"github.com/bborbe/auth/service"
@@ -54,8 +54,8 @@ type factory struct {
 }
 
 func New(
-	config model.Config,
-	ledisClient redis_client.Client,
+config model.Config,
+ledisClient redis_client.Client,
 ) *factory {
 	h := new(factory)
 	h.config = config
@@ -90,12 +90,12 @@ func (f *factory) passwordGenerator() generator.PasswordGenerator {
 	return generator.New()
 }
 
-func (f *factory) tokenUserDirectory() token_user_directory.TokenUserDirectory {
-	return token_user_directory.New(f.ledisClient)
+func (f *factory) tokenUserDirectory() token_username_directory.TokenUsernameDirectory {
+	return token_username_directory.New(f.ledisClient)
 }
 
-func (f *factory) userTokenDirectory() user_token_directory.UserTokenDirectory {
-	return user_token_directory.New(f.ledisClient)
+func (f *factory) userTokenDirectory() username_token_directory.UsernameTokenDirectory {
+	return username_token_directory.New(f.ledisClient)
 }
 
 func (f *factory) applicationDirectory() application_directory.ApplicationDirectory {
@@ -106,12 +106,12 @@ func (f *factory) groupUserDirectory() group_user_directory.GroupUserDirectory {
 	return group_user_directory.New(f.ledisClient)
 }
 
-func (f *factory) userGroupDirectory() user_group_directory.UserGroupDirectory {
-	return user_group_directory.New(f.ledisClient)
+func (f *factory) userGroupDirectory() username_groupname_directory.UsernameGroupnameDirectory {
+	return username_groupname_directory.New(f.ledisClient)
 }
 
-func (f *factory) userDataDirectory() user_data_directory.UserDataDirectory {
-	return user_data_directory.New(f.ledisClient)
+func (f *factory) userDataDirectory() username_data_directory.UsernameDataDirectory {
+	return username_data_directory.New(f.ledisClient)
 }
 
 func (f *factory) HealthzHandler() http.Handler {

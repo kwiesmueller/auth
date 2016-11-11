@@ -1,4 +1,4 @@
-package user_data_directory
+package username_data_directory
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type directory struct {
 	redis redis.Hash
 }
 
-type UserDataDirectory interface {
+type UsernameDataDirectory interface {
 	Set(userName model.UserName, data map[string]string) error
 	SetValue(userName model.UserName, key string, value string) error
 	Get(userName model.UserName) (map[string]string, error)

@@ -1,4 +1,4 @@
-package user_token_directory
+package username_token_directory
 
 import (
 	"testing"
@@ -10,7 +10,7 @@ import (
 
 func TestImplementsUserTokenDirectory(t *testing.T) {
 	object := New(nil)
-	var expected *UserTokenDirectory
+	var expected *UsernameTokenDirectory
 	if err := AssertThat(object, Implements(expected)); err != nil {
 		t.Fatal(err)
 	}

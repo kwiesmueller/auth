@@ -117,3 +117,8 @@ type DeleteUserDataValueResponse struct {
 
 type UserListRequest struct {
 }
+
+type UsernameTokenRequest struct {
+	AuthToken model.AuthToken `json:"authToken"`
+	Userame   model.UserName `json:"username"`
+}

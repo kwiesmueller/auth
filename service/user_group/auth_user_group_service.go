@@ -2,17 +2,17 @@ package user_group
 
 import (
 	"github.com/bborbe/auth/directory/group_user_directory"
-	"github.com/bborbe/auth/directory/user_group_directory"
+	"github.com/bborbe/auth/directory/username_groupname_directory"
 	"github.com/bborbe/auth/model"
 	"github.com/golang/glog"
 )
 
 type userGroupService struct {
-	userGroupDirectory user_group_directory.UserGroupDirectory
+	userGroupDirectory username_groupname_directory.UsernameGroupnameDirectory
 	groupUserDirectory group_user_directory.GroupUserDirectory
 }
 
-func New(userGroupDirectory user_group_directory.UserGroupDirectory, groupUserDirectory group_user_directory.GroupUserDirectory) *userGroupService {
+func New(userGroupDirectory username_groupname_directory.UsernameGroupnameDirectory, groupUserDirectory group_user_directory.GroupUserDirectory) *userGroupService {
 	s := new(userGroupService)
 	s.userGroupDirectory = userGroupDirectory
 	s.groupUserDirectory = groupUserDirectory

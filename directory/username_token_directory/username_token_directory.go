@@ -1,4 +1,4 @@
-package user_token_directory
+package username_token_directory
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type directory struct {
 	redis redis.Set
 }
 
-type UserTokenDirectory interface {
+type UsernameTokenDirectory interface {
 	Add(userName model.UserName, authToken model.AuthToken) error
 	Exists(userName model.UserName) (bool, error)
 	Contains(userName model.UserName, authToken model.AuthToken) (bool, error)

@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	. "github.com/bborbe/assert"
-	"github.com/bborbe/auth/directory/token_user_directory"
-	"github.com/bborbe/auth/directory/user_data_directory"
-	"github.com/bborbe/auth/directory/user_group_directory"
-	"github.com/bborbe/auth/directory/user_token_directory"
+	"github.com/bborbe/auth/directory/token_username_directory"
+	"github.com/bborbe/auth/directory/username_data_directory"
+	"github.com/bborbe/auth/directory/username_groupname_directory"
+	"github.com/bborbe/auth/directory/username_token_directory"
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/service"
 	ledis "github.com/bborbe/redis_client/mock"
@@ -24,10 +24,10 @@ func TestImplementsService(t *testing.T) {
 
 func TestDeleteUserData(t *testing.T) {
 	client := ledis.New()
-	userTokenDirectory := user_token_directory.New(client)
-	userGroupDirectory := user_group_directory.New(client)
-	tokenUserDirectory := token_user_directory.New(client)
-	userDataDirectory := user_data_directory.New(client)
+	userTokenDirectory := username_token_directory.New(client)
+	userGroupDirectory := username_groupname_directory.New(client)
+	tokenUserDirectory := token_username_directory.New(client)
+	userDataDirectory := username_data_directory.New(client)
 	userService := New(userTokenDirectory, userGroupDirectory, tokenUserDirectory, userDataDirectory)
 
 	user := model.UserName("test")

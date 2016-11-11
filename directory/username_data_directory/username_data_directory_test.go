@@ -1,4 +1,4 @@
-package token_user_directory
+package username_data_directory
 
 import (
 	"testing"
@@ -7,9 +7,9 @@ import (
 	"github.com/bborbe/auth/model"
 )
 
-func TestImplementsTokenUserDirectory(t *testing.T) {
+func TestImplementsUserDataDirectory(t *testing.T) {
 	object := New(nil)
-	var expected *TokenUserDirectory
+	var expected *UsernameDataDirectory
 	err := AssertThat(object, Implements(expected))
 	if err != nil {
 		t.Fatal(err)
@@ -17,8 +17,8 @@ func TestImplementsTokenUserDirectory(t *testing.T) {
 }
 
 func TestCreateKey(t *testing.T) {
-	key := createKey(model.AuthToken("test"))
-	if err := AssertThat(key, Is("token_user:test")); err != nil {
+	key := createKey(model.UserName("test"))
+	if err := AssertThat(key, Is("user_data:test")); err != nil {
 		t.Fatal(err)
 	}
 }
