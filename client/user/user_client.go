@@ -138,3 +138,11 @@ func (u *userService) DeleteUserWithToken(authToken model.AuthToken) error {
 	glog.V(4).Infof("delete user with token %s successful", authToken)
 	return nil
 }
+
+func (s *userService) AddTokenToUser(token model.AuthToken, username model.UserName) error {
+	panic("not implemented")
+}
+
+func (s *userService) RemoveTokenFromUser(token model.AuthToken, username model.UserName) error {
+	panic("not implemented")
+}

@@ -21,6 +21,8 @@ type UserService interface {
 	HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error)
 	VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
 	ListTokenOfUser(model.UserName) ([]model.AuthToken, error)
+	AddTokenToUser(model.AuthToken, model.UserName) error
+	RemoveTokenFromUser(model.AuthToken, model.UserName) error
 }
 
 type UserDataService interface {

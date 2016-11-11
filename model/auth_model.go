@@ -77,7 +77,7 @@ func (a AuthToken) String() string {
 }
 
 func AuthTokenByUsernameAndPassword(username string, password string) AuthToken {
-	return AuthToken(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintln("%s:%s", username, password))))
+	return AuthToken(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", username, password))))
 }
 
 func ParseTokens(tokens string) []AuthToken {

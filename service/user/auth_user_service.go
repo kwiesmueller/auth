@@ -218,3 +218,11 @@ func (s *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToke
 	glog.V(4).Infof("found %d tokens for user %v", len(result), username)
 	return result, nil
 }
+
+func (s *userService) AddTokenToUser(token model.AuthToken, username model.UserName) error {
+	panic("not implemented")
+}
+
+func (s *userService) RemoveTokenFromUser(token model.AuthToken, username model.UserName) error {
+	panic("not implemented")
+}
