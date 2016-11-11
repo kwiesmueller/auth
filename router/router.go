@@ -36,12 +36,17 @@ type HandlerCreator interface {
 	UserGroupRemoveHandler() http.Handler
 	TokensForUsernameHandler() http.Handler
 	GroupNamesForUsernameHandler() http.Handler
+	TokenAddToUsernameHandler() http.Handler
+	TokenRemoveFromToUsernameHandler() http.Handler
 }
 
 func Create(h HandlerCreator) http.Handler {
 	router := mux.NewRouter()
 
 	router.Path(fmt.Sprintf("%s/api/%s/version", h.Prefix(), v1.VERSION)).Methods(http.MethodGet).Handler(h.VersionHandler())
+
+	router.Path(fmt.Sprintf("%s/api/%s/tokenusername", h.Prefix(), v1.VERSION)).Methods(http.MethodPost).Handler(h.TokenAddToUsernameHandler())
+	router.Path(fmt.Sprintf("%s/api/%s/tokenusername", h.Prefix(), v1.VERSION)).Methods(http.MethodDelete).Handler(h.TokenRemoveFromToUsernameHandler())
 
 	router.Path(fmt.Sprintf("%s/api/%s/user", h.Prefix(), v1.VERSION)).Methods(http.MethodGet).Handler(h.UserListHandler())
 	router.Path(fmt.Sprintf("%s/api/%s/user", h.Prefix(), v1.VERSION)).Methods(http.MethodPost).Handler(h.UserRegisterHandler())

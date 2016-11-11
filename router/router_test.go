@@ -14,30 +14,32 @@ import (
 )
 
 type counter struct {
-	notFound              int
-	healthz               int
-	readiness             int
-	login                 int
-	applicationCreate     int
-	applicationDelete     int
-	applicationGet        int
-	userRegister          int
-	userUnregister        int
-	userDelete            int
-	tokenAdd              int
-	tokenRemove           int
-	userGroupAdd          int
-	userGroupRemove       int
-	userDataSet           int
-	userDataSetValue      int
-	userDataGet           int
-	userDataGetValue      int
-	userDataDelete        int
-	userDataDeleteValue   int
-	version               int
-	userList              int
-	tokensForUsername     int
-	groupNamesForUsername int
+	notFound                  int
+	healthz                   int
+	readiness                 int
+	login                     int
+	applicationCreate         int
+	applicationDelete         int
+	applicationGet            int
+	userRegister              int
+	userUnregister            int
+	userDelete                int
+	tokenAdd                  int
+	tokenRemove               int
+	userGroupAdd              int
+	userGroupRemove           int
+	userDataSet               int
+	userDataSetValue          int
+	userDataGet               int
+	userDataGetValue          int
+	userDataDelete            int
+	userDataDeleteValue       int
+	version                   int
+	userList                  int
+	tokensForUsername         int
+	groupNamesForUsername     int
+	tokenAddToUsername        int
+	tokenRemoveFromToUsername int
 }
 
 func createCounterHandler(counter *int) http.Handler {
@@ -48,6 +50,14 @@ func createCounterHandler(counter *int) http.Handler {
 
 func (c *counter) Prefix() model.Prefix {
 	return "/prefix"
+}
+
+func (c *counter) TokenAddToUsernameHandler() http.Handler {
+	return createCounterHandler(&c.tokenAddToUsername)
+}
+
+func (c *counter) TokenRemoveFromToUsernameHandler() http.Handler {
+	return createCounterHandler(&c.tokenRemoveFromToUsername)
 }
 
 func (c *counter) TokensForUsernameHandler() http.Handler {
@@ -606,6 +616,46 @@ func TestTokensForUsername(t *testing.T) {
 	}
 	r.ServeHTTP(resp, req)
 	if err := AssertThat(c.tokensForUsername, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTokenAddToUsernameHandler(t *testing.T) {
+	c := new(counter)
+	r := Create(c)
+	resp := mock.NewHttpResponseWriterMock()
+
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/api/1.0/tokenusername")
+	rb.SetMethod("POST")
+	req, err := rb.Build()
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(c.tokenAddToUsername, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err := AssertThat(c.tokenAddToUsername, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTokenRemoveFromUsernameHandler(t *testing.T) {
+	c := new(counter)
+	r := Create(c)
+	resp := mock.NewHttpResponseWriterMock()
+
+	rb := requestbuilder.NewHTTPRequestBuilder("http://example.com/prefix/api/1.0/tokenusername")
+	rb.SetMethod("DELETE")
+	req, err := rb.Build()
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(c.tokenRemoveFromToUsername, Is(0)); err != nil {
+		t.Fatal(err)
+	}
+	r.ServeHTTP(resp, req)
+	if err := AssertThat(c.tokenRemoveFromToUsername, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }

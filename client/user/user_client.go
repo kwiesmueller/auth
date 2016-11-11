@@ -139,10 +139,30 @@ func (u *userService) DeleteUserWithToken(authToken model.AuthToken) error {
 	return nil
 }
 
-func (s *userService) AddTokenToUser(token model.AuthToken, username model.UserName) error {
-	panic("not implemented")
+func (u *userService) AddTokenToUser(token model.AuthToken, username model.UserName) error {
+	glog.V(4).Infof("add token %v from user with name %v", token, username)
+	request := v1.UsernameTokenRequest{
+		Userame:   username,
+		AuthToken: token,
+	}
+	if err := u.callRest("/api/1.0/tokenusername", "POST", &request, nil); err != nil {
+		glog.V(4).Infof("add token %v from user with name %v failed: %v", token, username, err)
+		return err
+	}
+	glog.V(4).Infof("added token %v from user with name %v successful")
+	return nil
 }
 
-func (s *userService) RemoveTokenFromUser(token model.AuthToken, username model.UserName) error {
-	panic("not implemented")
+func (u *userService) RemoveTokenFromUser(token model.AuthToken, username model.UserName) error {
+	glog.V(4).Infof("remove token %v from user with name %v", token, username)
+	request := v1.UsernameTokenRequest{
+		Userame:   username,
+		AuthToken: token,
+	}
+	if err := u.callRest("/api/1.0/tokenusername", "DELETE", &request, nil); err != nil {
+		glog.V(4).Infof("remove token %v from user with name %v failed: %v", token, username, err)
+		return err
+	}
+	glog.V(4).Infof("removed token %v from user with name %v successful")
+	return nil
 }

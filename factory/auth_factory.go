@@ -18,11 +18,13 @@ import (
 	"github.com/bborbe/auth/service/user_data"
 	"github.com/bborbe/auth/service/user_group"
 	"github.com/bborbe/auth/v1/handler/access_denied"
+	"github.com/bborbe/auth/v1/handler/add_token_to_user"
 	"github.com/bborbe/auth/v1/handler/application_creator"
 	"github.com/bborbe/auth/v1/handler/application_deletor"
 	"github.com/bborbe/auth/v1/handler/application_getter"
 	"github.com/bborbe/auth/v1/handler/groupnames_by_username"
 	"github.com/bborbe/auth/v1/handler/login"
+	"github.com/bborbe/auth/v1/handler/remove_token_from_user"
 	"github.com/bborbe/auth/v1/handler/token_adder"
 	"github.com/bborbe/auth/v1/handler/token_remover"
 	"github.com/bborbe/auth/v1/handler/tokens_by_username"
@@ -54,8 +56,8 @@ type factory struct {
 }
 
 func New(
-config model.Config,
-ledisClient redis_client.Client,
+	config model.Config,
+	ledisClient redis_client.Client,
 ) *factory {
 	h := new(factory)
 	h.config = config
@@ -229,4 +231,12 @@ func (f *factory) TokensForUsernameHandler() http.Handler {
 
 func (f *factory) GroupNamesForUsernameHandler() http.Handler {
 	return f.addRequireAuth(groupnames_by_username.New(f.UserGroupService().ListGroupNamesForUsername))
+}
+
+func (f *factory) TokenAddToUsernameHandler() http.Handler {
+	return f.addRequireAuth(add_token_to_user.New(f.UserService().AddTokenToUser))
+}
+
+func (f *factory) TokenRemoveFromToUsernameHandler() http.Handler {
+	return f.addRequireAuth(remove_token_from_user.New(f.UserService().RemoveTokenFromUser))
 }

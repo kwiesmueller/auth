@@ -120,5 +120,5 @@ type UserListRequest struct {
 
 type UsernameTokenRequest struct {
 	AuthToken model.AuthToken `json:"authToken"`
-	Userame   model.UserName `json:"username"`
+	Userame   model.UserName  `json:"username"`
 }

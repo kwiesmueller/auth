@@ -373,3 +373,49 @@ func TestListGroupNamesForUsername(t *testing.T) {
 		}
 	})
 }
+
+func TestAddAndRemoveTokenToUsere(t *testing.T) {
+	run(t, func(services Services) {
+		token := model.AuthToken("token123")
+		username := model.UserName("user123")
+		{
+			list, err := services.UserService().ListTokenOfUser(username)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(len(list), Is(0)); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().AddTokenToUser(token, username)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			list, err := services.UserService().ListTokenOfUser(username)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(len(list), Is(1)); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			err := services.UserService().RemoveTokenFromUser(token, username)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+		}
+		{
+			list, err := services.UserService().ListTokenOfUser(username)
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(len(list), Is(0)); err != nil {
+				t.Fatal(err)
+			}
+		}
+	})
+}
