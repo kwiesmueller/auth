@@ -34,19 +34,19 @@ func createKey(groupName model.GroupName) string {
 }
 
 func (d *directory) Add(groupName model.GroupName, userName model.UserName) error {
-	glog.V(2).Infof("add user %v to group %v", userName, groupName)
+	glog.V(4).Infof("add user %v to group %v", userName, groupName)
 	key := createKey(groupName)
 	return d.redis.SetAdd(key, string(userName))
 }
 
 func (d *directory) Exists(groupName model.GroupName) (bool, error) {
-	glog.V(2).Infof("exists group %v", groupName)
+	glog.V(4).Infof("exists group %v", groupName)
 	key := createKey(groupName)
 	return d.redis.SetExists(key)
 }
 
 func (d *directory) Get(groupName model.GroupName) ([]model.UserName, error) {
-	glog.V(2).Infof("get users of group %v", groupName)
+	glog.V(4).Infof("get users of group %v", groupName)
 	key := createKey(groupName)
 	users, err := d.redis.SetGet(key)
 	if err != nil {
@@ -60,19 +60,19 @@ func (d *directory) Get(groupName model.GroupName) ([]model.UserName, error) {
 }
 
 func (d *directory) Remove(groupName model.GroupName, userName model.UserName) error {
-	glog.V(2).Infof("remove user %v from group %v", userName, userName)
+	glog.V(4).Infof("remove user %v from group %v", userName, userName)
 	key := createKey(groupName)
 	return d.redis.SetRemove(key, string(userName))
 }
 
 func (d *directory) Contains(groupName model.GroupName, userName model.UserName) (bool, error) {
-	glog.V(2).Infof("contains group %v user %v", groupName, userName)
+	glog.V(4).Infof("contains group %v user %v", groupName, userName)
 	key := createKey(groupName)
 	return d.redis.SetContains(key, string(userName))
 }
 
 func (d *directory) Delete(groupName model.GroupName) error {
-	glog.V(2).Infof("delete group %v", groupName)
+	glog.V(4).Infof("delete group %v", groupName)
 	key := createKey(groupName)
 	return d.redis.SetClear(key)
 }

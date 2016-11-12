@@ -35,19 +35,19 @@ func createKey(userName model.UserName) string {
 }
 
 func (d *directory) Add(userName model.UserName, authToken model.AuthToken) error {
-	glog.V(2).Infof("add token %v user %v", authToken, userName)
+	glog.V(4).Infof("add token %v user %v", authToken, userName)
 	key := createKey(userName)
 	return d.redis.SetAdd(key, string(authToken))
 }
 
 func (d *directory) Exists(userName model.UserName) (bool, error) {
-	glog.V(2).Infof("exists user %v", userName)
+	glog.V(4).Infof("exists user %v", userName)
 	key := createKey(userName)
 	return d.redis.SetExists(key)
 }
 
 func (d *directory) Get(userName model.UserName) ([]model.AuthToken, error) {
-	glog.V(2).Infof("get tokens for user %v", userName)
+	glog.V(4).Infof("get tokens for user %v", userName)
 	key := createKey(userName)
 	tokens, err := d.redis.SetGet(key)
 	if err != nil {
@@ -61,19 +61,19 @@ func (d *directory) Get(userName model.UserName) ([]model.AuthToken, error) {
 }
 
 func (d *directory) Contains(userName model.UserName, authToken model.AuthToken) (bool, error) {
-	glog.V(2).Infof("contains user %v token %v", userName, authToken)
+	glog.V(4).Infof("contains user %v token %v", userName, authToken)
 	key := createKey(userName)
 	return d.redis.SetContains(key, string(authToken))
 }
 
 func (d *directory) Remove(userName model.UserName, authToken model.AuthToken) error {
-	glog.V(2).Infof("remove token %v from user %v", authToken, userName)
+	glog.V(4).Infof("remove token %v from user %v", authToken, userName)
 	key := createKey(userName)
 	return d.redis.SetRemove(key, string(authToken))
 }
 
 func (d *directory) Delete(userName model.UserName) error {
-	glog.V(2).Infof("delete user %v", userName)
+	glog.V(4).Infof("delete user %v", userName)
 	key := createKey(userName)
 	return d.redis.SetClear(key)
 }
