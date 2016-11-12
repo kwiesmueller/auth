@@ -23,6 +23,7 @@ type authClient struct {
 }
 
 type Client interface {
+	AuthService() service.AuthService
 	ApplicationService() service.ApplicationService
 	UserDataService() service.UserDataService
 	UserGroupService() service.UserGroupService
