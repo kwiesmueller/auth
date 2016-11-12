@@ -16,16 +16,16 @@ type Check interface {
 }
 
 type handler struct {
-	userService    service.UserService
+	authService    service.AuthService
 	requiredGroups []model.GroupName
 }
 
 func New(
-	userService service.UserService,
+	authService service.AuthService,
 	requiredGroups ...model.GroupName,
 ) *handler {
 	h := new(handler)
-	h.userService = userService
+	h.authService = authService
 	h.requiredGroups = requiredGroups
 	return h
 }
@@ -36,7 +36,7 @@ func (h *handler) Check(req *http.Request) (bool, error) {
 		glog.V(2).Infof("parse authorization header failed: %v", err)
 		return false, err
 	}
-	return h.userService.HasGroups(
+	return h.authService.HasGroups(
 		model.AuthToken(header.CreateAuthorizationToken(name, value)),
 		h.requiredGroups,
 	)

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/bborbe/auth/client/application"
+	"github.com/bborbe/auth/client/auth"
 	"github.com/bborbe/auth/client/user"
 	"github.com/bborbe/auth/client/user_data"
 	"github.com/bborbe/auth/client/user_group"
@@ -62,4 +63,8 @@ func (r *authClient) UserGroupService() service.UserGroupService {
 
 func (r *authClient) UserService() service.UserService {
 	return user.New(r.call)
+}
+
+func (r *authClient) AuthService() service.AuthService {
+	return auth.New(r.call)
 }

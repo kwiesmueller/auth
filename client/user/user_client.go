@@ -34,30 +34,6 @@ func (u *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToke
 	return response, nil
 }
 
-func (u *userService) HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error) {
-	glog.V(4).Infof("check user %v has groups %v", authToken, requiredGroups)
-	userName, err := u.VerifyTokenHasGroups(authToken, requiredGroups)
-	if err != nil {
-		glog.V(2).Infof("check user %v has groups %v failed: %v", authToken, requiredGroups, err)
-		return false, err
-	}
-	return userName != nil && len(*userName) > 0, nil
-}
-
-func (u *userService) VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error) {
-	glog.V(4).Infof("verify user with token %v has groups %v", authToken, requiredGroupNames)
-	request := v1.LoginRequest{
-		AuthToken:      authToken,
-		RequiredGroups: requiredGroupNames,
-	}
-	var response v1.LoginResponse
-	if err := u.callRest("/api/1.0/login", http.MethodPost, &request, &response); err != nil {
-		glog.V(2).Infof("verify user with token %v has groups %v failed: %v", authToken, requiredGroupNames, err)
-		return nil, err
-	}
-	return response.UserName, nil
-}
-
 func (u *userService) List() ([]model.UserName, error) {
 	glog.V(2).Infof("list usernames")
 	var response []model.UserName

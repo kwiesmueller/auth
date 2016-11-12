@@ -30,6 +30,7 @@ func TestServerConfig(t *testing.T) {
 
 type Services interface {
 	ApplicationService() service.ApplicationService
+	AuthService() service.AuthService
 	UserService() service.UserService
 	UserDataService() service.UserDataService
 	UserGroupService() service.UserGroupService
@@ -130,7 +131,7 @@ func TestVerifyTokenHasGroups(t *testing.T) {
 	run(t, func(services Services) {
 		{
 
-			username, err := services.UserService().VerifyTokenHasGroups("testtoken", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("testtoken", nil)
 			if err := AssertThat(err, NotNilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -146,7 +147,7 @@ func TestVerifyTokenHasGroups(t *testing.T) {
 		}
 		{
 
-			username, err := services.UserService().VerifyTokenHasGroups("testtoken", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("testtoken", nil)
 			if err := AssertThat(err, NilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -161,7 +162,7 @@ func TestHasGroups(t *testing.T) {
 	run(t, func(services Services) {
 		{
 
-			result, err := services.UserService().HasGroups("testtoken", nil)
+			result, err := services.AuthService().HasGroups("testtoken", nil)
 			if err := AssertThat(err, NotNilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -177,7 +178,7 @@ func TestHasGroups(t *testing.T) {
 		}
 		{
 
-			result, err := services.UserService().HasGroups("testtoken", nil)
+			result, err := services.AuthService().HasGroups("testtoken", nil)
 			if err := AssertThat(err, NilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -192,7 +193,7 @@ func TestHasGroups(t *testing.T) {
 func TestHasGroupsWithGroup(t *testing.T) {
 	run(t, func(services Services) {
 		{
-			result, err := services.UserService().HasGroups("testtoken", []model.GroupName{"testgroup"})
+			result, err := services.AuthService().HasGroups("testtoken", []model.GroupName{"testgroup"})
 			if err := AssertThat(err, NotNilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -214,7 +215,7 @@ func TestHasGroupsWithGroup(t *testing.T) {
 		}
 		{
 
-			result, err := services.UserService().HasGroups("testtoken", []model.GroupName{"testgroup"})
+			result, err := services.AuthService().HasGroups("testtoken", []model.GroupName{"testgroup"})
 			if err := AssertThat(err, NilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -240,7 +241,7 @@ func TestAddTokenToUserWithToken(t *testing.T) {
 			}
 		}
 		{
-			username, err := services.UserService().VerifyTokenHasGroups("token1", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("token1", nil)
 			if err := AssertThat(err, NilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -249,7 +250,7 @@ func TestAddTokenToUserWithToken(t *testing.T) {
 			}
 		}
 		{
-			username, err := services.UserService().VerifyTokenHasGroups("token2", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("token2", nil)
 			if err := AssertThat(err, NilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -258,7 +259,7 @@ func TestAddTokenToUserWithToken(t *testing.T) {
 			}
 		}
 		{
-			username, err := services.UserService().VerifyTokenHasGroups("token3", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("token3", nil)
 			if err := AssertThat(err, NotNilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -290,7 +291,7 @@ func TestDeleteUserWithToken(t *testing.T) {
 			}
 		}
 		{
-			username, err := services.UserService().VerifyTokenHasGroups("token1", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("token1", nil)
 			if err := AssertThat(err, NotNilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -299,7 +300,7 @@ func TestDeleteUserWithToken(t *testing.T) {
 			}
 		}
 		{
-			username, err := services.UserService().VerifyTokenHasGroups("token2", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("token2", nil)
 			if err := AssertThat(err, NotNilValue()); err != nil {
 				t.Fatal(err)
 			}
@@ -325,7 +326,7 @@ func TestDeleteUserWithTokenSecond(t *testing.T) {
 			}
 		}
 		{
-			username, err := services.UserService().VerifyTokenHasGroups("token1", nil)
+			username, err := services.AuthService().VerifyTokenHasGroups("token1", nil)
 			if err := AssertThat(err, NotNilValue()); err != nil {
 				t.Fatal(err)
 			}

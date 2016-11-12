@@ -2,6 +2,11 @@ package service
 
 import "github.com/bborbe/auth/model"
 
+type AuthService interface {
+	HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error)
+	VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
+}
+
 type ApplicationService interface {
 	CreateApplication(applicationName model.ApplicationName) (*model.Application, error)
 	CreateApplicationWithPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (*model.Application, error)
@@ -18,8 +23,6 @@ type UserService interface {
 	AddTokenToUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
 	RemoveTokenFromUserWithToken(newToken model.AuthToken, userToken model.AuthToken) error
 	List() ([]model.UserName, error)
-	HasGroups(authToken model.AuthToken, requiredGroups []model.GroupName) (bool, error)
-	VerifyTokenHasGroups(authToken model.AuthToken, requiredGroupNames []model.GroupName) (*model.UserName, error)
 	ListTokenOfUser(model.UserName) ([]model.AuthToken, error)
 	AddTokenToUser(model.AuthToken, model.UserName) error
 	RemoveTokenFromUser(model.AuthToken, model.UserName) error

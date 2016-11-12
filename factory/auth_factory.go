@@ -14,6 +14,7 @@ import (
 	"github.com/bborbe/auth/router"
 	"github.com/bborbe/auth/service"
 	"github.com/bborbe/auth/service/application"
+	"github.com/bborbe/auth/service/auth"
 	"github.com/bborbe/auth/service/user"
 	"github.com/bborbe/auth/service/user_data"
 	"github.com/bborbe/auth/service/user_group"
@@ -75,6 +76,10 @@ func (f *factory) ApplicationService() service.ApplicationService {
 
 func (f *factory) UserService() service.UserService {
 	return user.New(f.userTokenDirectory(), f.userGroupDirectory(), f.tokenUserDirectory(), f.userDataDirectory())
+}
+
+func (f *factory) AuthService() service.AuthService {
+	return auth.New(f.userGroupDirectory(), f.tokenUserDirectory())
 }
 
 func (f *factory) UserGroupService() service.UserGroupService {
@@ -190,7 +195,7 @@ func (f *factory) UserDataDeleteValueHandler() http.Handler {
 }
 
 func (f *factory) LoginHandler() http.Handler {
-	return f.addRequireAuth(login.New(f.UserService().VerifyTokenHasGroups))
+	return f.addRequireAuth(login.New(f.AuthService().VerifyTokenHasGroups))
 }
 
 func (f *factory) ApplicationCreateHandler() http.Handler {
