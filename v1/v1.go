@@ -15,11 +15,16 @@ type LoginResponse struct {
 
 type RegisterRequest struct {
 	AuthToken model.AuthToken `json:"authToken"`
-	UserName  model.UserName  `json:"user"`
+	UserName  model.UserName  `json:"username"`
 }
 
 type UnregisterRequest struct {
 	AuthToken model.AuthToken `json:"authToken"`
+}
+
+type UsernameTokenRequest struct {
+	AuthToken model.AuthToken `json:"authToken"`
+	Userame   model.UserName  `json:"username"`
 }
 
 type AddTokenRequest struct {
@@ -30,11 +35,6 @@ type AddTokenRequest struct {
 type RemoveTokenRequest struct {
 	AuthToken model.AuthToken `json:"authToken"`
 	Token     model.AuthToken `json:"token"`
-}
-
-type UsernameTokenRequest struct {
-	AuthToken model.AuthToken `json:"authToken"`
-	Userame   model.UserName  `json:"username"`
 }
 
 type AddUserToGroupRequest struct {
