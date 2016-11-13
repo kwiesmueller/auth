@@ -2,6 +2,7 @@ package user_data
 
 import (
 	"fmt"
+
 	"github.com/bborbe/auth/model"
 )
 

@@ -90,25 +90,8 @@ func ParseTokens(tokens string) []AuthToken {
 	return result
 }
 
-type ApplicationName string
-
-func (a ApplicationName) String() string {
-	return string(a)
-}
-
-type ApplicationPassword string
-
-func (a ApplicationPassword) String() string {
-	return string(a)
-}
-
 type Url string
 
 func (u Url) String() string {
 	return string(u)
-}
-
-type Application struct {
-	ApplicationName     ApplicationName
-	ApplicationPassword ApplicationPassword
 }

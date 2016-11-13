@@ -50,8 +50,7 @@ func (u *userService) CreateUserWithToken(userName model.UserName, authToken mod
 		AuthToken: model.AuthToken(authToken),
 		UserName:  model.UserName(userName),
 	}
-	var response v1.RegisterResponse
-	if err := u.callRest(fmt.Sprintf("/api/1.0/user"), "POST", &request, &response); err != nil {
+	if err := u.callRest(fmt.Sprintf("/api/1.0/user"), "POST", &request, nil); err != nil {
 		glog.V(2).Infof("create user %s failed: %v", userName, err)
 		return err
 	}
@@ -68,8 +67,7 @@ func (h *userService) AddTokenToUserWithToken(token model.AuthToken, authToken m
 		AuthToken: model.AuthToken(authToken),
 		Token:     model.AuthToken(token),
 	}
-	var response v1.AddTokenResponse
-	if err := h.callRest("/api/1.0/token", "POST", &request, &response); err != nil {
+	if err := h.callRest("/api/1.0/token", "POST", &request, nil); err != nil {
 		glog.V(2).Infof("add token failed: %v", err)
 		return err
 	}
@@ -86,8 +84,7 @@ func (u *userService) RemoveTokenFromUserWithToken(token model.AuthToken, authTo
 		AuthToken: model.AuthToken(authToken),
 		Token:     model.AuthToken(token),
 	}
-	var response v1.AddTokenResponse
-	if err := u.callRest("/api/1.0/token", "DELETE", &request, &response); err != nil {
+	if err := u.callRest("/api/1.0/token", "DELETE", &request, nil); err != nil {
 		glog.V(2).Infof("remove token failed: %v", err)
 		return err
 	}

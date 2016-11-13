@@ -1,4 +1,4 @@
-package application_getter
+package get
 
 import (
 	"encoding/json"
@@ -8,30 +8,31 @@ import (
 	"strings"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
 	"github.com/golang/glog"
 )
 
-type GetApplication func(applicationName model.ApplicationName) (*model.Application, error)
+type getApplication func(applicationName model.ApplicationName) (*model.Application, error)
 
 type handler struct {
-	getApplication GetApplication
+	getApplication getApplication
 }
 
-func New(getApplication GetApplication) *handler {
+func New(getApplication getApplication) *handler {
 	h := new(handler)
 	h.getApplication = getApplication
 	return h
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	glog.V(2).Infof("get application")
+	glog.V(3).Infof("get application started")
 	if err := h.serveHTTP(resp, req); err != nil {
 		glog.V(2).Infof("Marshal json failed: %v", err)
 		e := error_handler.NewMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
+		return
 	}
+	glog.V(3).Infof("get application finished")
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
@@ -46,8 +47,5 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 		e.ServeHTTP(resp, req)
 		return nil
 	}
-	return json.NewEncoder(resp).Encode(&v1.GetApplicationResponse{
-		ApplicationName:     application.ApplicationName,
-		ApplicationPassword: application.ApplicationPassword,
-	})
+	return json.NewEncoder(resp).Encode(&application)
 }

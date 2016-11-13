@@ -1,4 +1,4 @@
-package application_creator
+package delete
 
 import (
 	"net/http"

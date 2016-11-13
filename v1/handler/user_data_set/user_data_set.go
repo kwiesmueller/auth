@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
 	"github.com/golang/glog"
 )
@@ -38,7 +37,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	glog.V(2).Infof("setUserData")
-	var request v1.SetUserDataRequest
+	var request map[string]string
 	path := req.URL.Path
 	glog.V(2).Infof("path: %s", path)
 	re := regexp.MustCompile(`/user/([^/]*)/data`)

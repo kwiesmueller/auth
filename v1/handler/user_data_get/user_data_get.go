@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
 	"github.com/golang/glog"
 )
@@ -49,6 +48,5 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	response := v1.GetUserDataResponse(data)
-	return json.NewEncoder(resp).Encode(&response)
+	return json.NewEncoder(resp).Encode(data)
 }

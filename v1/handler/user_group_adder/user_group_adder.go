@@ -35,17 +35,12 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	var request v1.AddUserToGroupRequest
-	var response v1.AddUserToGroupResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
-	err := h.action(&request, &response)
+	err := h.addUserToGroup(request.UserName, request.GroupName)
 	if err != nil {
 		return err
 	}
-	return json.NewEncoder(resp).Encode(&response)
-}
-
-func (h *handler) action(request *v1.AddUserToGroupRequest, response *v1.AddUserToGroupResponse) error {
-	return h.addUserToGroup(request.UserName, request.GroupName)
+	return nil
 }

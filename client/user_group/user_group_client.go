@@ -29,8 +29,7 @@ func (u *userGroupService) AddUserToGroup(userName model.UserName, groupName mod
 		UserName:  model.UserName(userName),
 		GroupName: model.GroupName(groupName),
 	}
-	var response v1.AddUserToGroupResponse
-	if err := u.callRest("/api/1.0/user_group", http.MethodPost, &request, &response); err != nil {
+	if err := u.callRest("/api/1.0/user_group", http.MethodPost, &request, nil); err != nil {
 		glog.V(2).Infof("add user %v to group %v failed: %v", userName, groupName, err)
 		return err
 	}
@@ -44,8 +43,7 @@ func (u *userGroupService) RemoveUserFromGroup(userName model.UserName, groupNam
 		UserName:  model.UserName(userName),
 		GroupName: model.GroupName(groupName),
 	}
-	var response v1.AddUserToGroupResponse
-	if err := u.callRest("/api/1.0/user_group", http.MethodDelete, &request, &response); err != nil {
+	if err := u.callRest("/api/1.0/user_group", http.MethodDelete, &request, nil); err != nil {
 		glog.V(2).Infof("remove user %v from group %v failed: %v", userName, groupName, err)
 		return err
 	}

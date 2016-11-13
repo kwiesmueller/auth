@@ -61,8 +61,8 @@ func Create(h HandlerCreator) http.Handler {
 	router.Path(fmt.Sprintf("%s/api/%s/login", h.Prefix(), v1.VERSION)).Methods(http.MethodPost).Handler(h.LoginHandler())
 
 	router.Path(fmt.Sprintf("%s/api/%s/application", h.Prefix(), v1.VERSION)).Methods(http.MethodPost).Handler(h.ApplicationCreateHandler())
-	router.PathPrefix(fmt.Sprintf("%s/api/%s/application/", h.Prefix(), v1.VERSION)).Methods(http.MethodDelete).Handler(h.ApplicationDeleteHandler())
-	router.PathPrefix(fmt.Sprintf("%s/api/%s/application/", h.Prefix(), v1.VERSION)).Methods(http.MethodGet).Handler(h.ApplicationGetHandler())
+	router.Path(fmt.Sprintf("%s/api/%s/application/{ApplicationId}", h.Prefix(), v1.VERSION)).Methods(http.MethodDelete).Handler(h.ApplicationDeleteHandler())
+	router.Path(fmt.Sprintf("%s/api/%s/application/{ApplicationId}", h.Prefix(), v1.VERSION)).Methods(http.MethodGet).Handler(h.ApplicationGetHandler())
 
 	router.Path(fmt.Sprintf("%s/api/%s/token/{token}", h.Prefix(), v1.VERSION)).Methods(http.MethodDelete).Handler(h.UserUnregisterHandler())
 	router.Path(fmt.Sprintf("%s/api/%s/token", h.Prefix(), v1.VERSION)).Methods(http.MethodGet).Queries("username", "{username}").Handler(h.TokensForUsernameHandler())

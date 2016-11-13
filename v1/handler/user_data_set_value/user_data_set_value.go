@@ -8,7 +8,6 @@ import (
 	"regexp"
 
 	"github.com/bborbe/auth/model"
-	"github.com/bborbe/auth/v1"
 	error_handler "github.com/bborbe/http_handler/error"
 	"github.com/golang/glog"
 )
@@ -38,7 +37,7 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	glog.V(2).Infof("setUserDataValue")
-	var request v1.SetUserDataValueRequest
+	var request string
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
@@ -49,5 +48,5 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if len(matches) != 3 {
 		return fmt.Errorf("find user failed")
 	}
-	return h.setUserDataValue(model.UserName(matches[1]), matches[2], string(request))
+	return h.setUserDataValue(model.UserName(matches[1]), matches[2], request)
 }

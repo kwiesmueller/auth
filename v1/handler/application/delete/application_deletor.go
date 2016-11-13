@@ -1,4 +1,4 @@
-package application_deletor
+package delete
 
 import (
 	"net/http"
@@ -11,27 +11,27 @@ import (
 	"github.com/golang/glog"
 )
 
-type DeleteApplication func(applicationName model.ApplicationName) error
+type deleteApplication func(applicationName model.ApplicationName) error
 
 type handler struct {
-	deleteApplication DeleteApplication
+	deleteApplication deleteApplication
 }
 
-func New(deleteApplication DeleteApplication) *handler {
+func New(deleteApplication deleteApplication) *handler {
 	h := new(handler)
 	h.deleteApplication = deleteApplication
 	return h
 }
 
 func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	glog.V(2).Infof("create application")
+	glog.V(3).Infof("delete application started")
 	if err := h.serveHTTP(resp, req); err != nil {
-		glog.V(2).Infof("create application failed: %v", err)
+		glog.V(2).Infof("delete application failed: %v", err)
 		e := error_handler.NewMessage(http.StatusInternalServerError, err.Error())
 		e.ServeHTTP(resp, req)
-	} else {
-		glog.V(2).Infof("create application success")
+		return
 	}
+	glog.V(3).Infof("delete application finished")
 }
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
@@ -45,6 +45,6 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	glog.V(2).Infof("application deleted")
+	glog.V(4).Infof("application deleted")
 	return nil
 }

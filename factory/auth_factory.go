@@ -20,9 +20,9 @@ import (
 	"github.com/bborbe/auth/service/user_group"
 	"github.com/bborbe/auth/v1/handler/access_denied"
 	"github.com/bborbe/auth/v1/handler/add_token_to_user"
-	"github.com/bborbe/auth/v1/handler/application_creator"
-	"github.com/bborbe/auth/v1/handler/application_deletor"
-	"github.com/bborbe/auth/v1/handler/application_getter"
+	application_create "github.com/bborbe/auth/v1/handler/application/create"
+	application_delete "github.com/bborbe/auth/v1/handler/application/delete"
+	application_get "github.com/bborbe/auth/v1/handler/application/get"
 	"github.com/bborbe/auth/v1/handler/groupnames_by_username"
 	"github.com/bborbe/auth/v1/handler/login"
 	"github.com/bborbe/auth/v1/handler/remove_token_from_user"
@@ -199,15 +199,15 @@ func (f *factory) LoginHandler() http.Handler {
 }
 
 func (f *factory) ApplicationCreateHandler() http.Handler {
-	return f.addRequireAuth(application_creator.New(f.ApplicationService().CreateApplication))
+	return f.addRequireAuth(application_create.New(f.ApplicationService().CreateApplication))
 }
 
 func (f *factory) ApplicationDeleteHandler() http.Handler {
-	return f.addRequireAuth(application_deletor.New(f.ApplicationService().DeleteApplication))
+	return f.addRequireAuth(application_delete.New(f.ApplicationService().DeleteApplication))
 }
 
 func (f *factory) ApplicationGetHandler() http.Handler {
-	return f.addRequireAuth(application_getter.New(f.ApplicationService().GetApplication))
+	return f.addRequireAuth(application_get.New(f.ApplicationService().GetApplication))
 }
 
 func (f *factory) UserUnregisterHandler() http.Handler {

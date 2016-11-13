@@ -420,3 +420,23 @@ func TestAddAndRemoveTokenToUsere(t *testing.T) {
 		}
 	})
 }
+
+func TestCreateApplication(t *testing.T) {
+	run(t, func(services Services) {
+		{
+			app, err := services.ApplicationService().CreateApplication("testapp")
+			if err := AssertThat(err, NilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(app, NotNilValue()); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(app.ApplicationName.String(), Is("testapp")); err != nil {
+				t.Fatal(err)
+			}
+			if err := AssertThat(len(app.ApplicationPassword), Gt(0)); err != nil {
+				t.Fatal(err)
+			}
+		}
+	})
+}

@@ -1,4 +1,4 @@
-package application_deletor
+package get
 
 import (
 	"net/http"

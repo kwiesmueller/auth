@@ -35,7 +35,6 @@ func (h *handler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	var request v1.AddTokenRequest
-	var response v1.AddTokenResponse
 	if err := json.NewDecoder(req.Body).Decode(&request); err != nil {
 		return err
 	}
@@ -43,5 +42,5 @@ func (h *handler) serveHTTP(resp http.ResponseWriter, req *http.Request) error {
 	if err := h.addTokenToUserWithToken(request.Token, request.AuthToken); err != nil {
 		return err
 	}
-	return json.NewEncoder(resp).Encode(&response)
+	return nil
 }
