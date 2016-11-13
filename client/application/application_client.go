@@ -58,13 +58,13 @@ func (s *applicationService) CreateApplication(applicationName model.Application
 }
 
 func (s *applicationService) CreateApplicationWithPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (*model.Application, error) {
-	panic("not implemented")
+	return nil, fmt.Errorf("not implemented")
 }
 
 func (s *applicationService) VerifyApplicationPassword(applicationName model.ApplicationName, applicationPassword model.ApplicationPassword) (bool, error) {
-	panic("not implemented")
+	return false, fmt.Errorf("not implemented")
 }
 
 func (s *applicationService) GetApplication(applicationName model.ApplicationName) (*model.Application, error) {
-	panic("not implemented")
+	return nil, fmt.Errorf("not implemented")
 }
