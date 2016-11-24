@@ -2,20 +2,20 @@ package auth
 
 import (
 	"net/http"
-
+	"net/url"
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	"github.com/golang/glog"
 )
 
-type callRest func(path string, method string, request interface{}, response interface{}) error
+type callRest func(path string, values url.Values, method string, request interface{}, response interface{}) error
 
 type authClient struct {
 	callRest callRest
 }
 
 func New(
-	callRest callRest,
+callRest callRest,
 ) *authClient {
 	u := new(authClient)
 	u.callRest = callRest
@@ -39,7 +39,7 @@ func (u *authClient) VerifyTokenHasGroups(authToken model.AuthToken, requiredGro
 		RequiredGroups: requiredGroupNames,
 	}
 	var response v1.LoginResponse
-	if err := u.callRest("/api/1.0/login", http.MethodPost, &request, &response); err != nil {
+	if err := u.callRest("/api/1.0/login", nil, http.MethodPost, &request, &response); err != nil {
 		glog.V(2).Infof("verify user with token %v has groups %v failed: %v", authToken, requiredGroupNames, err)
 		return nil, err
 	}

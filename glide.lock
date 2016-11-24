@@ -1,17 +1,17 @@
 hash: 6609223af5b3871e0e9851487bb727e450298c4233c0808a41e4170e947daf57
-updated: 2016-11-10T23:30:36.46255299+01:00
+updated: 2016-11-25T00:10:43.666921641+01:00
 imports:
 - name: github.com/bborbe/flagenv
   version: 96aab95bb1341e7a7ccf9160e49792e2ad3b0e08
 - name: github.com/bborbe/http
-  version: 4a9c65a4efec460ef645e1cc4d9241e9bf661069
+  version: cf94a87ca07464584321d03978be9b6ec8b07c12
   subpackages:
   - header
   - mock
   - requestbuilder
   - rest
 - name: github.com/bborbe/http_handler
-  version: a66fcc514c104a2ee66695621bd8b456b32e01ec
+  version: eaabd539fb300f804fb36a2b920e125e3851baa1
   subpackages:
   - adapter
   - check
@@ -24,7 +24,7 @@ imports:
   subpackages:
   - generator
 - name: github.com/bborbe/redis_client
-  version: c176e93fe4136e609090e09aeb34a176a6941e88
+  version: 64b534c6226be47d48f29897cba7989d07469255
   subpackages:
   - ledis
   - mock

@@ -2,22 +2,21 @@ package user
 
 import (
 	"net/http"
-
+	"net/url"
 	"fmt"
-
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	"github.com/golang/glog"
 )
 
-type callRest func(path string, method string, request interface{}, response interface{}) error
+type callRest func(path string, values url.Values, method string, request interface{}, response interface{}) error
 
 type userService struct {
 	callRest callRest
 }
 
 func New(
-	callRest callRest,
+callRest callRest,
 ) *userService {
 	u := new(userService)
 	u.callRest = callRest
@@ -27,7 +26,9 @@ func New(
 func (u *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToken, error) {
 	glog.V(4).Infof("list tokens of user %v", username)
 	var response []model.AuthToken
-	if err := u.callRest(fmt.Sprintf("/api/1.0/token?username=%v", username), http.MethodGet, nil, &response); err != nil {
+	values := url.Values{}
+	values.Add("username", username.String())
+	if err := u.callRest("/api/1.0/token", values, http.MethodGet, nil, &response); err != nil {
 		glog.V(2).Infof("list tokens of user %v failed: %v", username, err)
 		return nil, err
 	}
@@ -37,7 +38,7 @@ func (u *userService) ListTokenOfUser(username model.UserName) ([]model.AuthToke
 func (u *userService) List() ([]model.UserName, error) {
 	glog.V(2).Infof("list usernames")
 	var response []model.UserName
-	if err := u.callRest("/api/1.0/user", http.MethodGet, nil, &response); err != nil {
+	if err := u.callRest("/api/1.0/user", nil, http.MethodGet, nil, &response); err != nil {
 		glog.V(2).Infof("list usernames failed: %v", err)
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func (u *userService) CreateUserWithToken(userName model.UserName, authToken mod
 		AuthToken: model.AuthToken(authToken),
 		UserName:  model.UserName(userName),
 	}
-	if err := u.callRest(fmt.Sprintf("/api/1.0/user"), "POST", &request, nil); err != nil {
+	if err := u.callRest("/api/1.0/user", nil, http.MethodPost, &request, nil); err != nil {
 		glog.V(2).Infof("create user %s failed: %v", userName, err)
 		return err
 	}
@@ -67,7 +68,7 @@ func (h *userService) AddTokenToUserWithToken(token model.AuthToken, authToken m
 		AuthToken: model.AuthToken(authToken),
 		Token:     model.AuthToken(token),
 	}
-	if err := h.callRest("/api/1.0/token", "POST", &request, nil); err != nil {
+	if err := h.callRest("/api/1.0/token", nil, http.MethodPost, &request, nil); err != nil {
 		glog.V(2).Infof("add token failed: %v", err)
 		return err
 	}
@@ -84,7 +85,7 @@ func (u *userService) RemoveTokenFromUserWithToken(token model.AuthToken, authTo
 		AuthToken: model.AuthToken(authToken),
 		Token:     model.AuthToken(token),
 	}
-	if err := u.callRest("/api/1.0/token", "DELETE", &request, nil); err != nil {
+	if err := u.callRest("/api/1.0/token", nil, http.MethodDelete, &request, nil); err != nil {
 		glog.V(2).Infof("remove token failed: %v", err)
 		return err
 	}
@@ -94,7 +95,7 @@ func (u *userService) RemoveTokenFromUserWithToken(token model.AuthToken, authTo
 
 func (u *userService) DeleteUser(username model.UserName) error {
 	glog.V(2).Infof("delete user %s", username)
-	if err := u.callRest(fmt.Sprintf("/api/1.0/user/%s", username), "DELETE", nil, nil); err != nil {
+	if err := u.callRest(fmt.Sprintf("/api/1.0/user/%s", username), nil, http.MethodDelete, nil, nil); err != nil {
 		glog.V(2).Infof("delete user %s failed: %v", username, err)
 		return err
 	}
@@ -104,7 +105,7 @@ func (u *userService) DeleteUser(username model.UserName) error {
 
 func (u *userService) DeleteUserWithToken(authToken model.AuthToken) error {
 	glog.V(4).Infof("delete user with token %v", authToken)
-	if err := u.callRest(fmt.Sprintf("/api/1.0/token/%v", authToken), "DELETE", nil, nil); err != nil {
+	if err := u.callRest(fmt.Sprintf("/api/1.0/token/%v", authToken), nil, http.MethodDelete, nil, nil); err != nil {
 		glog.V(2).Infof("delete user with token %s failed: %v", authToken, err)
 		return err
 	}
@@ -118,7 +119,7 @@ func (u *userService) AddTokenToUser(token model.AuthToken, username model.UserN
 		Userame:   username,
 		AuthToken: token,
 	}
-	if err := u.callRest("/api/1.0/tokenusername", "POST", &request, nil); err != nil {
+	if err := u.callRest("/api/1.0/tokenusername", nil, http.MethodPost, &request, nil); err != nil {
 		glog.V(4).Infof("add token %v from user with name %v failed: %v", token, username, err)
 		return err
 	}
@@ -132,7 +133,7 @@ func (u *userService) RemoveTokenFromUser(token model.AuthToken, username model.
 		Userame:   username,
 		AuthToken: token,
 	}
-	if err := u.callRest("/api/1.0/tokenusername", "DELETE", &request, nil); err != nil {
+	if err := u.callRest("/api/1.0/tokenusername", nil, http.MethodDelete, &request, nil); err != nil {
 		glog.V(4).Infof("remove token %v from user with name %v failed: %v", token, username, err)
 		return err
 	}

@@ -1,22 +1,21 @@
 package user_group
 
 import (
-	"fmt"
 	"net/http"
-
+	"net/url"
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	"github.com/golang/glog"
 )
 
-type callRest func(path string, method string, request interface{}, response interface{}) error
+type callRest func(path string, values url.Values, method string, request interface{}, response interface{}) error
 
 type userGroupService struct {
 	callRest callRest
 }
 
 func New(
-	callRest callRest,
+callRest callRest,
 ) *userGroupService {
 	u := new(userGroupService)
 	u.callRest = callRest
@@ -29,7 +28,7 @@ func (u *userGroupService) AddUserToGroup(userName model.UserName, groupName mod
 		UserName:  model.UserName(userName),
 		GroupName: model.GroupName(groupName),
 	}
-	if err := u.callRest("/api/1.0/user_group", http.MethodPost, &request, nil); err != nil {
+	if err := u.callRest("/api/1.0/user_group", nil, http.MethodPost, &request, nil); err != nil {
 		glog.V(2).Infof("add user %v to group %v failed: %v", userName, groupName, err)
 		return err
 	}
@@ -43,7 +42,7 @@ func (u *userGroupService) RemoveUserFromGroup(userName model.UserName, groupNam
 		UserName:  model.UserName(userName),
 		GroupName: model.GroupName(groupName),
 	}
-	if err := u.callRest("/api/1.0/user_group", http.MethodDelete, &request, nil); err != nil {
+	if err := u.callRest("/api/1.0/user_group", nil, http.MethodDelete, &request, nil); err != nil {
 		glog.V(2).Infof("remove user %v from group %v failed: %v", userName, groupName, err)
 		return err
 	}
@@ -54,7 +53,9 @@ func (u *userGroupService) RemoveUserFromGroup(userName model.UserName, groupNam
 func (u *userGroupService) ListGroupNamesForUsername(username model.UserName) ([]model.GroupName, error) {
 	glog.V(4).Infof("list groupnames of user %v", username)
 	result := []model.GroupName{}
-	if err := u.callRest(fmt.Sprintf("/api/1.0/user_group?username=%v", username), http.MethodGet, nil, &result); err != nil {
+	values := url.Values{}
+	values.Add("username", username.String())
+	if err := u.callRest("/api/1.0/user_group", values, http.MethodGet, nil, &result); err != nil {
 		glog.V(2).Infof("list groupnames of user %v failed: %v", username, err)
 		return nil, err
 	}

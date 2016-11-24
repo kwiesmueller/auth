@@ -13,6 +13,7 @@ import (
 	"github.com/bborbe/auth/service"
 	"github.com/bborbe/http/header"
 	"github.com/bborbe/http/rest"
+	"net/url"
 )
 
 type authClient struct {
@@ -31,10 +32,10 @@ type Client interface {
 }
 
 func New(
-	executeRequest func(req *http.Request) (resp *http.Response, err error),
-	url model.Url,
-	applicationName model.ApplicationName,
-	applicationPassword model.ApplicationPassword,
+executeRequest func(req *http.Request) (resp *http.Response, err error),
+url model.Url,
+applicationName model.ApplicationName,
+applicationPassword model.ApplicationPassword,
 ) *authClient {
 	r := new(authClient)
 	r.executeRequest = executeRequest
@@ -44,10 +45,10 @@ func New(
 	return r
 }
 
-func (r *authClient) call(path string, method string, request interface{}, response interface{}) error {
+func (r *authClient) call(path string, values url.Values, method string, request interface{}, response interface{}) error {
 	h := make(http.Header)
 	h.Add("Authorization", header.CreateAuthorizationBearerHeader(r.applicationName.String(), r.applicationPassword.String()))
-	return rest.New(r.executeRequest).Call(fmt.Sprintf("%s%s", r.url, path), method, request, response, h)
+	return rest.New(r.executeRequest).Call(fmt.Sprintf("%s%s", r.url, path), values, method, request, response, h)
 }
 
 func (r *authClient) ApplicationService() service.ApplicationService {

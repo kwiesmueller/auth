@@ -2,18 +2,18 @@ package user_data
 
 import (
 	"fmt"
-
+	"net/url"
 	"github.com/bborbe/auth/model"
 )
 
-type callRest func(path string, method string, request interface{}, response interface{}) error
+type callRest func(path string, values url.Values, method string, request interface{}, response interface{}) error
 
 type userDataService struct {
 	callRest callRest
 }
 
 func New(
-	callRest callRest,
+callRest callRest,
 ) *userDataService {
 	s := new(userDataService)
 	s.callRest = callRest
