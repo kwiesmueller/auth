@@ -24,6 +24,7 @@ auth_server \
 -v=2 \
 -port=6666 \
 -ledisdb-address=localhost:5555 \
+-auth-application-name=auth \
 -auth-application-password=test123 \
 -prefix=
 ```
@@ -63,7 +64,7 @@ http://localhost:6666/readiness
 ```
 curl \
 -X POST \
--d '{ "authToken":"dGVzdGVyOnNlY3JldA==","user":"tester" }' \
+-d '{ "authToken":"dGVzdGVyOnNlY3JldA==","username":"tester" }' \
 -H "Authorization: Bearer YXV0aDp0ZXN0MTIz" \
 http://localhost:6666/api/1.0/user
 ```

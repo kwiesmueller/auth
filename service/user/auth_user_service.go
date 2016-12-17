@@ -67,12 +67,18 @@ func (u *userService) DeleteUser(username model.UserName) error {
 }
 
 func (u *userService) CreateUserWithToken(username model.UserName, authToken model.AuthToken) error {
-	glog.V(4).Infof("add token user %v with token %v", username, authToken)
+	glog.V(4).Infof("add token %v to user %v", authToken, username)
+	if len(username) == 0 {
+		return fmt.Errorf("username empty")
+	}
+	if len(authToken) == 0 {
+		return fmt.Errorf("token empty")
+	}
 	if err := u.assertTokenNotUsed(authToken); err != nil {
 		glog.V(2).Infof("token %v already used", authToken)
 		return err
 	}
-	if err := u.assertUserNameNotUser(username); err != nil {
+	if err := u.assertUserNameNotUsed(username); err != nil {
 		glog.V(2).Infof("username %v already used", username)
 		return err
 	}
@@ -102,7 +108,7 @@ func (u *userService) assertTokenNotUsed(authToken model.AuthToken) error {
 	return nil
 }
 
-func (u *userService) assertUserNameNotUser(username model.UserName) error {
+func (u *userService) assertUserNameNotUsed(username model.UserName) error {
 	glog.V(4).Infof("assert user %s not existing", username)
 	exists, err := u.usernameTokenDirectory.Exists(username)
 	if err != nil {

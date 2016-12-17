@@ -5,9 +5,10 @@ import (
 
 	"net/http"
 
+	"net/url"
+
 	"github.com/bborbe/auth/model"
 	"github.com/golang/glog"
-	"net/url"
 )
 
 type callRest func(path string, values url.Values, method string, request interface{}, response interface{}) error
@@ -17,7 +18,7 @@ type applicationService struct {
 }
 
 func New(
-callRest callRest,
+	callRest callRest,
 ) *applicationService {
 	s := new(applicationService)
 	s.callRest = callRest

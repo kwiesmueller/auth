@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 	"net/url"
+
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	"github.com/golang/glog"
@@ -15,7 +16,7 @@ type authClient struct {
 }
 
 func New(
-callRest callRest,
+	callRest callRest,
 ) *authClient {
 	u := new(authClient)
 	u.callRest = callRest

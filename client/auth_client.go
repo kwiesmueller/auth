@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"net/url"
+
 	"github.com/bborbe/auth/client/application"
 	"github.com/bborbe/auth/client/auth"
 	"github.com/bborbe/auth/client/user"
@@ -13,7 +15,6 @@ import (
 	"github.com/bborbe/auth/service"
 	"github.com/bborbe/http/header"
 	"github.com/bborbe/http/rest"
-	"net/url"
 )
 
 type authClient struct {
@@ -32,10 +33,10 @@ type Client interface {
 }
 
 func New(
-executeRequest func(req *http.Request) (resp *http.Response, err error),
-url model.Url,
-applicationName model.ApplicationName,
-applicationPassword model.ApplicationPassword,
+	executeRequest func(req *http.Request) (resp *http.Response, err error),
+	url model.Url,
+	applicationName model.ApplicationName,
+	applicationPassword model.ApplicationPassword,
 ) *authClient {
 	r := new(authClient)
 	r.executeRequest = executeRequest

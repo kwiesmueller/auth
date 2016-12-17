@@ -3,6 +3,7 @@ package user_data
 import (
 	"fmt"
 	"net/url"
+
 	"github.com/bborbe/auth/model"
 )
 
@@ -13,7 +14,7 @@ type userDataService struct {
 }
 
 func New(
-callRest callRest,
+	callRest callRest,
 ) *userDataService {
 	s := new(userDataService)
 	s.callRest = callRest

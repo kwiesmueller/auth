@@ -1,9 +1,10 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
-	"fmt"
+
 	"github.com/bborbe/auth/model"
 	"github.com/bborbe/auth/v1"
 	"github.com/golang/glog"
@@ -16,7 +17,7 @@ type userService struct {
 }
 
 func New(
-callRest callRest,
+	callRest callRest,
 ) *userService {
 	u := new(userService)
 	u.callRest = callRest
