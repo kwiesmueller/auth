@@ -21,10 +21,17 @@ func New(verifyApplicationPassword VerifyApplicationPassword) *check {
 }
 
 func (c *check) Check(req *http.Request) (bool, error) {
-	glog.V(2).Infof("validate application")
+	glog.V(3).Infof("validate application started")
 	name, pass, err := header.ParseAuthorizationBearerHttpRequest(req)
 	if err != nil {
+		glog.V(2).Infof("parse header failed: %v", err)
 		return false, err
 	}
-	return c.verifyApplicationPassword(model.ApplicationName(name), model.ApplicationPassword(pass))
+	result, err := c.verifyApplicationPassword(model.ApplicationName(name), model.ApplicationPassword(pass))
+	if err != nil {
+		glog.V(2).Infof("verify application password failed: %v", err)
+		return false, err
+	}
+	glog.V(3).Infof("validate application finished")
+	return result, nil
 }
