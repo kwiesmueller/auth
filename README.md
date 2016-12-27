@@ -211,7 +211,7 @@ http://localhost:6666/api/1.0/user/tester/data/keya
 
 ## Continuous integration
 
-[Jenkins](https://www.benjamin-borbe.de/jenkins/job/Go-Auth/)
+[Jenkins](https://jenkins.benjamin-borbe.de/job/Go-Auth/)
 
 ## Copyright and license
 
